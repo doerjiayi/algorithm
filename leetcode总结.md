@@ -2097,53 +2097,110 @@ keyVFre[key].second;//键的使用次数，修改次数，记录键的使用次�
 （其他）
 [复制带随机指针的链表](https://leetcode-cn.com/problems/copy-list-with-random-pointer)    
 ------------------------------------------------------------------------------------------
-/*
-// Definition for a Node.
-class Node {
-public:
-int val;
-Node* next;
-Node* random;
-Node() {}
-Node(int \_val, Node* \_next, Node* \_random) {
-val = \_val;
-next = \_next;
-random = \_random;
-}
-};
-*/
 class Solution {
 public:
-Node* dummy;
-Solution(){dummy = new Node();}
-~Solution(){delete dummy;}
-Node* copyRandomList(Node* head) {
-if (!head)return NULL;
-unordered_map<Node*,Node*> mp;//old => new
-for(Node* tmp = head,* tmpDummy = dummy;tmp;tmp = tmp->next)
-{
-tmpDummy->next = mp[tmp] = new
-Node(tmp->val,NULL,NULL);//先处理next指针，哈希表中节点映射的是新链表的节点
-tmpDummy = tmpDummy->next;
-}
-for(Node* tmp = head;tmp;tmp = tmp->next)
-{
-mp[tmp]->random =
-mp[tmp->random];//再处理random指针，哈希表中的random映射的是新链表的节点
-}
-return dummy->next;
-}
+    Node* copyRandomList(Node* head) {
+        if (!head)return NULL;
+        shared_ptr<Node> dummy = make_shared<Node>();
+        unordered_map<Node*,Node*> mp;//old => new
+        for(Node* tmp = head,* tmpDummy = dummy.get();tmp;tmp = tmp->next)
+        {
+            tmpDummy->next = mp[tmp] = new Node(tmp->val,NULL,NULL);//先处理next指针，哈希表中节点映射的是新链表的节点
+            tmpDummy = tmpDummy->next;
+        }
+        for(Node* tmp = head;tmp;tmp = tmp->next)
+        {
+            mp[tmp]->random = mp[tmp->random];//再处理random指针，哈希表中的random映射的是新链表的节点
+        }
+        return dummy->next;
+    }
 };
 [删除链表中的节点](https://leetcode-cn.com/problems/delete-node-in-a-linked-list)    
 -------------------------------------------------------------------------------------
+class Solution {
+public:
+    void deleteNode(ListNode* node) {
+        ListNode* tmp = node->next;
+        node->val = tmp->val;
+        node->next = tmp->next;
+        delete tmp;
+    }
+};
 [相交链表](https://leetcode-cn.com/problems/intersection-of-two-linked-lists)    
 ---------------------------------------------------------------------------------
+class Solution {
+public:
+    ListNode *getIntersectionNode(ListNode *headA, ListNode *headB) {
+        if (!headA || !headB)return NULL;
+        unordered_map<ListNode *,int> m;
+        ListNode *tmp = headB;
+        while(tmp)
+        {
+            m[tmp] = 1;
+            tmp = tmp->next;
+        }
+        tmp = headA;
+        while(tmp)
+        {
+            if (m[tmp] > 0)return tmp;
+            tmp = tmp->next;
+        }
+        return NULL;
+    }
+};
 [对链表进行插入排序](https://leetcode-cn.com/problems/insertion-sort-list)    
 ------------------------------------------------------------------------------
 [排序链表](https://leetcode-cn.com/problems/sort-list)    
 ----------------------------------------------------------
+class Solution {
+public:
+    ListNode* sortList(ListNode* head) {
+        if (!head)return head;
+        ListNode* cur = head;
+        for(;cur;cur = cur->next)      
+        {
+            ListNode* mark = cur,* tmp = cur;
+            while(tmp)
+            {
+                if (mark->val > tmp->val)
+                {
+                    mark = tmp;
+                }
+                tmp = tmp->next;
+            }
+            swap(cur->val,mark->val);
+        }
+        return head;
+    }
+};
 [对链表进行插入排序](https://leetcode-cn.com/problems/insertion-sort-list)    
 ------------------------------------------------------------------------------
+class Solution {
+public:
+    ListNode* insertionSortList(ListNode* head) {
+        if (!head)return NULL;
+        int len(0);
+        ListNode* temp = head;
+        while (temp) 
+        {
+            ++len;
+            temp = temp->next;
+        }
+        while (--len)
+        {
+            ListNode*pre = head;
+            ListNode*node = pre->next;
+            int tmplen = len;
+            while (tmplen--)
+            {
+                if (pre->val > node->val)swap(pre->val,node->val);
+                pre = pre->next;
+                node = node->next;
+            }
+        }
+        return head;
+    }
+};
 [环形链表](https://leetcode-cn.com/problems/linked-list-cycle)
 --------------------------------------------------------------
 使用快慢指针的方式遍历判断
@@ -2189,43 +2246,91 @@ public:
 };
 [重排链表](https://leetcode-cn.com/problems/reorder-list)
 ---------------------------------------------------------
+class Solution {
+public:
+    //先使用快慢指针将链表从中间分割成两段，然后后半段就地逆置．之后合并插入到前半段链表即可，时间复杂度O(n)。
+    void reorderList(ListNode* head) {
+        if(!head || !head->next) return;  
+        ListNode *slow = head, *fast = head;  
+        while(fast->next && fast->next->next)  
+            slow = slow->next, fast = fast->next->next;  
+        fast = slow->next, slow->next = NULL;  
+        ListNode *p = fast;
+        ListNode *q = fast->next;
+        fast->next = NULL;  
+        while(q)//翻转后半段  
+        {  
+            auto tem = q->next;  
+            q->next = p;  
+            p = q, q = tem;  
+        }  
+        q = head;  
+        while(q && p)  //两个串联
+        {  
+            auto tem1 = q->next, tem2 = p->next;  
+            p->next = q->next;  
+            q->next = p;  
+            q = tem1, p = tem2;  
+        }  
+    }
+};
 [删除排序链表中的重复元素](https://leetcode-cn.com/problems/remove-duplicates-from-sorted-list)    
 ---------------------------------------------------------------------------------------------------
 [删除排序链表中的重复元素 II](https://leetcode-cn.com/problems/remove-duplicates-from-sorted-list-ii)    
 ---------------------------------------------------------------------------------------------------------
 [分隔链表](https://leetcode-cn.com/problems/partition-list)    
 ---------------------------------------------------------------
+class Solution {
+public:
+    ListNode* partition(ListNode* head, int x) {
+        shared_ptr<ListNode> big = make_shared<ListNode>(0);
+        shared_ptr<ListNode> small = make_shared<ListNode>(0);
+        ListNode* bigtmp = big.get();
+        ListNode* smalltmp = small.get();
+        ListNode* temp = head;
+        while (temp)
+        {
+            if (temp->val >= x)
+            {
+                bigtmp->next = temp;
+                bigtmp = temp;
+            }
+            else 
+            {
+                smalltmp->next = temp;
+                smalltmp = temp;
+            }
+            temp = temp->next;
+        }
+        bigtmp->next = NULL;
+        smalltmp->next = big.get()->next;
+        return small.get()->next;
+    }
+};
 [旋转链表](https://leetcode-cn.com/problems/rotate-list)    
 ------------------------------------------------------------
 连成一圈再断开，注意计算断开位置
-/**
-* Definition for singly-linked list.
-* struct ListNode {
-* int val;
-* ListNode *next;
-* ListNode(int x) : val(x), next(NULL) {}
-* };
-*/
 class Solution {
 public:
-ListNode* rotateRight(ListNode* head, int k) {
-if (!head || !head->next) return head;
-// 获取长度和末尾节点tail
-int len = 1;
-ListNode* tail = head;
-while (tail->next && len++) tail = tail->next;
-if (k % len == 0) return head;
-// 找到倒数第k%len(也是断开节点的)的前一个节点
-int pos = len - k % len;
-ListNode *pre = head;
-while (--pos) pre = pre->next;
-// 连成一个圈
-tail->next = head;
-//从pre位置处断开
-head = pre->next;
-pre->next = NULL;
-return head;
-}
+    ListNode* rotateRight(ListNode* head, int k) {
+        if (!head || !head->next) return head;
+
+		// 获取长度和末尾节点tail
+		int len = 1;
+		ListNode* tail = head;
+		while (tail->next && len++) tail = tail->next;
+		if (k % len == 0) return head;
+		// 找到倒数第k%len(也是断开节点的)的前一个节点
+		int pos = len - k % len;
+		ListNode *pre = head;
+		while (--pos) pre = pre->next;
+		// 连成一个圈
+		tail->next = head;
+        //从pre位置处断开
+		head = pre->next;
+		pre->next = NULL;
+		return head;
+    }
 };
 [移除链表元素](https://leetcode-cn.com/problems/remove-linked-list-elements)    
 --------------------------------------------------------------------------------
