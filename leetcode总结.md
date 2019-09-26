@@ -4384,6 +4384,32 @@ public:
 };
 [二叉树的坡度](https://leetcode-cn.com/problems/binary-tree-tilt)    
 ---------------------------------------------------------------------
+class Solution {
+public:
+    int findTilt(TreeNode* root) {
+        if (NULL == root)return 0;
+        int sum = 0;
+        dfs(root,sum);
+        return sum;
+    }
+    void dfs(TreeNode* n,int &sum)
+    {
+        if (NULL == n)return;
+        int l = 0;int r = 0;
+        subtree(n->left,l);
+        subtree(n->right,r);
+        sum += abs(l - r);
+        dfs(n->left,sum);
+        dfs(n->right,sum);
+    }
+    void subtree(TreeNode* n,int &s)
+    {
+        if (NULL == n)return;
+        s += n->val;
+        if (n->left)subtree(n->left,s);
+        if (n->right)subtree(n->right,s);
+    }
+};
 [另一个树的子树](https://leetcode-cn.com/problems/subtree-of-another-tree)    
 ------------------------------------------------------------------------------
 class Solution {
