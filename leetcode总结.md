@@ -18,6 +18,7 @@ public:
     }
 };
 [摆动序列](https://leetcode-cn.com/problems/wiggle-subsequence)
+---------------------------------------------------------------------
 方向不同的才计数
 class Solution {
 public:
@@ -94,6 +95,7 @@ public:
         return false;
     }
 };
+
 [最长连续序列](https://leetcode-cn.com/problems/longest-consecutive-sequence)
 -----------------------------------------------------------------------------
 class Solution {
@@ -227,7 +229,9 @@ dfs
 （排列）结束的条件为遍历的长度
 [全排列](https://leetcode-cn.com/problems/permutations)  
 ---------------------------------------------------------
+
 选择一个，递归，恢复原来，不需要检查去重
+
 class Solution {
 public:
     vector<vector<int>> res;
@@ -281,6 +285,7 @@ continue;   //不与相同的交换
 -----------------------------------------------------
 结束的条件为达到目标，比如数量
 路径为
+
 class Solution {
 public:
     vector<vector<int>> vv;
@@ -326,6 +331,7 @@ public:
         }
     }
 };
+
 [子集 II](https://leetcode-cn.com/problems/subsets-ii)
 ------------------------------------------------------
 dfs，利用有序性去重，去重在后面执行，因为需要先遍历
@@ -1352,8 +1358,63 @@ public:
 ====
 [矩形面积](https://leetcode-cn.com/problems/rectangle-area)    
 ---------------------------------------------------------------
+class Solution {
+public:
+    int computeArea(int A, int B, int C, int D, int E, int F, int G, int H) {
+        long area = (long) (C - A) * (D - B) + (long)(G - E) * (H - F);
+        long width = max((long)min(C, G) - (long)max(A, E), (long)0);
+        long height = max((long)min(D, H) - (long)max(B, F),(long) 0);
+        return (int)(area - width * height);
+    }
+};
 [直线上最多的点数](https://leetcode-cn.com/problems/max-points-on-a-line)    
 -----------------------------------------------------------------------------
+ */
+class Solution {
+public:
+    int maxPoints(vector<Point>& points) 
+    {
+        if (points.size() == 0)return 0;
+        int res(0);
+        for(int i = 0;i < points.size();++i)
+        {
+            map<pair<int,int>,int> counterM;
+            int dup(0),local(0);
+            for(int j = 0;j <points.size();++j)//计算过的就不用再计算
+            {
+                if (points[j].x == points[i].x && points[j].y == points[i].y)
+                {
+                    dup++;
+                    continue;
+                }
+                pair<int,int> p = GetMin(points[i],points[j]);
+                counterM[p]++;
+                //printf("1)%d %d \n",p.first,p.second);
+            }
+            local = dup;
+            for(auto c:counterM)
+            {
+                //printf("2)%d %d %d \n",local,c.second , dup);
+                local = max(local,c.second+dup);
+            }
+            //printf("2)%d %d %d\n",res,dup,local);
+            res = max(res,local);
+        }
+        return res;
+    }
+    pair<int,int> GetMin(Point &p1,Point &p2)
+    {
+        int dx = p1.x - p2.x;
+        int dy = p1.y - p2.y;
+        int dmin = GetMinCommon(dx,dy);
+        return make_pair(dx/dmin,dy/dmin);
+    }
+    int GetMinCommon(int x,int y)
+    {
+        if (y == 0)return x;
+        return GetMinCommon(y,x%y);
+    }
+};
 拓扑结构
 ========
 [课程表](https://leetcode-cn.com/problems/course-schedule)
@@ -3087,6 +3148,20 @@ t);//获取和小于等于t的下一个数（n >= nums[i] - t)  ,nums[i] - n <
 };
 [长度最小的子数组](https://leetcode-cn.com/problems/minimum-size-subarray-sum)    
 ----------------------------------------------------------------------------------
+class Solution {
+public:
+    int minSubArrayLen(int s, vector<int>& nums) {
+           int res = INT_MAX, left = 0, sum = 0;
+            for (int i = 0; i < nums.size(); ++i) {
+                sum += nums[i];
+                while (left <= i && sum >= s) {
+                    res = min(res, i - left + 1);
+                    sum -= nums[left++];
+                }
+            }
+            return res == INT_MAX ? 0 : res;
+    }
+};
 [合并区间](https://leetcode-cn.com/problems/merge-intervals)    
 ----------------------------------------------------------------
 先排序，再遍历检查和合并
@@ -3291,6 +3366,19 @@ public:
 -------------------------------------------------------------------
 [找不同](https://leetcode-cn.com/problems/find-the-difference)    
 ------------------------------------------------------------------
+class Solution {
+public:
+    char findTheDifference(string s, string t) {
+        int m[128] = {0};
+        for(int i = 0;i< s.size();++i)m[s[i]]++;
+        for(int i = 0;i< t.size();++i)
+        {
+            m[t[i]]--;
+            if (m[t[i]] < 0) return t[i];
+        }
+        return 0;
+    }
+};
 [去除重复字母](https://leetcode-cn.com/problems/remove-duplicate-letters)
 -------------------------------------------------------------------------
 贪心计算字符
@@ -3317,8 +3405,42 @@ continue;//同样的字符前面访问过的就不再访问，因为没意义
 };
 [最长回文子串](https://leetcode-cn.com/problems/longest-palindromic-substring)    
 ----------------------------------------------------------------------------------
+class Solution {
+public:
+    int begin = 0;int maxLen = 0;
+    string longestPalindrome(string s) {
+        int len = s.length();
+        if (len < 2)
+            return s;
+        for (int i = 0; i < len-1; i++) {
+             extendPalindrome(s, i, i);  //assume odd length
+             extendPalindrome(s, i, i+1); //assume even length.
+        }
+        return s.substr(begin, maxLen);
+    }
+    void extendPalindrome(const string& s, int left, int right) {
+        while (left >= 0 && right < s.length() && s[left] == s[right]) {
+            left--;right++;
+        }
+        if (maxLen < right - left - 1) {
+            begin = left + 1;
+            maxLen = right - left - 1;
+        }
+    }
+};
 [反转字符串](https://leetcode-cn.com/problems/reverse-string)    
 -----------------------------------------------------------------
+class Solution {
+public:
+    void reverseString(vector<char>& s) {
+        for(int  b = 0, e = s.size()-1;b < e;++b,--e)
+        {//利用异或的特性：相同的数异或会抵消掉
+            s[b] ^= s[e];
+            s[e] ^= s[b];
+            s[b] ^= s[e];
+        }
+    }
+};
 [反转字符串中的元音字母](https://leetcode-cn.com/problems/reverse-vowels-of-a-string)    
 -----------------------------------------------------------------------------------------
 [至少有K个重复字符的最长子串](https://leetcode-cn.com/problems/longest-substring-with-at-least-k-repeating-characters)    
@@ -3331,22 +3453,177 @@ continue;//同样的字符前面访问过的就不再访问，因为没意义
 ------------------------------------------------------------------------------------------------
 [无重复字符的最长子串](https://leetcode-cn.com/problems/longest-substring-without-repeating-characters)
 -------------------------------------------------------------------------------------------------------
+class Solution {
+public:
+  int lengthOfLongestSubstring(string s)
+  {
+      if (s.size() <= 1)return s.size();
+      vector<int> mark(128,-1);
+      int global(0),left(0),right(0);
+      for(;right < s.size();++right)
+      {
+          if (mark[s[right]] >= 0)
+          {
+              global = max(global,right - left);
+              //cout << mark[s[right]] << " " << s[right] << endl;
+              left = max(left,mark[s[right]]+1);//跳过无重复
+              //left = mark[s[right]]+1;
+          }
+          mark[s[right]] = right;
+      }
+      global = max(global,right - left);
+      return global;
+  }
+};
 [有效的字母异位词](https://leetcode-cn.com/problems/valid-anagram)    
 ----------------------------------------------------------------------
+class Solution {
+public:
+    bool isAnagram(string s, string t) 
+    {
+        if (s.size() != t.size())return false;
+        if (s.size() == 0)return true;
+        unordered_map<char,int> m1;
+        unordered_map<char,int> m2;
+        for(auto& c:s)
+        {
+            m1[c]++;
+        }
+        for(auto& c:t)
+        {
+            m2[c]++;
+        }
+        for(auto& iter:m1)
+        {
+            if (iter.second != m2[iter.first])return false;
+        }
+    
+        return true;
+    }
+};
 [Fizz Buzz](https://leetcode-cn.com/problems/fizz-buzz)    
 -----------------------------------------------------------
+class Solution {
+public:
+    vector<string> fizzBuzz(int n) {
+        vector<string> res;
+        for(int i = 1;i <= n;++i)
+        {
+            if (i % 3 == 0 && i % 5 == 0)
+            {
+                res.push_back("FizzBuzz");
+            }
+            else if (i % 3 == 0)
+            {
+                res.push_back("Fizz");
+            }
+            else if (i % 5 == 0)
+            {
+                res.push_back("Buzz");
+            }
+            else
+            {
+                res.push_back(to_string(i));
+            }
+        }
+        return res;
+    }
+};
 [字符串相加](https://leetcode-cn.com/problems/add-strings)    
 --------------------------------------------------------------
+class Solution {
+public:
+    string addStrings(string num1, string num2) {
+        string res;
+        int i(0),c(0),n;
+        for(;i < num1.size() || i < num2.size();++i)
+        {
+            if (i < num1.size() && i < num2.size())
+            {
+                n = (num1[num1.size()-1-i] - '0')+ (num2[num2.size()-1-i] - '0') + c ; 
+            }
+            else if (i < num1.size())
+            {
+                n = (num1[num1.size()-1-i] - '0')+ c ; 
+            }
+            else
+            {
+                n = (num2[num2.size()-1-i] - '0') + c ; 
+            }
+            c = n /10;
+            res.push_back('0' + n % 10);
+        } 
+        if (c)res.push_back('0' + c);
+        reverse(res.begin(),res.end());
+        return res;
+    }
+};
 [字符串中的单词数](https://leetcode-cn.com/problems/number-of-segments-in-a-string)    
 ---------------------------------------------------------------------------------------
+class Solution {
+public:
+    int countSegments(string s) {
+        int res = 0, n = s.size();
+        for (int i = 0; i < n; ++i) {
+            if (s[i] == ' ') continue;
+            ++res;
+            while (i < n && s[i] != ' ') ++i;
+        }
+        return res;
+    }
+};
 [最长回文串](https://leetcode-cn.com/problems/longest-palindrome)    
 ---------------------------------------------------------------------
 [重复的子字符串](https://leetcode-cn.com/problems/repeated-substring-pattern)    
 ---------------------------------------------------------------------------------
+class Solution {
+public:
+    bool repeatedSubstringPattern(string s) {
+        string newStr = s + s;
+        newStr = newStr.substr(1, 2 * s.size() - 2);
+        return newStr.find(s) != -1;
+    }
+};
 [键盘行](https://leetcode-cn.com/problems/keyboard-row)    
 -----------------------------------------------------------
+class Solution {
+public:
+    vector<string> findWords(vector<string>& words) {
+        string arr1 = "qwertyuiop";
+        string arr2 = "asdfghjkl";
+        string arr3 = "zxcvbnm";
+        unordered_map<char,int> m;
+        for(auto c:arr1) m[c] = 1;
+        for(auto c:arr2) m[c] = 2;
+        for(auto c:arr3) m[c] = 3;
+        vector<string> res;
+        for(auto s:words)
+        {
+            int last(0), index(0);
+            for(;index < s.size();++index) 
+            {
+                int i = m[tolower(s[index])];
+                if (!i || (last && last != i))break;
+                if (!last) last = i;
+            }
+            if (index == s.size())res.emplace_back(s);
+        }
+        return res;
+    }
+    
+};
 [检测大写字母](https://leetcode-cn.com/problems/detect-capital)    
 -------------------------------------------------------------------
+class Solution {
+public:
+    bool detectCapitalUse(string word) {
+        int cnt = 0, n = word.size();
+        for (int i = 0; i < n; ++i) {
+            if (word[i] <= 'Z') ++cnt;
+        }
+        return cnt == 0 || cnt == n || (cnt == 1 && word[0] <= 'Z');
+    }
+};
 [单词替换](https://leetcode-cn.com/problems/replace-words)    
 --------------------------------------------------------------
 [词典中最长的单词](https://leetcode-cn.com/problems/longest-word-in-dictionary)    
@@ -3382,6 +3659,32 @@ continue;//同样的字符前面访问过的就不再访问，因为没意义
 -----------------------------------------------------------------------------------------
 [二叉树的右视图](https://leetcode-cn.com/problems/binary-tree-right-side-view)    bfs 
 --------------------------------------------------------------------------------------
+class Solution {
+public:
+    vector<TreeNode*> level[2];
+    int index;
+    vector<int> res;
+    vector<int> rightSideView(TreeNode* root) {
+        if (!root)return res;
+        index = 0;
+        level[index].push_back(root);
+        bfs();
+        return res;
+    }
+    void bfs()
+    {
+        if (level[index].size() == 0)return;
+        for(auto n:level[index])
+        {
+            if (n->left)level[1-index].push_back(n->left);
+            if (n->right)level[1-index].push_back(n->right);
+        }
+        res.push_back(level[index][level[index].size()-1]->val);
+        level[index].clear();
+        index = 1 - index;
+        bfs();
+    }
+};
 [路径总和](https://leetcode-cn.com/problems/path-sum)    
 ---------------------------------------------------------
 [路径总和 II](https://leetcode-cn.com/problems/path-sum-ii)  dfs
@@ -3669,24 +3972,206 @@ public:
 --------------------------------------------------------------------------------------------------------
 [平衡二叉树](https://leetcode-cn.com/problems/balanced-binary-tree)    
 -----------------------------------------------------------------------
+class Solution {
+public:  
+    int cntHeight(TreeNode *node) {  
+        if(node == NULL) return 0;  
+        int l = cntHeight(node->left);  
+        if (l < 0)return -1;
+        int r = cntHeight(node->right);  
+        if (r < 0)return -1;
+        if(abs(l-r) > 1) return -1; //不平衡
+        return max(l, r) + 1;  
+    }  
+    bool isBalanced(TreeNode *root) {    
+        if (!root)return true; 
+        return cntHeight(root) >= 0;
+    }  
+};
 [二叉树的最小深度](https://leetcode-cn.com/problems/minimum-depth-of-binary-tree)    
 -------------------------------------------------------------------------------------
+class Solution {
+public:
+    int minDepth(TreeNode* root) {
+        if (!root)return 0;
+        if (!root->left)return minDepth(root->right) + 1;
+        if (!root->right)return minDepth(root->left) + 1;
+        return min(minDepth(root->left),minDepth(root->right)) + 1;
+    }
+};
 [二叉树的所有路径](https://leetcode-cn.com/problems/binary-tree-paths)    
 --------------------------------------------------------------------------
+class Solution {
+    vector<string>  ps;
+public:
+    vector<string> binaryTreePaths(TreeNode* root) {
+        string s;
+        dfs(root,s);
+        return ps;
+    }
+    void dfs(TreeNode* root,string s)
+    {
+        if (!root)return;
+        if (!root->left && !root->right)
+        {
+            s += to_string(root->val);
+            ps.push_back(s);
+            return;
+        }
+        s += to_string(root->val);
+        if (root->left)
+        {
+            dfs(root->left,s + "->");
+        }
+        if (root->right)
+        {
+            dfs(root->right,s + "->");
+        } 
+    }
+};
 [路径总和 III](https://leetcode-cn.com/problems/path-sum-iii)    
 -----------------------------------------------------------------
+class Solution {
+public:
+    int pathSum(TreeNode* root, int sum) {
+        if (!root) return 0;
+        int res = findPath(root, 0, sum) + pathSum(root->left, sum) + pathSum(root->right, sum);
+        return res;
+     }
+     int findPath(TreeNode* node, int curSum, int sum) {
+         if (!node) return 0;
+         curSum += node->val;
+         return (curSum == sum) + findPath(node->left, curSum, sum) + findPath(node->right, curSum, sum);
+     }
+};
 [找树左下角的值](https://leetcode-cn.com/problems/find-bottom-left-tree-value)    
 ----------------------------------------------------------------------------------
+class Solution {
+public:
+    int findBottomLeftValue(TreeNode* root) {
+        if (!root)return 0;
+        res = index = 0;
+        v[index].emplace_back(root);
+        bfs();
+        return res;
+    }
+    void bfs()
+    {
+        if (v[index].size() == 0)return;
+        for(auto node:v[index])
+        {
+            if (node->left)v[1-index].emplace_back(node->left);
+            if (node->right)v[1-index].emplace_back(node->right);
+        }
+        if (v[1-index].size() == 0)
+        {
+            res = v[index][0]->val;
+            return;
+        }
+        v[index].clear();
+        index = 1 - index;
+        bfs();
+    }
+    int res;
+    vector<TreeNode*> v[2];
+    int index;
+};
 [二叉搜索树中的众数](https://leetcode-cn.com/problems/find-mode-in-binary-search-tree)    
 ------------------------------------------------------------------------------------------
+class Solution {
+public:
+    unordered_map<int,int> m;
+    vector<int> findMode(TreeNode* root) {
+        vector<int> res;
+        if (!root)return res;
+        stack<TreeNode*> s;
+        s.push(root);
+        int maxCount(0);
+        while(s.size() > 0)
+        {
+            root = s.top();s.pop();
+            ++m[root->val];
+            if (m[root->val] > maxCount)maxCount = m[root->val];
+            
+            if (root->right)s.push(root->right);
+            if (root->left)s.push(root->left);
+        }
+        for(auto it:m)
+        {
+            if (it.second == maxCount)
+            {
+                res.push_back(it.first);
+            }
+        }
+        return res;
+    }
+};
 [N叉树的最大深度](https://leetcode-cn.com/problems/maximum-depth-of-n-ary-tree)    
 -----------------------------------------------------------------------------------
 [二叉树的直径](https://leetcode-cn.com/problems/diameter-of-binary-tree)    
 ----------------------------------------------------------------------------
+class Solution {
+public:
+    int diameterOfBinaryTree(TreeNode* root) {
+        if (!root) return 0;
+        int res = getHeight(root->left) + getHeight(root->right);
+        return max(res, max(diameterOfBinaryTree(root->left), diameterOfBinaryTree(root->right)));
+    }
+    int getHeight(TreeNode* node)
+    {
+        if (!node) return 0;
+        if (m.count(node)) return m[node];
+        int h = 1 + max(getHeight(node->left), getHeight(node->right));
+        return m[node] = h;
+    }
+    unordered_map<TreeNode*, int> m;
+};
 [最长同值路径](https://leetcode-cn.com/problems/longest-univalue-path)    
 --------------------------------------------------------------------------
+class Solution {
+public:
+    int res = 0;
+    int longestUnivaluePath(TreeNode* root) {
+        dfs(root, 0);
+		return res;
+	}
+	int dfs(TreeNode* root, int n) {
+		if (!root) return 0;
+        
+		int left = dfs(root->left, root->val);
+		int right = dfs(root->right, root->val);
+		res = max(res, left + right);//路径
+		return root->val == n ? max(left, right) + 1 : 0;//路径
+	}
+};
 [两数之和 IV - 输入 BST](https://leetcode-cn.com/problems/two-sum-iv-input-is-a-bst)    
 ----------------------------------------------------------------------------------------
+class Solution {
+public:
+    bool findTarget(TreeNode* root, int k) {
+        if(!root) return false;
+        unordered_map<int,int> m;
+        stack<TreeNode* > s;
+        TreeNode* p = root;
+        while(p || s.size())
+        {
+            while(p)
+            {
+                s.push(p);
+                p = p->left;
+            }
+            p = s.top();
+            s.pop();
+            if (m[k - p->val])
+            {
+                return true;
+            }
+            m[p->val] = 1;
+            p = p->right;
+        }
+        return false;
+    }
+};
 [二叉树最大宽度](https://leetcode-cn.com/problems/maximum-width-of-binary-tree)    
 -----------------------------------------------------------------------------------
 class Solution {
@@ -3762,10 +4247,62 @@ public:
 };
 [二叉搜索树的最小绝对差](https://leetcode-cn.com/problems/minimum-absolute-difference-in-bst)    
 -------------------------------------------------------------------------------------------------
+class Solution {
+public:
+    int getMinimumDifference(TreeNode* root) {
+        long diff = INT_MAX, pre = INT_MIN;  
+        stack<TreeNode*> stk;  
+        TreeNode* p = root;  
+        //中序遍历
+        while(p || !stk.empty()) {  
+            while(p) { 
+                stk.push(p);  
+                p = p->left; 
+            }  
+            p = stk.top();  
+            stk.pop();  
+            diff = min(diff, p->val - pre);  
+            pre = p->val;  
+            p = p->right;   
+        }  
+        return diff;  
+    }
+};
 [把二叉搜索树转换为累加树](https://leetcode-cn.com/problems/convert-bst-to-greater-tree)    
 --------------------------------------------------------------------------------------------
+class Solution {
+public:
+    TreeNode* convertBST(TreeNode* root) {
+        if (!root)return root;
+        int sum(0);
+        convertBST(root,sum);
+        return root;
+    }
+    void convertBST(TreeNode* root,int &s)
+    {
+        if (!root)return; 
+        convertBST(root->right,s);
+        root->val += s;
+        s = root->val;
+        convertBST(root->left,s);
+    }
+};
 [二叉搜索树中的搜索](https://leetcode-cn.com/problems/search-in-a-binary-search-tree)    
 -----------------------------------------------------------------------------------------
+class Solution {
+public:
+    TreeNode* searchBST(TreeNode* root, int val) {
+        if (!root) return NULL;
+        TreeNode*  p = root;
+        while(p)
+        {
+            if (p->val == val)break;
+            else if (p->val > val)p = p->left; 
+            else p = p->right; 
+        }
+        return p;
+    }
+};
 [二叉搜索树结点最小距离](https://leetcode-cn.com/problems/minimum-distance-between-bst-nodes)    
 -------------------------------------------------------------------------------------------------
 class Solution {
