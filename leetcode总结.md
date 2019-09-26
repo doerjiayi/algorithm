@@ -1,9 +1,11 @@
 常用算法
+====
 贪心
 ====
 [盛最多水的容器](https://leetcode-cn.com/problems/container-with-most-water)
 ----------------------------------------------------------------------------
 矮边是乘积的成员，而宽度是一直减少的，贪心移动矮边
+
 class Solution {
 public:
     int maxArea(vector<int>& height) {
@@ -20,6 +22,7 @@ public:
 [摆动序列](https://leetcode-cn.com/problems/wiggle-subsequence)
 ---------------------------------------------------------------------
 方向不同的才计数
+
 class Solution {
 public:
     int wiggleMaxLength(vector<int>& nums)
@@ -229,9 +232,7 @@ dfs
 （排列）结束的条件为遍历的长度
 [全排列](https://leetcode-cn.com/problems/permutations)  
 ---------------------------------------------------------
-
 选择一个，递归，恢复原来，不需要检查去重
-
 class Solution {
 public:
     vector<vector<int>> res;
@@ -1607,7 +1608,7 @@ public:
     struct node
     {
         node():isWord(false){memset(children,0,sizeof(children));}
-        \~node(){for(int i = 0;i < 26;++i){if (children[i]) {delete
+        ~node(){for(int i = 0;i < 26;++i){if (children[i]) {delete
 children[i];children[i] = NULL; } }}
         node* children[26];
         bool isWord;
@@ -1617,7 +1618,7 @@ children[i];children[i] = NULL; } }}
     Trie() {
         root = new node();
     }
-    \~Trie(){delete root;}
+    ~Trie(){delete root;}
     /** Inserts a word into the trie. */
     void insert(string word) {
         if (word.size() == 0)return;
@@ -1672,7 +1673,7 @@ TrieNode *root;
 WordDictionary() {
 root = new TrieNode();
 }
-\~WordDictionary(){delete root;}
+~WordDictionary(){delete root;}
 // Adds a word into the data structure.
 void addWord(const string &word) {
 TrieNode *p = root;
@@ -1767,7 +1768,7 @@ vector<string>& words) {
         {
             if (exist(board,w))setRes.insert(w);
         }
-        for(auto \&s:setRes)res.emplace_back(s);
+        for(auto &s:setRes)res.emplace_back(s);
         return res;
     }
     //find
@@ -1801,8 +1802,68 @@ false;
 ------------------------------------------------------------------
 [矩阵中的最长递增路径](https://leetcode-cn.com/problems/longest-increasing-path-in-a-matrix)    
 ------------------------------------------------------------------------------------------------
+class Solution {
+public:
+    int m,n;
+    int longestIncreasingPath(vector<vector<int>>& matrix) 
+    {
+        if (matrix.size() == 0||matrix[0].size() == 0)return 0;
+        m = matrix.size();
+        n = matrix[0].size();
+        vector<vector<int>> dp(m,vector<int>(n,0));
+        int maxL = 0;
+        for(int i = 0;i < m;++i)
+        {
+            for(int j = 0;j < n;++j)
+            {
+                maxL = max(maxL,extend(i,j,matrix,dp));
+            }
+        }
+        return maxL;
+    }
+    int extend(int i,int j,vector<vector<int>>& matrix,vector<vector<int>> &dp)
+    {
+        if (!dp[i][j])
+        {
+            dp[i][j] = 1;
+            if (j + 1< n && matrix[i][j] < matrix[i][j+1])dp[i][j] = max(dp[i][j],1 + extend(i,j+1,matrix,dp));
+            if (j - 1>= 0 && matrix[i][j] < matrix[i][j-1])dp[i][j] = max(dp[i][j],1 + extend(i,j-1,matrix,dp));
+            if (i + 1< m && matrix[i][j] < matrix[i+1][j])dp[i][j] = max(dp[i][j],1 + extend(i+1,j,matrix,dp));
+            if (i - 1>= 0 && matrix[i][j] < matrix[i-1][j])dp[i][j] = max(dp[i][j],1 + extend(i-1,j,matrix,dp));
+        }
+        return dp[i][j];
+    }
+};
 [岛屿的最大面积](https://leetcode-cn.com/problems/max-area-of-island)    
 -------------------------------------------------------------------------
+class Solution {
+public:
+    int maxAreaOfIsland(vector<vector<int>>& grid) {
+        if (grid.size() == 0 ||grid[0].size() == 0)return 0;
+        int maxArea(0);
+        int x = grid[0].size();
+        int y = grid.size();
+        for(int i = 0;i < y;++i)
+        {
+            for(int j= 0;j < x;++j)
+            {
+                if (grid[i][j] == 1) maxArea = max(maxArea,findArea(i,j,x,y,grid));
+            }
+        }
+        return maxArea;
+    }
+    int findArea(int m,int n,int x,int y,vector<vector<int>>& grid)
+    {
+        if (grid[m][n] != 1)return 0;
+        int tmp(1);
+        grid[m][n]=2;
+        if (m + 1< y && grid[m + 1][n] == 1) {tmp += findArea(m+1,n,x,y,grid);}
+        if (n + 1< x && grid[m][n+1] == 1) {tmp += findArea(m,n+1,x,y,grid);}
+        if (m > 0 && grid[m-1][n] == 1) {tmp += findArea(m-1,n,x,y,grid);}
+        if (n > 0 && grid[m][n-1] == 1) {tmp += findArea(m,n-1,x,y,grid);}
+        return tmp;
+    }
+};
 [岛屿的个数](https://leetcode-cn.com/problems/number-of-islands)    
 --------------------------------------------------------------------
 回溯就是使用多个方向的dfs来搜索，过程中为了避免回环需要设置路径成员为特殊字符。找到一个岛屿计数一次
@@ -1885,7 +1946,7 @@ public:
         int res(0);
         for(auto &n:nums)
         {
-            res \^= n;
+            res ^= n;
         }
         return res;
     }
@@ -1901,11 +1962,11 @@ public:
         int threes;
         for(int i = 0; i < nums.size(); i++){
             int t = nums[i];
-            twos \|= ones\&t;//要在更新ones前面更新twos
-            ones \^= t;
-            threes = ones\&twos;//ones和twos中都为1即出现了3次
-            ones &= \~threes;//抹去出现了3次的bits
-            twos &= \~threes;
+            twos |= ones&t;//要在更新ones前面更新twos
+            ones ^= t;
+            threes = ones&twos;//ones和twos中都为1即出现了3次
+            ones &= ~threes;//抹去出现了3次的bits
+            twos &= ~threes;
         }
         return ones;
     }
@@ -1918,16 +1979,16 @@ public:
     vector<int> singleNumber(vector<int>& nums) {
         int AXORB = 0;
         for (int num : nums) {
-            AXORB \^= num;
+            AXORB ^= num;
         }
-        int bitFlag = AXORB & (\~AXORB +
+        int bitFlag = AXORB & (~AXORB +
 1);//与自身的补码是为了获取其中一位,并且该位只是存在于其中一个数中
         vector<int> res = vector<int>(2,0);
         for (int num : nums) {
             if ((num & bitFlag) == 0) {
-                res[0] \^= num;
+                res[0] ^= num;
             } else {
-                res[1] \^= num;
+                res[1] ^= num;
             }
         }
         return res;
@@ -2055,7 +2116,7 @@ class Solution {
 public:
 Node* dummy;
 Solution(){dummy = new Node();}
-\~Solution(){delete dummy;}
+~Solution(){delete dummy;}
 Node* copyRandomList(Node* head) {
 if (!head)return NULL;
 unordered_map<Node*,Node*> mp;//old => new
@@ -2176,67 +2237,59 @@ return head;
 -------------------------------------------------------------------------------
 [合并K个排序链表](https://leetcode-cn.com/problems/merge-k-sorted-lists)    
 ----------------------------------------------------------------------------
-/**
-* Definition for singly-linked list.
-* struct ListNode {
-* int val;
-* ListNode *next;
-* ListNode(int x) : val(x), next(NULL) {}
-* };
-*/
 class Solution {
 public:
-ListNode * dummy;
-Solution(){dummy = new ListNode(-1);}
-\~Solution(){delete dummy;}
-ListNode* mergeKLists(vector<ListNode*>& lists) {
-if(lists.empty()){
-return nullptr;
-}
-list<ListNode*> l;
-for(auto h:lists)l.emplace_back(h);
-while(l.size() > 1){
-ListNode* l1 = l.front();
-l.pop_front();
-ListNode* l2 = l.front();
-l.pop_front();
-l.emplace_back(mergeTwoLists(l1,l2));
-}
-return l.front();
-}
-ListNode *mergeTwoLists(ListNode *l1, ListNode *l2) {
-if(!l1 || !l2) return l1? l1:l2;
-ListNode * tmp = dummy;
-while (l1 && l2)
-{
-if(l1->val <= l2->val)
-{
-tmp ->next = l1;
-l1 = l1->next;
-}
-else
-{
-tmp->next = l2;
-l2 = l2->next;
-}
-tmp = tmp->next;
-}
-if (l1) tmp->next = l1;
-else tmp->next = l2;
-return dummy->next;
-}
-/*
-考虑分治的思想来解这个题（类似归并排序的思路）。把这些链表分成两半，如果每一半都合并好了，那么我就最后把这两个合并了就行了。这就是分治法的核心思想。
+    ListNode * dummy;
+    Solution(){dummy = new ListNode(-1);}
+    ~Solution(){delete dummy;}
+    ListNode* mergeKLists(vector<ListNode*>& lists) {
+        if(lists.empty()){
+            return nullptr;
+        }
+        list<ListNode*> l;
+        for(auto h:lists)l.emplace_back(h);
+        while(l.size() > 1){
+            ListNode* l1 = l.front();
+            l.pop_front();
+            ListNode* l2 = l.front();
+            l.pop_front();
+            l.emplace_back(mergeTwoLists(l1,l2));
+        }
+        return l.front();
+    }
+    ListNode *mergeTwoLists(ListNode *l1, ListNode *l2) {
+        if(!l1 || !l2) return l1? l1:l2;
+        ListNode * tmp = dummy;
+        while (l1 && l2)
+        {
+            if(l1->val <= l2->val)
+            {
+                tmp ->next = l1;
+                l1 = l1->next;
+            }
+            else
+            {
+                tmp->next = l2;
+                l2 = l2->next;
+            }
+            tmp = tmp->next;
+        }
+        if (l1) tmp->next = l1;
+        else tmp->next = l2;
+        
+        return dummy->next;
+    }
+    /*
+    考虑分治的思想来解这个题（类似归并排序的思路）。把这些链表分成两半，如果每一半都合并好了，那么我就最后把这两个合并了就行了。这就是分治法的核心思想。
 但是这道题由于存的都是指针，就具有了更大的操作灵活性，可以不用递归来实现分治。就是先两两合并后在两两合并。。。一直下去直到最后成了一个。（相当于分治算法的那棵二叉树从底向上走了）。
 第一次两两合并是进行了k/2次，每次处理2n个值,即2n * k/2 = kn 次比较。
 第二次两两合并是进行了k/4次，每次处理4n个值,即4n * k/4 = kn 次比较。
 。。。
-最后一次两两合并是进行了k/(2\^logk)次（=1次），每次处理2\^logK *
-N个值（kn个），即1*kn= kn 次比较。
+最后一次两两合并是进行了k/(2^logk)次（=1次），每次处理2^logK  * N个值（kn个），即1*kn= kn 次比较。
 所以时间复杂度：
 O(KN* logK)
 空间复杂度是O(1)。
-*/
+    */
 };
 [两两交换链表中的节点](https://leetcode-cn.com/problems/swap-nodes-in-pairs)    
 --------------------------------------------------------------------------------
