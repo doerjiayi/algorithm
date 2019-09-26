@@ -2334,12 +2334,107 @@ public:
 };
 [移除链表元素](https://leetcode-cn.com/problems/remove-linked-list-elements)    
 --------------------------------------------------------------------------------
+class Solution {
+public:
+    ListNode* removeElements(ListNode* head, int val) {
+        if (head == NULL) return NULL;
+        ListNode* d(NULL);
+        ListNode* p = head;  
+        while (p->next != NULL) {  
+            if (p->next->val == val) 
+            {
+                d = p->next;
+                p->next = p->next->next; 
+                delete d;
+            }
+            else p = p->next;
+        }  
+        if (head->val == val){d = head;head = head->next;delete d;}
+        return head;
+    }
+};
 [反转链表](https://leetcode-cn.com/problems/reverse-linked-list)    
 --------------------------------------------------------------------
+class Solution {
+public:
+    ListNode* reverseList(ListNode* head) 
+    {
+        if (!head || !head->next)return head;
+        ListNode* pre = NULL;
+        ListNode* cur = head;
+        while(cur)
+        {
+            ListNode* ne = cur->next;
+            cur->next = pre;
+            pre = cur;
+            cur = ne;
+        }
+        return pre;
+    }
+};
 [反转链表 II](https://leetcode-cn.com/problems/reverse-linked-list-ii)    
 --------------------------------------------------------------------------
+class Solution {
+public:
+    ListNode* reverseBetween(ListNode* head, int m, int n) {
+        if (head == NULL)  
+            return NULL;  
+              
+        ListNode *beforeReverse = NULL;  
+        ListNode *p = head;  
+        for(int i = 0; i < m - 1; i++)  
+        {  
+            beforeReverse = p;  
+            p = p->next;  
+        }  
+        ListNode *reverseH = p;  // q 1 p 2 
+        ListNode *pPre = p; 
+        p = p->next;  
+        for(int i = m ; i < n; i++)  //2
+        {  
+            ListNode *pNext = p->next;        
+            p->next = pPre;  
+            pPre = p;  
+            p = pNext;  
+            
+        }  
+        reverseH->next = p;  // 2 => 5 
+        if (beforeReverse)  
+            beforeReverse->next = pPre;  
+        else  
+            head = pPre;  
+          
+        return head;  
+    }
+};
 [合并两个有序链表](https://leetcode-cn.com/problems/merge-two-sorted-lists)    
 -------------------------------------------------------------------------------
+class Solution {
+public:
+    ListNode* mergeTwoLists(ListNode* l1, ListNode* l2) 
+    {
+        if (!l1 || !l2)return l1 ? l1 :l2;
+        shared_ptr<ListNode> dummy(new ListNode(-1));
+        ListNode* pre = dummy.get();
+        while(l1 && l2)
+        {
+            if (l1->val <= l2->val)
+            {
+                pre->next = l1;
+                l1 = l1->next;
+            }
+            else
+            {
+                pre->next = l2;
+                l2 = l2->next;
+            }
+            pre = pre->next;
+        }
+        if (l2)pre->next = l2;
+        else pre->next = l1;
+        return dummy->next;
+    }
+};
 [合并K个排序链表](https://leetcode-cn.com/problems/merge-k-sorted-lists)    
 ----------------------------------------------------------------------------
 class Solution {
@@ -4266,6 +4361,33 @@ public:
 };
 [N叉树的最大深度](https://leetcode-cn.com/problems/maximum-depth-of-n-ary-tree)    
 -----------------------------------------------------------------------------------
+class Solution {
+public:
+    
+    int maxDepth(Node* root) {
+        if (!root)return 0;
+        vector<Node*> l[2];
+        int index = 0;
+        l[index].push_back(root);
+        int res = 0;
+        while(l[index].size())
+        {
+            //printf("%d\n",l[index].size());
+            ++res;
+            for(auto n:l[index])
+            {
+                if (n)
+                {
+                    for(auto sub:n->children)
+                    if (sub)l[1-index].push_back(sub);
+                }
+            }
+            l[index].clear();
+            index = 1 - index;
+        }
+        return res;
+    }
+};
 [二叉树的直径](https://leetcode-cn.com/problems/diameter-of-binary-tree)    
 ----------------------------------------------------------------------------
 class Solution {
