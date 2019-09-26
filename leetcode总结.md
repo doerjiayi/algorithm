@@ -444,8 +444,48 @@ private:
 };
 [括号生成](https://leetcode-cn.com/problems/generate-parentheses)    
 ---------------------------------------------------------------------
+class Solution {
+public:
+    vector<string> generateParenthesis(int n) {
+        if (n == 0)
+            return vector<string>();
+        vector<string > ret;
+        dfs(ret, "", n, n);
+        return ret;
+    }
+    //利用二叉树递归思想
+    void dfs(vector<string> &ret, string tmp, int left, int right)
+    {
+        if (0 == left && 0 == right)
+        {
+            ret.push_back(tmp);
+            return;
+        }
+        if (left > 0)
+            dfs(ret, tmp + '(', left - 1, right);
+
+        if (left < right)
+            dfs(ret, tmp + ')', left, right - 1);
+    }
+};
 [正则表达式匹配](https://leetcode-cn.com/problems/regular-expression-matching)    
 ----------------------------------------------------------------------------------
+class Solution {
+public:
+    bool isMatch(string s, string p) 
+    {
+        return dp(s,p,0,0);
+    }
+    bool dp(string& s,string& p,int i,int j)
+    {
+        if(j >= p.size()) return i == s.size();
+        bool j_match = i < s.size() && (s[i]==p[j] || p[j]=='.');
+        if(j + 1 < p.size() && p[j + 1]=='*'){
+            return dp(s,p,i,j+2)||(j_match &&dp(s,p,i+1,j));
+        }
+        return j_match && dp(s,p,i+1,j+1);
+    }
+};
 二分
 ====
 [有效的完全平方数](https://leetcode-cn.com/problems/valid-perfect-square) 
@@ -504,26 +544,140 @@ public:
 };
 [搜索插入位置](https://leetcode-cn.com/problems/search-insert-position)    
 ---------------------------------------------------------------------------
+class Solution {
+public:
+    int searchInsert(vector<int>& nums, int target) {
+        int low = 0, high = nums.size()-1;
+        while(low <= high) {
+            int mid = (low+high)>>1;
+            if(nums[mid] == target) 
+                return mid;
+            else if(nums[mid] > target) 
+                high = mid-1;
+            else
+                low = mid+1;
+        }
+        return low;  
+    }
+};
 [矩形区域不超过 K 的最大数值和](https://leetcode-cn.com/problems/max-sum-of-rectangle-no-larger-than-k)    
 -----------------------------------------------------------------------------------------------------------
 [Pow(x, n)](https://leetcode-cn.com/problems/powx-n)    
 --------------------------------------------------------
+class Solution {
+public:
+    double myPow(double x, int n) {
+        double res(1.0);
+        for(int k = n;k != 0;k/=2)
+        {
+            if (k % 2 == 1)
+            {
+                res *= x;    
+            }
+            x *= x;
+        }
+        return n < 0? 1/res:res;
+    }
+};
 连续序列
 ========
 [乘积最大子序列](https://leetcode-cn.com/problems/maximum-product-subarray)    
 -------------------------------------------------------------------------------
+class Solution {
+public:
+    int maxProduct(vector<int>& nums) {
+        int local_max = nums[0],local_min = nums[0],global_max = nums[0],tmp;
+        for(int i = 1;i < nums.size();++i)
+        {
+            tmp = max(max(local_max * nums[i],local_min * nums[i]),nums[i]);
+            local_min = min(min(local_max * nums[i],local_min * nums[i]),nums[i]);
+            local_max = tmp;
+            global_max = max(local_max,global_max);
+        }
+        return global_max;
+    }
+};
 二维数组
 ========
 [旋转图像](https://leetcode-cn.com/problems/rotate-image)    
 -------------------------------------------------------------
+class Solution {
+public:
+    void rotate(vector<vector<int>>& matrix) {
+        int n = matrix.size();
+         for(int i = 0; i < n - 1; i++){//i只能取到 n - 2, 因为n - 1是对称轴
+             for(int j = 0; j < n - 1 - i; j++){//j只能取到n - 1 - i, 在对称轴的左边
+                 swap(matrix[i][j], matrix[n - 1 - j][n - 1 - i]);
+             }
+         }
+         for(int i = 0; i < n / 2; i++){//i只能取到横向中间轴的上面
+             for(int j = 0; j < n; j++){//j可以取到所有值
+                 swap(matrix[i][j], matrix[n - 1 - i][j]);//按横向轴翻转，j不变；i变为n-1-i
+             }
+         }
+    }
+};
+/*
+首先以从对角线为轴翻转，然后再以x轴中线上下翻转即可得到结果，如下图所示(其中蓝色数字表示翻转轴)：
+
+1  2  3　　　 　　 9  6  3　　　　　  7  4  1
+
+4  5  6　　-->　　8  5  2　　 -->     8  5  2　　
+
+7  8  9 　　　 　　7  4  1　　　　　  9  6  3
+*/
 [Z 字形变换](https://leetcode-cn.com/problems/zigzag-conversion)    
 --------------------------------------------------------------------
 哈希表
 ======
 [两数之和](https://leetcode-cn.com/problems/two-sum)    
 --------------------------------------------------------
+class Solution {
+public:
+    vector<int> twoSum(vector<int>& nums, int target) {
+        vector<int> res;  
+        unordered_map<int, int> mp;  
+        for(int i = 0;i < nums.size();++i)
+        {
+            if (mp.find(target-nums[i]) != mp.end())
+            {
+                res.push_back(i);
+                res.push_back(mp[target-nums[i]]);
+                return res;
+            }
+            mp[nums[i]] = i;
+        }
+        return res;
+    }
+};
 [三数之和](https://leetcode-cn.com/problems/3sum)    
 -----------------------------------------------------
+class Solution {
+public:
+    vector<vector<int>> threeSum(vector<int>& nums) {
+        if (nums.size() == 0) return {};
+        sort(nums.begin(), nums.end());
+        unordered_map<int,int> map;
+        for (int i = 0; i < nums.size(); i++) {
+            map[nums[i]] = i;
+        }
+        vector<vector<int> > ret;
+        for (int i = 0; i < nums.size() - 2; i++) {
+            if (nums[i] > 0) return ret;
+            if (i > 0 && nums[i] == nums[i-1]) continue;
+            for (int j = i+1; j < nums.size() - 1; j++) {
+                if (j >i +1 && nums[j]==nums[j-1]) continue;
+                int two = nums[i] + nums[j];
+                auto it = map.find(-two);
+                if (it!= map.end() && it->second > j) {
+                    vector<int> r = {nums[i],nums[j],-two};
+                    ret.push_back(r);
+                }
+            }
+        }
+        return ret;
+    }
+};
 [四数之和](https://leetcode-cn.com/problems/4sum)  
 ---------------------------------------------------
 需要利用哈希表访问快，以及数组的有序性来去重
@@ -566,31 +720,25 @@ nums[ vec[k].second ] });//a≤b≤c≤d
 ---------------------------------------------------------
 class Solution {
 public:
-bool wordPattern(string pattern, string str) {
-unordered_map<char, int> mP;
-unordered_map<string, int> mS;
-istringstream in(str);
-int i = 0;
-for (string word; in >> word ; ++i)
-{
-if (mP.find(pattern[i]) != mP.end() || mS.find(word) != mS.end())
-{
-if (mP[pattern[i]] != mS[word]) //如果pat 到了末尾就是0了,也会结束
-{
-//printf("4)%d %s %c %d\\n",i,word.c_str(),pattern[i],mS[word]);
-return false;
-}
-//printf("%d %s\\n",i,word.c_str());
-}
-else
-{
-mP[pattern[i]] = mS[word] = i + 1;
-//printf("2)%d %s\\n",i,word.c_str());
-}
-}
-//printf("3)%d \\n",i);
-return i == pattern.size();
-}
+    bool wordPattern(string pattern, string str) {
+        unordered_map<char, int> mP;
+        unordered_map<string, int> mS;
+        stringstream in(str);
+        int i = 0;
+        for (string word; in >> word; ++i) 
+        {
+            if (mP.find(pattern[i]) != mP.end() || mS.find(word) != mS.end()) 
+            {
+                if (mP[pattern[i]] != mS[word]) return false;
+            }
+            else 
+            {
+                mP[pattern[i]] = mS[word] = i + 1;
+            }
+        }
+        return i == pattern.size();
+
+    }
 };
 动规
 ====
@@ -623,7 +771,7 @@ public:
 ----------------------------------------------------------------------
 class Solution {
 public:
-/*
+    /*
 跟LCS类似，用双序列动态规划解决。
 1. 设计：
 dp[i][j]表示从第一个字符串前i个组成的子串转换为第二个字符串前j个组成的子串共有多少种方案。
@@ -634,73 +782,202 @@ s[i - 1] != t[j - 1]，则dp[i][j] = dp[i - 1][j];
 dp[i][0] = 1（t没有字符只有一种方案）
 4. 返回值：
 dp[sz1][sz2]
-*/
-int numDistinct(string s, string t) {// S 的子序列中 T 出现的个数
-int sz1 = s.size(), sz2 = t.size();
-vector<vector<long>> dp(sz1 + 1,vector<long>(sz2 + 1,0));
-for (int i = 0; i <= sz1; ++i) {
-dp[i][0] = 1;//边界条件,（t没有字符只有一种方案）
-}
-for (int i = 1; i <= sz1; ++i) {
-for (int j = 1; j <= sz2; ++j) {
-if (s[i - 1] == t[j - 1]) {
-dp[i][j] = dp[i - 1][j - 1] + dp[i - 1][j];//如(aatt,aat) 2= (aat,aa) 1 +
-(aat,aat) 1
-}
-else {
-dp[i][j] = dp[i - 1][j];//如,(aate,aat) 1 = (aat,aat) 1
-}
-}
-}
-return dp[sz1][sz2];
-}
+    */
+    int numDistinct(string s, string t) {// S 的子序列中 T 出现的个数
+         int sz1 = s.size(), sz2 = t.size();
+         vector<vector<long>> dp(sz1 + 1,vector<long>(sz2 + 1,0));
+         for (int i = 0; i <= sz1; ++i) {
+             dp[i][0] = 1;//边界条件,（t没有字符只有一种方案）
+         }
+         for (int i = 1; i <= sz1; ++i) {
+             for (int j = 1; j <= sz2; ++j) {
+                 if (s[i - 1] == t[j - 1]) {
+                     dp[i][j] = dp[i - 1][j - 1] + dp[i - 1][j];//如(aatt,aat) 2= (aat,aa) 1 + (aat,aat) 1
+                 }
+                 else {
+                     dp[i][j] = dp[i - 1][j];//如,(aate,aat) 1 = (aat,aat) 1
+                 }
+             }
+         }
+         return dp[sz1][sz2];
+    }
 };
 [三角形最小路径和](https://leetcode-cn.com/problems/triangle)    
 -----------------------------------------------------------------
+class Solution {
+public:
+    /*
+    可以用一个一维数组来存储自底向上的路径向量，路径向量初始化为三角形数阵底部向量，此后每计算一次，更新一次，空间复杂度为O(n),且不影响输入三角形数阵的原始数据
+    */
+    int minimumTotal(vector<vector<int>>& triangle) {
+        int length=triangle.size();  
+        if(length==0)return 0;//特殊情况处理，容错机制  
+        if(length==1)return triangle[0][0];    
+        vector<int> sum=triangle[triangle.size()-1];//初始化路径和存储向量，自底向上  
+          
+        for(int i=triangle.size()-2;i>=0;i--)//自底向上迭代  
+        {  
+            for(int j=0;j<triangle[i].size();j++)  
+            {  
+                sum[j]=min(triangle[i][j]+sum[j],triangle[i][j]+sum[j+1]);  
+            }  
+        }  
+        return sum[0];  
+    }
+};
 [最大正方形](https://leetcode-cn.com/problems/maximal-square)    
 -----------------------------------------------------------------
+class Solution {
+public:
+    int maximalSquare(vector<vector<char>>& matrix) {
+        int ret=0;
+        
+        if(matrix.empty()||matrix[0].empty()){
+            return ret;
+        }
+        int m=matrix.size();
+        int n=matrix[0].size();
+        vector<vector<int> > v(m,vector<int>(n,0));
+        for(int i=0;i<m;i++){
+            if(matrix[i][0]=='1'){
+                v[i][0]=1;
+                ret=1;
+            }
+        }
+        for(int j=0;j<n;j++){
+            if(matrix[0][j]=='1'){
+                v[0][j]=1;
+                ret=1;
+            }
+        }
+        for(int i=1;i<m;i++){
+            for(int j=1;j<n;j++){
+                if(matrix[i][j]=='1'){
+                    v[i][j]=min(v[i-1][j],min(v[i-1][j-1],v[i][j-1]))+1;
+                    ret=max(ret,v[i][j]);
+                }
+            }
+        }
+        return ret*ret;
+    }
+    /*
+    动态规划，从左上角开始，如果当前位置为1，那么到当前位置包含的最大正方形边长为左/左上/上的值中的最小值加一，因为边长是由短板控制的。注意返回的是面积
+    */
+};
 [爬楼梯](https://leetcode-cn.com/problems/climbing-stairs)    
 --------------------------------------------------------------
 class Solution {
 public:
-int climbStairs(int n) {
-if (n <= 2)return n;
-int vec[3];
-vec[0] = 1;vec[1] = 2;//初始化值（n 为1和2 ）
-for(int i=3; i<=n; i++)//计算 n -2 次
-{//地推公式为： vec[n] = vec[n-1] + vec[n-2]
-vec[2] = vec[0]+vec[1];
-vec[0] = vec[1];//移动变量
-vec[1] = vec[2];
-}
-return vec[2];
-}
+    int climbStairs(int n) {
+        if (n <= 2)return n;
+        int vec[3];
+        vec[0] = 1;vec[1] = 2;//初始化值（n 为1和2 ）
+        for(int i=3; i<=n; i++)//计算 n -2 次
+        {//地推公式为： vec[n] = vec[n-1] + vec[n-2]
+            vec[2] = vec[0]+vec[1];
+            vec[0] = vec[1];//移动变量
+            vec[1] = vec[2];
+        }
+        return vec[2];
+    }
 };
 [分割回文串](https://leetcode-cn.com/problems/palindrome-partitioning)    
 --------------------------------------------------------------------------
+class Solution {
+public:
+    //回溯
+    vector<vector<string>> res;
+    vector<string> tmp;
+    vector<vector<string>> partition(string s) {
+        if (s.size() == 0)return {};
+        dfs(s,0);
+        return res;
+    }
+    
+    void dfs(string &s,int pos)
+    {
+        if (pos == s.size())
+        {
+            res.push_back(tmp);
+            return;
+        }
+        for(int i = pos;i < s.size();++i)
+        {
+            if (IsPlalindrome(s,pos,i))
+            {
+                tmp.push_back(s.substr(pos,i-pos+1));
+                dfs(s,i+1);
+                tmp.pop_back();
+            }
+        }
+    }
+    bool IsPlalindrome(string &s,int b,int e)
+    {
+        for(;b <= e;++b,--e)
+        {
+            if (s[b] != s[e])return false;
+            
+        }
+        return true;
+    }
+
+};
 [分割回文串 II](https://leetcode-cn.com/problems/palindrome-partitioning-ii)    
 --------------------------------------------------------------------------------
+class Solution {
+public:
+    int minCut(string s) {
+        int len = s.size();
+        vector<vector<bool>> P(len,vector<bool>(len,false));
+        int dp[len + 1];
+        for (int i = 0; i <= len; ++i) {
+            dp[i] = len - i - 1;
+        }
+        for (int i = len - 1; i >= 0; --i) {
+            for (int j = i; j < len; ++j) {
+                if (s[i] == s[j] && (j - i <= 1 || P[i + 1][j - 1])) {
+                    P[i][j] = true;
+                    dp[i] = min(dp[i], dp[j + 1] + 1);
+                }
+            }
+        }
+        return dp[0];
+    }
+};
 [格雷编码](https://leetcode-cn.com/problems/gray-code)
 ------------------------------------------------------
 class Solution {
 public:
-vector<int> grayCode(int n)
-{
-vector<int> res;
-res.push_back(0);
-for(int i = 0;i < n;++i)//n位
-{
-for(int j = res.size()-1;j >=
-0;--j)//每次从后往前遍历，能保障相邻的只有一个字符不同
-{
-res.push_back((1 << i) + res[j]);
-}
-}
-return res;
-}
+    vector<int> grayCode(int n) 
+    {
+        vector<int> res;
+        res.push_back(0);
+        for(int i = 0;i < n;++i)
+        {
+            for(int j = res.size()-1;j >= 0;--j)
+            {
+                res.push_back((1 << i) + res[j]);
+            }
+        }
+        return res;
+    }
 };
 [解码方法](https://leetcode-cn.com/problems/decode-ways)    
 ------------------------------------------------------------
+class Solution {
+public:
+    int numDecodings(string s) {
+        if (s.length() == 0) return 0;  
+        vector<int> nums(s.length()+1,0);
+        nums[0] = 1;  
+        for(int i=1; i<=s.length(); i++) {  
+            if (s[i-1] != '0') nums[i] += nums[i-1];  
+            if (i>1 && s[i-2] == '1') nums[i] += nums[i-2];  
+            else if (i>1 && s[i-2] == '2' && s[i-1] >= '0' && s[i-1] <= '6') nums[i] += nums[i-2];  
+        }  
+        return nums[s.length()];  
+    }
+};
 [买卖股票的最佳时机](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock)
 --------------------------------------------------------------------------------------
 class Solution {
@@ -2318,86 +2595,143 @@ public:
 -----------------------------------------------------------------------------------------
 class Solution {
 public:
-int evalRPN(vector<string>& tokens) {
-stack<long> sk;//长整形栈
-for(int i = 0;i < tokens.size();++i)
-{
-if (tokens[i].size() == 1 && tokens[i][0] ==
-'+')//符号则弹出前面两个并处理，逆波兰的特性
-{
-long x1 = sk.top();
-sk.pop();
-long x2 = sk.top();
-sk.pop();
-sk.push(x2 + x1);
-}
-else if (tokens[i].size() == 1 && tokens[i][0] == '-')
-{
-long x1 = sk.top();
-sk.pop();
-long x2 = sk.top();
-sk.pop();
-sk.push(x2 - x1);
-}
-else if (tokens[i].size() == 1 && tokens[i][0] == '*')
-{
-long x1 = sk.top();
-sk.pop();
-long x2 = sk.top();
-sk.pop();
-sk.push(x2 * x1);
-}
-else if (tokens[i].size() == 1 && tokens[i][0] == '/')
-{
-long x1 = sk.top();
-sk.pop();
-long x2 = sk.top();
-sk.pop();
-sk.push(x2 / x1);
-}
-else//数字就压入等待处理
-{
-if (tokens[i][0] == '-')
-{
-long x = strtol(tokens[i].c_str()+1,NULL,10);
-sk.push(-x);
-}
-else
-{
-long x = strtol(tokens[i].c_str(),NULL,10);
-sk.push(x);
-}
-}
-}
-return sk.top();
-}
+    int evalRPN(vector<string>& tokens) {
+        stack<long> sk;
+        for(int i = 0;i < tokens.size();++i)
+        {
+            if (tokens[i].size() == 1 && tokens[i][0] == '+')//表达式的规则是后面压的数是被操作的对象
+            {
+                long x1 = sk.top();
+                sk.pop();
+                long x2 = sk.top();
+                sk.pop();
+                sk.push(x2 + x1);
+            }
+            else if (tokens[i].size() == 1 && tokens[i][0] == '-')
+            {
+                long x1 = sk.top();
+                sk.pop();
+                long x2 = sk.top();
+                sk.pop();
+                sk.push(x2 - x1);
+            }
+            else if (tokens[i].size() == 1 && tokens[i][0] == '*')
+            {
+                long x1 = sk.top();
+                sk.pop();
+                long x2 = sk.top();
+                sk.pop();
+                sk.push(x2 * x1);
+            }
+            else if (tokens[i].size() == 1 && tokens[i][0] == '/')
+            {
+                long x1 = sk.top();
+                sk.pop();
+                long x2 = sk.top();
+                sk.pop();
+                sk.push(x2 / x1);
+            }
+            else
+            {
+                if (tokens[i][0] == '-')
+                {
+                    long x = strtoll(tokens[i].c_str()+1,NULL,10);
+                    sk.push(-x);
+                }
+                else
+                {
+                    long x = strtoll(tokens[i].c_str(),NULL,10);
+                    sk.push(x);
+                }
+            }
+        }
+        return sk.top();
+    }
 };
 [寻找峰值](https://leetcode-cn.com/problems/find-peak-element)    
 ------------------------------------------------------------------
+class Solution {
+public://
+    int findPeakElement(vector<int>& nums) {
+        if (nums.size() <= 1)return 0;
+        if (nums.size() == 2)return (nums[0] > nums[1] ? 0:1);
+        int left = 0,right = nums.size()-1,mid(0);
+        while(left <= right)//二分法查找上升或者下降的坡
+        {
+            mid = left + (right - left)/2;
+            if (mid == left) 
+            {
+                return nums[left] > nums[right] ? left: right; 
+            }
+            if (nums[mid] < nums[mid+1])//寻找峰点，峰点在右边
+            {
+                left = mid;
+            }
+            else //(nums[mid] >= nums[mid+1]) 寻找峰点，峰点在左边
+            {
+                right = mid;
+            }
+        }
+        return 0;
+    }
+};
 [同构字符串](https://leetcode-cn.com/problems/isomorphic-strings)    
 ---------------------------------------------------------------------
+class Solution {
+public:
+    bool isIsomorphic(string s, string t) {
+         if(s.length() != t.length())return false;
+         unordered_map<char,char> m;
+         for(int i = 0; i< s.length();++i)
+         {
+             if(m.find(s[i]) == m.end())m[s[i]] = t[i];
+             else if (m[s[i]] != t[i])return false;
+         }
+         m.clear();
+         for(int i = 0; i< t.length();++i)
+         {
+             if(m.find(t[i]) == m.end())m[t[i]] = s[i];
+             else if (m[t[i]] != s[i])return false;
+         }
+         return true;
+
+    }
+};
 [颜色分类](https://leetcode-cn.com/problems/sort-colors)    
 ------------------------------------------------------------
 class Solution {
 public:
-void sortColors(vector<int>& nums) {
-// 荷兰国旗问题，需要三个指针
-int begin = 0, current = 0, end = nums.size() - 1;
-while (current <= end){
-if (nums[current] == 0){
-swap(nums[current++], nums[begin++]);
-}
-else if (nums[current] == 2){
-swap(nums[current], nums[end--]);
-}
-else {
-current++;
-}
-}
-}
+    void sortColors(vector<int>& nums) {
+        // 荷兰国旗问题        
+        int begin = 0, cur = 0, end = nums.size() - 1;
+        while (cur <= end){
+            if (nums[cur] == 0){
+                swap(nums[cur++], nums[begin++]);
+            }
+            else if (nums[cur] == 2){
+                swap(nums[cur], nums[end--]);
+            }
+            else {
+                cur++;
+            }
+        }
+    }
 };
 [两数之和 II - 输入有序数组](https://leetcode-cn.com/problems/two-sum-ii-input-array-is-sorted)    
 ---------------------------------------------------------------------------------------------------
+class Solution {
+public:
+    vector<int> twoSum(vector<int>& numbers, int target) {
+        int l = 0, r = numbers.size() - 1;
+        while (l < r) {
+            int sum = numbers[l] + numbers[r];
+            if (sum == target) return {l + 1, r + 1};
+            else if (sum < target) ++l;
+            else --r;
+        }
+        return {};
+    }
+};
 [加油站](https://leetcode-cn.com/problems/gas-station)    
 ----------------------------------------------------------
 class Solution {
@@ -2438,12 +2772,103 @@ public:
 --------------------------------------------------------------------------------------------------------
 [求众数](https://leetcode-cn.com/problems/majority-element)    
 ---------------------------------------------------------------
+class Solution {
+public:
+    int majorityElement(vector<int>& nums) {
+        int count(0);
+        int n(0);
+        for(auto& num:nums)
+        {
+            if (!count)
+            {
+                count = 1;
+                n = num;
+            }
+            else if (n == num)
+            {
+                ++count;
+            }
+            else --count;
+        }
+        return n;
+    }
+};
+
 [杨辉三角](https://leetcode-cn.com/problems/pascals-triangle)    
 -----------------------------------------------------------------
+class Solution {
+public:
+    vector<vector<int>> generate(int numRows) {
+        vector<vector<int> > vecs;
+        if(numRows <= 0)return vecs;
+        if (1 == numRows) return {{1}} ;
+        vector<int> tempvec[2];
+        int cur = 0;
+        tempvec[cur].push_back(1);
+        for(int i = 2;i<=numRows;i++)
+        {
+            tempvec[1-cur].push_back(1);
+            for(int j = 1;j< tempvec[cur].size();j++)
+            {
+                 tempvec[1-cur].push_back(tempvec[cur][j-1] + tempvec[cur][j]);  
+            }
+            tempvec[1-cur].push_back(1);
+            vecs.push_back(tempvec[cur]);
+            tempvec[cur].clear();
+            cur = 1 - cur;
+        }
+        vecs.push_back(tempvec[cur]);
+        return vecs;
+    }
+};
 [杨辉三角 II](https://leetcode-cn.com/problems/pascals-triangle-ii)    
 -----------------------------------------------------------------------
+class Solution {
+public:
+    vector<int> getRow(int rowIndex) {
+        if (rowIndex < 0) return {};
+        if (rowIndex == 0) return {1};
+
+        vector<int> rows[2];
+        int cur= 0;
+        rows[cur].push_back(1);
+        for(int i = 1;i <= rowIndex;++i)
+        {
+            rows[1 - cur].push_back(1);
+            for(int j = 1;j < rows[cur].size();++j)
+            {
+                rows[1 - cur].push_back(rows[cur][j - 1] + rows[cur][j]);
+            }
+            rows[1 - cur].push_back(1);
+            rows[cur].clear();
+            cur = 1 - cur;
+        }
+        return rows[cur];
+    }
+};
 [合并两个有序数组](https://leetcode-cn.com/problems/merge-sorted-array)    
 ---------------------------------------------------------------------------
+class Solution {
+public:
+    void merge(vector<int>& nums1, int m, vector<int>& nums2, int n) 
+    {
+        int k = m + n -1;
+        int i = m - 1,j = n - 1;
+        while(i >= 0 && j >= 0)
+        {
+            if (nums1[i] > nums2[j])
+            {
+                nums1[k--] = nums1[i--];
+            }
+            else 
+            {
+                nums1[k--] = nums2[j--];
+            }
+        }
+        while(i >= 0)nums1[k--] = nums1[i--];
+        while(j >= 0)nums1[k--] = nums2[j--];
+    }
+};
 [搜索二维矩阵](https://leetcode-cn.com/problems/search-a-2d-matrix)
 -------------------------------------------------------------------
 把二维矩阵当做一维数组来计算，就是访问下标时需要转换下标
@@ -2502,6 +2927,35 @@ public:
 };
 [螺旋矩阵 II](https://leetcode-cn.com/problems/spiral-matrix-ii)    
 --------------------------------------------------------------------
+class Solution {
+public:
+    vector<vector<int>> generateMatrix(int n) 
+    {
+        if (n <= 0)return {};
+        vector<vector<int>> res(n,vector<int>(n,0));
+        int row(n-1),col(n-1),x(0),y(0),cnt(0);
+        for(;x <= row && y <= col;++x,++y,--row,--col)
+        {
+            for(int i = y;i <= col;++i)
+            {
+                res[x][i] = ++cnt;//printf("1)%d %d %d\n",x,i,cnt);
+            }
+            for(int i = x+1;i <= row;++i)
+            {
+                res[i][col] = ++cnt;//printf("2)%d %d %d\n",i,col,cnt);
+            }
+            for(int i = col-1;i >= y && x != row;--i)
+            {
+                res[row][i] = ++cnt;//printf("3)%d %d %d\n",row,i,cnt);
+            }
+            for(int i = row-1;i >= x + 1&& y != col;--i)
+            {
+                res[i][y] = ++cnt;//printf("4)%d %d %d\n",i,y,cnt);
+            }
+        }
+        return res;
+    }
+};
 [搜索旋转排序数组](https://leetcode-cn.com/problems/search-in-rotated-sorted-array)    
 ---------------------------------------------------------------------------------------
 [搜索旋转排序数组 II](https://leetcode-cn.com/problems/search-in-rotated-sorted-array-ii)    
