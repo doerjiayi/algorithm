@@ -164,8 +164,64 @@ wordBreak(s.substr(w.size()),wordDict);//分治
 };
 [扁平化嵌套列表迭代器](https://leetcode-cn.com/problems/flatten-nested-list-iterator)    
 -----------------------------------------------------------------------------------------
+class NestedIterator {
+public:
+    vector<int> nums;
+    int cnt = 0;
+    NestedIterator(vector<NestedInteger> &nestedList) {
+        flat(nestedList);
+    }
+    void flat(vector<NestedInteger> &nestedList)//递归追加到列表
+    {
+        for(auto & i:nestedList)
+        {
+            if (i.isInteger())
+            {
+                nums.push_back(i.getInteger());
+            }
+            else
+            {
+                flat(i.getList());
+            }
+        }
+    }
+    int next() {
+        return nums[cnt++];
+    }
+    bool hasNext() {
+        return cnt < nums.size();
+    }
+};
 [为运算表达式设计优先级](https://leetcode-cn.com/problems/different-ways-to-add-parentheses)    
 ------------------------------------------------------------------------------------------------
+class Solution {
+public:
+    //1.按照运算符做分割，然后用分治算法解。
+    //2.边界条件为：如果剩下的的字符串中没有运算符，即剩下的字符串中有且仅有数字。
+    vector<int> diffWaysToCompute(string input) {
+        vector<int> res;
+        for(int i=0;i<input.size();i++)
+        {
+            char c = input[i];
+            if(c=='+'||c=='-'||c=='*')
+            {
+                auto res1 = diffWaysToCompute(input.substr(0,i));
+                auto res2 = diffWaysToCompute(input.substr(i+1));
+                for(int r1:res1)//所有的结果的组合
+                {
+                    for(int r2:res2)
+                    {
+                        if(c=='+') res.push_back(r1+r2);
+                        else if(c=='-') res.push_back(r1-r2);  
+                        else res.push_back(r1*r2);                        
+                    }
+                }
+            }
+        }
+        if(res.empty()) res.push_back(stoi(input));
+        return res;
+    }
+};
 dfs
 ===
 （排列）结束的条件为遍历的长度
@@ -3633,10 +3689,77 @@ public:
 ----------------------------------------------------------------------------------------
 [二叉树最大宽度](https://leetcode-cn.com/problems/maximum-width-of-binary-tree)    
 -----------------------------------------------------------------------------------
+class Solution {
+public:
+    int widthOfBinaryTree(TreeNode* root) {
+        long double maxWidth = 0;
+        vector<long double> start;
+        dfs(root, 0, 1, start, maxWidth);
+        return maxWidth;
+    }
+    void dfs(TreeNode* root, int depth, long double index, vector<long double>& start, long double& maxWidth)
+    {
+        if (root)
+        {
+            if (depth >= start.size())
+                start.push_back(index);
+            maxWidth = max(maxWidth, index - start[depth] + 1);
+            dfs(root->left, depth + 1, 2 * index, start, maxWidth);
+            dfs(root->right, depth + 1, 2 * index + 1, start, maxWidth);
+        }
+    } 
+};
 [修剪二叉搜索树](https://leetcode-cn.com/problems/trim-a-binary-search-tree)    
 --------------------------------------------------------------------------------
+class Solution {
+public:
+    TreeNode* trimBST(TreeNode* root, int L, int R) {
+        if (!root)
+        return NULL;
+        if (root->val < L) {
+            return trimBST(root->right, L, R);
+        }
+        else if (root->val > R) {
+            return trimBST(root->left, L, R);
+        }
+        else {
+            root->left = trimBST(root->left, L, R);
+            root->right = trimBST(root->right, L, R);
+            return root;
+        }
+    }
+};
 [二叉树的层平均值](https://leetcode-cn.com/problems/average-of-levels-in-binary-tree)    
 -----------------------------------------------------------------------------------------
+class Solution {
+public:
+    vector<double> averageOfLevels(TreeNode* root) {
+        if (!root)return {};
+        index = 0;
+        dataList[index].push_back(root);
+        bfs();
+        return res;
+    }
+    void bfs()
+    {
+        if (dataList[index].size() == 0)return;
+        double avg(0.0);
+        for(int i = 0;i < dataList[index].size();++i)
+        {
+            TreeNode* node = dataList[index][i];
+            avg += node->val;
+            if (node->left) dataList[1-index].push_back(node->left);
+            if (node->right) dataList[1-index].push_back(node->right);
+        }
+        res.push_back(avg/dataList[index].size());
+        dataList[index].clear();
+        index = 1-index;
+        bfs();
+    }
+    int index;
+    vector<TreeNode*> dataList[2];
+    vector<double> res;
+};
 [二叉搜索树的最小绝对差](https://leetcode-cn.com/problems/minimum-absolute-difference-in-bst)    
 -------------------------------------------------------------------------------------------------
 [把二叉搜索树转换为累加树](https://leetcode-cn.com/problems/convert-bst-to-greater-tree)    
@@ -3645,11 +3768,108 @@ public:
 -----------------------------------------------------------------------------------------
 [二叉搜索树结点最小距离](https://leetcode-cn.com/problems/minimum-distance-between-bst-nodes)    
 -------------------------------------------------------------------------------------------------
+class Solution {
+public:
+    int minDiffInBST(TreeNode* root) {
+        if (!root)return 0;
+        stack<TreeNode*> s;
+        long m1(INT_MIN),m2(INT_MIN),diff(INT_MAX);
+        TreeNode* p = root;
+        while(p||s.size())
+        {
+            while(p)
+            {
+                s.push(p);
+                p = p->left;
+            }
+            p = s.top();
+            s.pop();
+            m1 = m2;
+            m2 = p->val;
+            diff = min(diff,m2 - m1);
+            p = p->right;
+        }
+        return diff;
+    }
+};
 [二叉树的坡度](https://leetcode-cn.com/problems/binary-tree-tilt)    
 ---------------------------------------------------------------------
 [另一个树的子树](https://leetcode-cn.com/problems/subtree-of-another-tree)    
 ------------------------------------------------------------------------------
+class Solution {
+public:
+    list<TreeNode*> l;
+    bool isSubtree(TreeNode* s, TreeNode* t) {
+        list<TreeNode*> sl;
+        sl.push_back(s);
+        while(sl.size() > 0)
+        {
+            s = sl.front();
+            sl.pop_front();
+            if (isSame(s,t))return true;
+            if (s->left)sl.push_back(s->left);
+            if (s->right)sl.push_back(s->right);
+        }
+        return false;
+    }
+    bool isSame(TreeNode* p, TreeNode* q) 
+    {
+        l.clear();
+        l.push_back(p);
+        l.push_back(q);
+        while(l.size() > 1)
+        {
+            p = l.front();
+            l.pop_front();
+            q = l.front();
+            l.pop_front();
+            if (p || q) 
+            {
+                if (!p || !q) return false;    
+                if (p->val != q->val) return false;    
+                if ((p->left && !q->left) || (p->right && !q->right)) return false;    
+                l.push_back(p->left);
+                l.push_back(q->left);
+                l.push_back(p->right);
+                l.push_back(q->right);
+            }
+        }
+        return true;
+    }
+};
 [根据二叉树创建字符串](https://leetcode-cn.com/problems/construct-string-from-binary-tree)    
 ----------------------------------------------------------------------------------------------
+class Solution {
+public:
+    string tree2str(TreeNode* t) {
+        if (!t) return "";
+        string res = "";
+        helper(t, res);
+        return string(res.begin() + 1, res.end() - 1);
+    }
+    void helper(TreeNode* t, string& res) {
+        if (!t) return;
+        res += "(" + to_string(t->val);
+        if (!t->left && t->right) res += "()";
+        helper(t->left, res);
+        helper(t->right, res);
+        res += ")";
+    }
+};
 [合并二叉树](https://leetcode-cn.com/problems/merge-two-binary-trees)    
 -------------------------------------------------------------------------
+class Solution {
+public:
+    TreeNode* mergeTrees(TreeNode* t1, TreeNode* t2) {
+        if (t1 == NULL) {
+            return t2;
+        } else if (t2 == NULL) {
+            return t1;
+        } else {
+            TreeNode* newNode = new TreeNode(t1->val + t2->val);
+            newNode->left = mergeTrees(t1->left, t2->left);
+            newNode->right = mergeTrees(t1->right, t2->right);
+            return newNode;
+        }
+    }
+};
