@@ -451,11 +451,103 @@ candidates[i-1])++i;//本层去重
 };
 [组合总和 III](https://leetcode-cn.com/problems/combination-sum-iii)
 --------------------------------------------------------------------
+class Solution {
+public:
+    vector<int> path;
+    vector<vector<int>> result;
+    vector<int> candidates = {1,2,3,4,5,6,7,8,9};
+    vector<vector<int>> combinationSum3(int k, int n) {
+        dfs(k,n,0,0);
+        return result;
+    }
+
+    void dfs(int k,int sum,int pos,int s)
+    {
+        if (path.size() > k) return;
+        if(s > sum) return;
+        if(s==sum && path.size() == k)
+        {
+            result.push_back(path);
+            return;
+        }
+
+        for(int i=pos;i<candidates.size();i++)
+        {
+            path.push_back(candidates[i]);
+            dfs(k,sum,i+1,s+candidates[i]);
+            path.pop_back();
+        }
+    }
+};
 （其他）
 [复原IP地址](https://leetcode-cn.com/problems/restore-ip-addresses)    
 -----------------------------------------------------------------------
+class Solution {
+public:
+    vector<string> restoreIpAddresses(string s) 
+    {
+        if(s.size() == 0)return {};
+        vector<string> res;
+        string ip;
+        dfs(s,0,0,ip,res);
+        return res;
+    }
+private:
+    void dfs(string &str,int step,int index,const string& ip,vector<string> &res){
+        if(step == 4 || index >= str.size())
+        {
+            if(step == 4 && index == str.size())
+            {
+                res.push_back(ip);
+            }
+            return;
+        }
+        string part;
+        for(int i = 1;i <= 3 && index + i <= str.size();++i)
+        {
+            if(i != 1 && str[index] == '0')break;// 不能以0开始(单个0可以)
+            part = str.substr(index,i);
+            if(stoi(part) <= 255)
+            {
+                string tmp = step ? ip + "." + part:part;
+                dfs(str,step+1,index+i,tmp,res);
+            }
+        }
+    }
+};
 [串联所有单词的子串](https://leetcode-cn.com/problems/substring-with-concatenation-of-all-words)    
 ----------------------------------------------------------------------------------------------------
+class Solution {
+public:
+    vector<int> findSubstring(string s, vector<string>& words) {
+        if (s.size() == 0 || words.size() == 0)return {};
+        vector<int> res;
+        unordered_map<string,int> wordsMap;
+        int wl = words[0].size();
+        for(auto & str:words)wordsMap[str]++;
+        int wordNum = words.size();
+        unordered_map<string,int> tempWordsMap;
+        for(int i = 0;i < s.size() - wl * wordNum + 1;++i)
+        {
+            int k = i;
+            string str = s.substr(k,wl);
+            int counter(0);
+            tempWordsMap.clear();
+            while (wordsMap[str] > 0)
+            {
+                if (++tempWordsMap[str] > wordsMap[str])break;
+                k += wl;   
+                str = s.substr(k,wl);
+                ++counter;
+            }
+            if (counter == wordNum)
+            {
+                res.push_back(i);
+            }
+        }
+        return res;
+    }
+};
 [N皇后](https://leetcode-cn.com/problems/n-queens)
 --------------------------------------------------
 dfs遍历，一行一行的去遍历，每行只能一皇后，需要检查列和斜线。
