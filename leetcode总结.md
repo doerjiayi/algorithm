@@ -1,7 +1,5 @@
-贪心
-====
-[盛最多水的容器](https://leetcode-cn.com/problems/container-with-most-water)
-----------------------------------------------------------------------------
+#贪心
+##[盛最多水的容器](https://leetcode-cn.com/problems/container-with-most-water)
 矮边是乘积的成员，而宽度是一直减少的，贪心移动矮边
 
 class Solution {
@@ -17,9 +15,7 @@ public:
         return nMax;
     }
 };
----------------------------------------------------------------------
-[摆动序列](https://leetcode-cn.com/problems/wiggle-subsequence)
----------------------------------------------------------------------
+##[摆动序列](https://leetcode-cn.com/problems/wiggle-subsequence)
 方向不同的才计数
 
 class Solution {
@@ -43,9 +39,7 @@ public:
         return g;
     }
 };
----------------------------------------------------------------------
-[最接近的三数之和](https://leetcode-cn.com/problems/3sum-closest)    
----------------------------------------------------------------------
+##[最接近的三数之和](https://leetcode-cn.com/problems/3sum-closest)    
 class Solution {
 public:
     int threeSumClosest(vector<int>& nums, int target)
@@ -73,9 +67,8 @@ public:
         return res;
     }
 };
----------------------------------------------------------------------
-[搜索二维矩阵 II](https://leetcode-cn.com/problems/search-a-2d-matrix-ii)
--------------------------------------------------------------------------
+##[搜索二维矩阵 II](https://leetcode-cn.com/problems/search-a-2d-matrix-ii)
+ 
 class Solution {
 public:
     bool searchMatrix(vector<vector<int>>& matrix, int target) {
@@ -99,9 +92,7 @@ public:
         return false;
     }
 };
----------------------------------------------------------------------
-[最长连续序列](https://leetcode-cn.com/problems/longest-consecutive-sequence)
------------------------------------------------------------------------------
+##[最长连续序列](https://leetcode-cn.com/problems/longest-consecutive-sequence)
 class Solution {
 public:
     int longestConsecutive(vector<int>& nums)
@@ -124,9 +115,7 @@ public:
         return res;
     }
 };
----------------------------------------------------------------------
-[最大子序和](https://leetcode-cn.com/problems/maximum-subarray)    
--------------------------------------------------------------------
+##[最大子序和](https://leetcode-cn.com/problems/maximum-subarray)    
 class Solution {
 public:
     int maxSubArray(vector<int>& nums)
@@ -142,13 +131,10 @@ public:
         return res;
     }
 };
----------------------------------------------------------------------
-分治
-====
 
----------------------------------------------------------------------
-[单词拆分 II](https://leetcode-cn.com/problems/word-break-ii)    
------------------------------------------------------------------
+#分治
+##[单词拆分 II](https://leetcode-cn.com/problems/word-break-ii)    
+
 class Solution {
 public:
     unordered_map<string,vector<string>> m;//复杂度 K * n
@@ -172,9 +158,7 @@ wordBreak(s.substr(w.size()),wordDict);//分治
         return m[s] = res;//从后往前收敛，数组已是本子串的所有情况
     }
 };
----------------------------------------------------------------------
-[扁平化嵌套列表迭代器](https://leetcode-cn.com/problems/flatten-nested-list-iterator)    
------------------------------------------------------------------------------------------
+##[扁平化嵌套列表迭代器](https://leetcode-cn.com/problems/flatten-nested-list-iterator)   
 class NestedIterator {
 public:
     vector<int> nums;
@@ -203,9 +187,7 @@ public:
         return cnt < nums.size();
     }
 };
----------------------------------------------------------------------
-[为运算表达式设计优先级](https://leetcode-cn.com/problems/different-ways-to-add-parentheses)    
-------------------------------------------------------------------------------------------------
+##[为运算表达式设计优先级](https://leetcode-cn.com/problems/different-ways-to-add-parentheses) 
 class Solution {
 public:
     //1.按照运算符做分割，然后用分治算法解。
@@ -234,14 +216,9 @@ public:
         return res;
     }
 };
----------------------------------------------------------------------
-dfs
-===
+#dfs
 （排列）结束的条件为遍历的长度
-
----------------------------------------------------------------------
-[全排列](https://leetcode-cn.com/problems/permutations)  
----------------------------------------------------------
+##[全排列](https://leetcode-cn.com/problems/permutations)  
 选择一个，递归，恢复原来，不需要检查去重
 class Solution {
 public:
@@ -268,9 +245,7 @@ public:
     }
 };
 
----------------------------------------------------------------------
-[全排列 II](https://leetcode-cn.com/problems/permutations-ii)
--------------------------------------------------------------
+##[全排列 II](https://leetcode-cn.com/problems/permutations-ii)
 选择一个，利用有序性去重，继续选下一个，为了保持顺序而不恢复，但递归需要拷贝
 class Solution {
     vector<vector<int>> res;
@@ -294,9 +269,7 @@ continue;   //不与相同的交换
         }
     }
 };
----------------------------------------------------------------------
-[组合](https://leetcode-cn.com/problems/combinations)
------------------------------------------------------
+##[组合](https://leetcode-cn.com/problems/combinations)
 结束的条件为达到目标，比如数量
 路径为
 
@@ -321,9 +294,7 @@ public:
         }
     }
 };
----------------------------------------------------------------------
-[子集](https://leetcode-cn.com/problems/subsets)    
-----------------------------------------------------
+##[子集](https://leetcode-cn.com/problems/subsets)    
 dfs，选择或者不选择，没去重
 class Solution {
 public:
@@ -346,9 +317,7 @@ public:
         }
     }
 };
----------------------------------------------------------------------
-[子集 II](https://leetcode-cn.com/problems/subsets-ii)
-------------------------------------------------------
+##[子集 II](https://leetcode-cn.com/problems/subsets-ii)
 dfs，利用有序性去重，去重在后面执行，因为需要先遍历
 class Solution {
 public:
@@ -377,9 +346,7 @@ path,vector<vector<int>> &result)
         }
     }
 };
----------------------------------------------------------------------
-[组合总和](https://leetcode-cn.com/problems/combination-sum)
-------------------------------------------------------------
+##[组合总和](https://leetcode-cn.com/problems/combination-sum)
 需要从小到大处理，因为使用了条件过滤（target >= candidates[i]）
 class Solution {
 public:
@@ -432,9 +399,7 @@ target) {
         }
     }
 };
----------------------------------------------------------------------
-[组合总和 II](https://leetcode-cn.com/problems/combination-sum-ii)    
-----------------------------------------------------------------------
+##[组合总和 II](https://leetcode-cn.com/problems/combination-sum-ii)    
 dfs,需要排序，利用有序性去重
 class Solution {
 public:
@@ -465,7 +430,7 @@ candidates[i-1])++i;//本层去重
         }
     }
 };
----------------------------------------------------------------------
+##
 [组合总和 III](https://leetcode-cn.com/problems/combination-sum-iii)
 --------------------------------------------------------------------
 class Solution {
@@ -497,9 +462,8 @@ public:
 };
 （其他）
 
----------------------------------------------------------------------
-[复原IP地址](https://leetcode-cn.com/problems/restore-ip-addresses)    
------------------------------------------------------------------------
+##[复原IP地址](https://leetcode-cn.com/problems/restore-ip-addresses)    
+
 class Solution {
 public:
     vector<string> restoreIpAddresses(string s) 
@@ -533,9 +497,8 @@ private:
         }
     }
 };
----------------------------------------------------------------------
-[串联所有单词的子串](https://leetcode-cn.com/problems/substring-with-concatenation-of-all-words)    
-----------------------------------------------------------------------------------------------------
+##[串联所有单词的子串](https://leetcode-cn.com/problems/substring-with-concatenation-of-all-words)    
+
 class Solution {
 public:
     vector<int> findSubstring(string s, vector<string>& words) {
@@ -567,9 +530,8 @@ public:
         return res;
     }
 };
----------------------------------------------------------------------
-[N皇后](https://leetcode-cn.com/problems/n-queens)
---------------------------------------------------
+##[N皇后](https://leetcode-cn.com/problems/n-queens)
+
 dfs遍历，一行一行的去遍历，每行只能一皇后，需要检查列和斜线。
 到了最后一行就是收敛条件。然后把该结果放入结果集
 class Solution {
@@ -617,9 +579,8 @@ private:
         return true;
     }
 };
----------------------------------------------------------------------
-[括号生成](https://leetcode-cn.com/problems/generate-parentheses)    
----------------------------------------------------------------------
+##[括号生成](https://leetcode-cn.com/problems/generate-parentheses)    
+
 class Solution {
 public:
     vector<string> generateParenthesis(int n) {
@@ -643,9 +604,8 @@ public:
             dfs(ret, tmp + ')', left, right - 1);
     }
 };
----------------------------------------------------------------------
-[正则表达式匹配](https://leetcode-cn.com/problems/regular-expression-matching)    
-----------------------------------------------------------------------------------
+##[正则表达式匹配](https://leetcode-cn.com/problems/regular-expression-matching)    
+
 class Solution {
 public:
     bool isMatch(string s, string p) 
@@ -662,12 +622,9 @@ public:
         return j_match && dp(s,p,i+1,j+1);
     }
 };
----------------------------------------------------------------------
-二分
-====
----------------------------------------------------------------------
-[有效的完全平方数](https://leetcode-cn.com/problems/valid-perfect-square) 
---------------------------------------------------------------------------
+#二分
+##[有效的完全平方数](https://leetcode-cn.com/problems/valid-perfect-square) 
+
 二分尝试
 class Solution {
 public:
@@ -685,9 +642,8 @@ public:
         return false;
     }
 };
----------------------------------------------------------------------
-[第一个错误的版本](https://leetcode-cn.com/problems/first-bad-version)    
---------------------------------------------------------------------------
+##[第一个错误的版本](https://leetcode-cn.com/problems/first-bad-version)    
+
 // Forward declaration of isBadVersion API.
 bool isBadVersion(int version);
 class Solution {
@@ -721,9 +677,8 @@ public:
         return -1;
     }
 };
----------------------------------------------------------------------
-[搜索插入位置](https://leetcode-cn.com/problems/search-insert-position)    
----------------------------------------------------------------------------
+##[搜索插入位置](https://leetcode-cn.com/problems/search-insert-position)    
+
 class Solution {
 public:
     int searchInsert(vector<int>& nums, int target) {
@@ -740,9 +695,8 @@ public:
         return low;  
     }
 };
----------------------------------------------------------------------
-[矩形区域不超过 K 的最大数值和](https://leetcode-cn.com/problems/max-sum-of-rectangle-no-larger-than-k)    
------------------------------------------------------------------------------------------------------------
+##[矩形区域不超过 K 的最大数值和](https://leetcode-cn.com/problems/max-sum-of-rectangle-no-larger-than-k)    
+
 class Solution {
 public:
     int maxSumSubmatrix(vector<vector<int>>& matrix, int k) {
@@ -778,9 +732,8 @@ public:
     思路: 一种naive的算法就是枚举每个矩形块, 时间复杂度为O((mn)^2), 可以做少许优化时间复杂度可以降低到O(mnnlogm), 其中m为行数, n为列数. 
 先求出任意两列之间的所有数的和, 然后再枚举任意两行之间的和, 而我们优化的地方就在后者. 我们用s[x]来表示第x行从a列到b列的和. 遍历一遍从第0行到最后一行的求和数组, 并依次将其放到二叉搜索树中, 这样当我们知道了从第0行到当前行的和的值之后, 我们就可以用lower_bound在O(log n)的时间复杂度内找到能够使得从之前某行到当前行的矩阵值最接近k. 也就是说求在之前的求和数组中找到第一个位置使得大于(curSum - k), 这种做法的原理是在curSum之下规定了一个bottom-line, 在这上面的第一个和就是(curSum-val)差值与k最接近的数. 还需要注意的是预先为二叉搜索树加一个0值, 这种做法的原理是如果当前curSum小于k, 那么至少本身是一个潜在的解. 
     */
----------------------------------------------------------------------
-[Pow(x, n)](https://leetcode-cn.com/problems/powx-n)    
---------------------------------------------------------
+##[Pow(x, n)](https://leetcode-cn.com/problems/powx-n)    
+
 class Solution {
 public:
     double myPow(double x, int n) {
@@ -796,12 +749,11 @@ public:
         return n < 0? 1/res:res;
     }
 };
----------------------------------------------------------------------
-连续序列
-========
----------------------------------------------------------------------
-[乘积最大子序列](https://leetcode-cn.com/problems/maximum-product-subarray)    
--------------------------------------------------------------------------------
+
+#连续序列
+
+##[乘积最大子序列](https://leetcode-cn.com/problems/maximum-product-subarray)    
+
 class Solution {
 public:
     int maxProduct(vector<int>& nums) {
@@ -816,12 +768,10 @@ public:
         return global_max;
     }
 };
----------------------------------------------------------------------
-二维数组
-========
----------------------------------------------------------------------
-[旋转图像](https://leetcode-cn.com/problems/rotate-image)    
--------------------------------------------------------------
+##二维数组
+
+##[旋转图像](https://leetcode-cn.com/problems/rotate-image)    
+
 class Solution {
 public:
     void rotate(vector<vector<int>>& matrix) {
@@ -844,9 +794,8 @@ public:
 4  5  6　　-->　　8  5  2　　 -->     8  5  2　　
 7  8  9 　　　 　　7  4  1　　　　　  9  6  3
 */
----------------------------------------------------------------------
-[Z 字形变换](https://leetcode-cn.com/problems/zigzag-conversion)    
---------------------------------------------------------------------
+##[Z 字形变换](https://leetcode-cn.com/problems/zigzag-conversion)    
+
 class Solution {
 public:
     /*
@@ -894,12 +843,10 @@ LDREOEIIECIHNTSG
         return oss.str();
     }
 };
----------------------------------------------------------
-哈希表
-======
----------------------------------------------------------
-[两数之和](https://leetcode-cn.com/problems/two-sum)    
---------------------------------------------------------
+
+#哈希表
+##[两数之和](https://leetcode-cn.com/problems/two-sum)    
+
 class Solution {
 public:
     vector<int> twoSum(vector<int>& nums, int target) {
@@ -918,9 +865,9 @@ public:
         return res;
     }
 };
----------------------------------------------------------
-[三数之和](https://leetcode-cn.com/problems/3sum)    
------------------------------------------------------
+
+##[三数之和](https://leetcode-cn.com/problems/3sum)    
+
 class Solution {
 public:
     vector<vector<int>> threeSum(vector<int>& nums) {
@@ -947,9 +894,9 @@ public:
         return ret;
     }
 };
----------------------------------------------------------
-[四数之和](https://leetcode-cn.com/problems/4sum)  
----------------------------------------------------
+
+##[四数之和](https://leetcode-cn.com/problems/4sum)  
+
 需要利用哈希表访问快，以及数组的有序性来去重
 class Solution {
 public:
@@ -986,9 +933,9 @@ nums[ vec[k].second ] });//a≤b≤c≤d
         return res;
     }
 };
----------------------------------------------------------
-[单词模式](https://leetcode-cn.com/problems/word-pattern)
----------------------------------------------------------
+
+##[单词模式](https://leetcode-cn.com/problems/word-pattern)
+
 class Solution {
 public:
     bool wordPattern(string pattern, string str) {
@@ -1010,14 +957,13 @@ public:
         return i == pattern.size();
     }
 };
----------------------------------------------------------
-动规
-====
+
+#动规
+
 需要找到前面k-1个成员（或者第k-1个）与第k个成员的关系
 
----------------------------------------------------------
-[单词拆分](https://leetcode-cn.com/problems/word-break)    
------------------------------------------------------------
+##[单词拆分](https://leetcode-cn.com/problems/word-break)    
+
 哈希表是为了快速访问，保存动规状态才能递推
 class Solution {
 public:
@@ -1040,9 +986,9 @@ public:
         return dp[s.size()];
     }
 };
----------------------------------------------------------
-[不同的子序列](https://leetcode-cn.com/problems/distinct-subsequences)
-----------------------------------------------------------------------
+
+##[不同的子序列](https://leetcode-cn.com/problems/distinct-subsequences)
+
 class Solution {
 public:
     /*
@@ -1076,9 +1022,9 @@ dp[sz1][sz2]
          return dp[sz1][sz2];
     }
 };
----------------------------------------------------------
-[三角形最小路径和](https://leetcode-cn.com/problems/triangle)    
------------------------------------------------------------------
+ 
+##[三角形最小路径和](https://leetcode-cn.com/problems/triangle)    
+ 
 class Solution {
 public:
     /*
@@ -1099,9 +1045,9 @@ public:
         return sum[0];  
     }
 };
----------------------------------------------------------
-[最大正方形](https://leetcode-cn.com/problems/maximal-square)    
------------------------------------------------------------------
+
+##[最大正方形](https://leetcode-cn.com/problems/maximal-square)    
+
 class Solution {
 public:
     int maximalSquare(vector<vector<char>>& matrix) {
@@ -1138,9 +1084,9 @@ public:
     动态规划，从左上角开始，如果当前位置为1，那么到当前位置包含的最大正方形边长为左/左上/上的值中的最小值加一，因为边长是由短板控制的。注意返回的是面积
     */
 };
----------------------------------------------------------
-[爬楼梯](https://leetcode-cn.com/problems/climbing-stairs)    
---------------------------------------------------------------
+
+##[爬楼梯](https://leetcode-cn.com/problems/climbing-stairs)    
+
 class Solution {
 public:
     int climbStairs(int n) {
@@ -1156,9 +1102,9 @@ public:
         return vec[2];
     }
 };
----------------------------------------------------------
-[分割回文串](https://leetcode-cn.com/problems/palindrome-partitioning)    
---------------------------------------------------------------------------
+
+##[分割回文串](https://leetcode-cn.com/problems/palindrome-partitioning)    
+
 class Solution {
 public:
     //回溯
@@ -1196,9 +1142,9 @@ public:
     }
 
 };
----------------------------------------------------------
-[分割回文串 II](https://leetcode-cn.com/problems/palindrome-partitioning-ii)    
---------------------------------------------------------------------------------
+
+##[分割回文串 II](https://leetcode-cn.com/problems/palindrome-partitioning-ii)    
+
 class Solution {
 public:
     int minCut(string s) {
@@ -1219,9 +1165,9 @@ public:
         return dp[0];
     }
 };
----------------------------------------------------------
-[格雷编码](https://leetcode-cn.com/problems/gray-code)
-------------------------------------------------------
+
+##[格雷编码](https://leetcode-cn.com/problems/gray-code)
+
 class Solution {
 public:
     vector<int> grayCode(int n) 
@@ -1238,9 +1184,9 @@ public:
         return res;
     }
 };
----------------------------------------------------------
-[解码方法](https://leetcode-cn.com/problems/decode-ways)    
-------------------------------------------------------------
+
+##[解码方法](https://leetcode-cn.com/problems/decode-ways)    
+
 class Solution {
 public:
     int numDecodings(string s) {
@@ -1255,9 +1201,9 @@ public:
         return nums[s.length()];  
     }
 };
----------------------------------------------------------
-[买卖股票的最佳时机](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock)
---------------------------------------------------------------------------------------
+
+##[买卖股票的最佳时机](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock)
+
 class Solution {
 public:
     int maxProfit(vector<int>& prices) {
@@ -1272,9 +1218,9 @@ public:
         return res;
     }
 };
----------------------------------------------------------
-[买卖股票的最佳时机 II](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-ii)    
-------------------------------------------------------------------------------------------------
+
+##[买卖股票的最佳时机 II](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-ii)    
+
 class Solution {
 public:
     int maxProfit(vector<int>& prices) {
@@ -1286,9 +1232,9 @@ public:
         return res;
     }
 };
----------------------------------------------------------
-[买卖股票的最佳时机 III](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-iii)
-----------------------------------------------------------------------------------------------
+
+##[买卖股票的最佳时机 III](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-iii)
+
 class Solution {
 public:
     int maxProfit(vector<int>& prices) {
@@ -1313,9 +1259,9 @@ local[j] = max(global[j - 1] + max(diff, 0), local[j] + diff)
 global[j] = max(local[j], global[j]) //全局最优比较局部最优和前一天的全局最优
     */
 };
----------------------------------------------------------
-[编辑距离](https://leetcode-cn.com/problems/edit-distance)    
---------------------------------------------------------------
+ 
+##[编辑距离](https://leetcode-cn.com/problems/edit-distance)    
+ 
 class Solution {
 public:
     int minDistance(string word1, string word2) {
@@ -1336,9 +1282,8 @@ dp[i - 1][j - 1] + 1;//替换或相同
         return dp[size1][size2];
     }
 };
----------------------------------------------------------
-[不同路径](https://leetcode-cn.com/problems/unique-paths)    
--------------------------------------------------------------
+##[不同路径](https://leetcode-cn.com/problems/unique-paths)    
+
 class Solution {
 public:
     int uniquePaths(int m, int n) {
@@ -1353,9 +1298,9 @@ public:
         return array[m-1][n-1];  
     }
 };
----------------------------------------------------------
-[不同路径 II](https://leetcode-cn.com/problems/unique-paths-ii)    
--------------------------------------------------------------------
+
+##[不同路径 II](https://leetcode-cn.com/problems/unique-paths-ii)    
+
 class Solution {
 public:
     int uniquePathsWithObstacles(vector<vector<int>>& obstacleGrid) {
@@ -1374,9 +1319,9 @@ public:
         return array[m-1][n-1];
     }
 };
----------------------------------------------------------
-[最小路径和](https://leetcode-cn.com/problems/minimum-path-sum)    
--------------------------------------------------------------------
+
+##[最小路径和](https://leetcode-cn.com/problems/minimum-path-sum)    
+
 class Solution {
 public:
     int minPathSum(vector<vector<int>>& grid) {
@@ -1394,9 +1339,9 @@ grid[0][j];  
         return paths[m - 1][n - 1];  
     }
 };
----------------------------------------------------------
-[跳跃游戏](https://leetcode-cn.com/problems/jump-game)    
-----------------------------------------------------------
+ 
+##[跳跃游戏](https://leetcode-cn.com/problems/jump-game)    
+ 
 class Solution {
 public:
     bool canJump(vector<int>& nums) {
@@ -1408,9 +1353,9 @@ public:
           return rightMost >= (nums.size() - 1);
     }
 };
----------------------------------------------------------
-[跳跃游戏 II](https://leetcode-cn.com/problems/jump-game-ii)    
-----------------------------------------------------------------
+
+##[跳跃游戏 II](https://leetcode-cn.com/problems/jump-game-ii)    
+
 class Solution {
 public:
     int jump(vector<int>& nums) {
@@ -1429,13 +1374,13 @@ public:
         return cnt;
     }
 };
----------------------------------------------------------
-[最大整除子集](https://leetcode-cn.com/problems/largest-divisible-subset) 
---------------------------------------------------------------------------
 
----------------------------------------------------------
-[H指数](https://leetcode-cn.com/problems/h-index)    
------------------------------------------------------
+##[最大整除子集](https://leetcode-cn.com/problems/largest-divisible-subset) 
+
+
+ 
+##[H指数](https://leetcode-cn.com/problems/h-index)    
+ 
 坐标和数值的关系，利用了有序性
 class Solution {
 public:
@@ -1455,9 +1400,9 @@ public:
         return h;
     }
 };
----------------------------------------------------------
-[H指数 II](https://leetcode-cn.com/problems/h-index-ii)
--------------------------------------------------------
+ 
+##[H指数 II](https://leetcode-cn.com/problems/h-index-ii)
+ 
 坐标和数值的关系，利用了有序性
 class Solution {
 public:
@@ -1475,9 +1420,9 @@ public:
         return h;
     }
 };
----------------------------------------------------------
-[零钱兑换](https://leetcode-cn.com/problems/coin-change)  
----------------------------------------------------------  
+ 
+##[零钱兑换](https://leetcode-cn.com/problems/coin-change)  
+   
 第k个与前面某个的关系
 class Solution {
 public:
@@ -1500,9 +1445,9 @@ public:
         return dp[amount] > 0? dp[amount]:-1;
     }
 };
----------------------------------------------------------
-[打家劫舍](https://leetcode-cn.com/problems/house-robber)    
--------------------------------------------------------------
+ 
+##[打家劫舍](https://leetcode-cn.com/problems/house-robber)    
+ 
 class Solution {
 public:
     int rob(vector<int>& nums) {
@@ -1518,9 +1463,9 @@ public:
         return g;
     }
 };
----------------------------------------------------------
-[打家劫舍 II](https://leetcode-cn.com/problems/house-robber-ii)
----------------------------------------------------------------
+ 
+##[打家劫舍 II](https://leetcode-cn.com/problems/house-robber-ii)
+ 
 第一个开始，倒数2结束；或者第二个开始，倒数一结束
 class Solution {
 public:
@@ -1544,9 +1489,9 @@ public:
         return g;
     }
 };
----------------------------------------------------------
-[打家劫舍 III](https://leetcode-cn.com/problems/house-robber-iii)
------------------------------------------------------------------
+ 
+##[打家劫舍 III](https://leetcode-cn.com/problems/house-robber-iii)
+ 
 dp。每个子树含取root，不取root两个状态的值，也是局部最优解；父树依赖子树状态来得到自身两状态，最终是全局最优解。
 class Solution {
 public:
@@ -1564,9 +1509,9 @@ public:
         return max(ret[0], ret[1]);  
     }
 };
----------------------------------------------------------
-[最长上升子序列](https://leetcode-cn.com/problems/longest-increasing-subsequence)
----------------------------------------------------------------------------------
+ 
+##[最长上升子序列](https://leetcode-cn.com/problems/longest-increasing-subsequence)
+ 
 class Solution {
 public:
     int lengthOfLIS(vector<int>& nums) 
@@ -1590,9 +1535,9 @@ public:
         return len+1;
     }
 };
----------------------------------------------------------
-[鸡蛋掉落](https://leetcode-cn.com/problems/super-egg-drop)
------------------------------------------------------------
+ 
+##[鸡蛋掉落](https://leetcode-cn.com/problems/super-egg-drop)
+ 
 class Solution {
 public:
     int superEggDrop(int K, int N) {
@@ -1606,21 +1551,19 @@ public:
         return m;
     }
 };
----------------------------------------------------------
-集合
-====
----------------------------------------------------------
-[天际线问题](https://leetcode-cn.com/problems/the-skyline-problem)    
-----------------------------------------------------------------------
----------------------------------------------------------
-[常数时间插入、删除和获取随机元素](https://leetcode-cn.com/problems/insert-delete-getrandom-o1)    
----------------------------------------------------------------------------------------------------
-几何
-====
+ 
+#集合
 
----------------------------------------------------------------
-[矩形面积](https://leetcode-cn.com/problems/rectangle-area)    
----------------------------------------------------------------
+ 
+##[天际线问题](https://leetcode-cn.com/problems/the-skyline-problem)    
+ 
+ 
+##[常数时间插入、删除和获取随机元素](https://leetcode-cn.com/problems/insert-delete-getrandom-o1)    
+ 
+#几何
+
+##[矩形面积](https://leetcode-cn.com/problems/rectangle-area)    
+ 
 class Solution {
 public:
     int computeArea(int A, int B, int C, int D, int E, int F, int G, int H) {
@@ -1630,10 +1573,10 @@ public:
         return (int)(area - width * height);
     }
 };
----------------------------------------------------------------
-[直线上最多的点数](https://leetcode-cn.com/problems/max-points-on-a-line)    
------------------------------------------------------------------------------
- */
+ 
+#[直线上最多的点数](https://leetcode-cn.com/problems/max-points-on-a-line)    
+ 
+ 
 class Solution {
 public:
     int maxPoints(vector<Point>& points) 
@@ -1679,13 +1622,13 @@ public:
         return GetMinCommon(y,x%y);
     }
 };
----------------------------------------------------------------
-拓扑结构
-========
 
----------------------------------------------------------------
-[课程表](https://leetcode-cn.com/problems/course-schedule)
-----------------------------------------------------------
+#拓扑结构
+
+
+ 
+##[课程表](https://leetcode-cn.com/problems/course-schedule)
+ 
 利用了哈希表记录入度表，利用哈希表记录入度的出度，利用set来遍历
 class Solution {
 public:
@@ -1727,9 +1670,9 @@ false;//没有减少课程的则说明不能继续       
     }
 };
 
----------------------------------------------------------------
-[课程表 II](https://leetcode-cn.com/problems/course-schedule-ii)
-----------------------------------------------------------------
+ 
+#[课程表 II](https://leetcode-cn.com/problems/course-schedule-ii)
+ 
 因为只需要返回一种，可以直接遍历
 
 class Solution {
@@ -1778,9 +1721,9 @@ public:
 };
 
 
---------------------------------------------------------------
-[单词接龙 II](https://leetcode-cn.com/problems/word-ladder-ii)
---------------------------------------------------------------
+ 
+#[单词接龙 II](https://leetcode-cn.com/problems/word-ladder-ii)
+ 
 拓扑图的方式一层层遍历获取临接节点，临接节点为修改一个字符就出现在字典内的；每遍历一层后再从字典删除该前一层的节点。每一个新的节点、新的路径，需要拷贝，因为需要发现所有的可能的路径（所有的有向无环图）。
 
 class Solution {
@@ -1828,9 +1771,9 @@ break;//长度已超过最短长度，则表示已到最后一层
     }
 };
 
----------------------------------------------------------
-[单词接龙](https://leetcode-cn.com/problems/word-ladder) 
----------------------------------------------------------
+ 
+##[单词接龙](https://leetcode-cn.com/problems/word-ladder) 
+ 
 拓扑图的方式一层层遍历获取临接节点，临接节点为修改一个字符就出现在字典内的；每遍历一个临接节点就从字典删除该节点
 class Solution {
 public:
@@ -1873,13 +1816,13 @@ endWord.size() || wordList.size() == 0)return 0;
     }
 };
 
----------------------------------------------------------
-前缀树
-======
+ 
+#前缀树
+ 
 
----------------------------------------------------------
-[实现 Trie (前缀树)](https://leetcode-cn.com/problems/implement-trie-prefix-tree) 
-----------------------------------------------------------------------------------
+ 
+##[实现 Trie (前缀树)](https://leetcode-cn.com/problems/implement-trie-prefix-tree) 
+ 
 本质上是多叉树，利用了当前的访问的状态能够依赖之前访问的状态
 class Trie {
 public:
@@ -1936,9 +1879,9 @@ prefix. */
 };
 
 
----------------------------------------------------------
-[添加与搜索单词 - 数据结构设计](https://leetcode-cn.com/problems/add-and-search-word-data-structure-design)    
-----------------------------------------------------------------------------------------------------
+ 
+##[添加与搜索单词 - 数据结构设计](https://leetcode-cn.com/problems/add-and-search-word-data-structure-design)    
+ 
 class WordDictionary {
 public:
    struct TrieNode {
@@ -1983,22 +1926,22 @@ public:
         return p->isWord;
     }
 }; 
------------------------------------------------------------------------
+
 /*
 这道题如果做过之前的那道 Implement Trie (Prefix Tree)
 实现字典树(前缀树)的话就没有太大的难度了，还是要用到字典树的结构，唯一不同的地方就是search的函数需要重新写一下，因为这道题里面'.'可以代替任意字符，所以一旦有了'.'，就需要查找所有的子树，只要有一个返回true，整个search函数就返回true，典型的DFS的问题，其他部分跟上一道实现字典树没有太大区别
 */
 
 
-回溯
-====
+#回溯
+ 
 
------------------------------------------------------------------------
-[被围绕的区域](https://leetcode-cn.com/problems/surrounded-regions)    
------------------------------------------------------------------------
------------------------------------------------------------------------
-[单词搜索](https://leetcode-cn.com/problems/word-search)
---------------------------------------------------------
+
+##[被围绕的区域](https://leetcode-cn.com/problems/surrounded-regions)    
+
+
+##[单词搜索](https://leetcode-cn.com/problems/word-search)
+ 
 回溯就是使用多个方向的dfs来搜索，过程中为了避免回环需要设置路径成员为特殊字符。
 
 class Solution {
@@ -2031,9 +1974,9 @@ false;
 };
 
 
-------------------------------------------------------------------
-[单词搜索 II](https://leetcode-cn.com/problems/word-search-ii)    
-------------------------------------------------------------------
+ 
+##[单词搜索 II](https://leetcode-cn.com/problems/word-search-ii)    
+ 
 class Solution {
 public:
     int height;int width;
@@ -2080,13 +2023,13 @@ false;
     }
 }; 
 
-------------------------------------------------------------------
-[矩阵置零](https://leetcode-cn.com/problems/set-matrix-zeroes)    
-------------------------------------------------------------------
+ 
+##[矩阵置零](https://leetcode-cn.com/problems/set-matrix-zeroes)    
+ 
 
-------------------------------------------------------------------
-[矩阵中的最长递增路径](https://leetcode-cn.com/problems/longest-increasing-path-in-a-matrix)    
-----------------------------------------------------------------------------------------
+ 
+##[矩阵中的最长递增路径](https://leetcode-cn.com/problems/longest-increasing-path-in-a-matrix)    
+ 
 
 class Solution {
 public:
@@ -2122,9 +2065,9 @@ public:
 };
 
 
--------------------------------------------------------------------------
-[岛屿的最大面积](https://leetcode-cn.com/problems/max-area-of-island)    
--------------------------------------------------------------------------
+ 
+##[岛屿的最大面积](https://leetcode-cn.com/problems/max-area-of-island)    
+ 
 class Solution {
 public:
     int maxAreaOfIsland(vector<vector<int>>& grid) {
@@ -2155,9 +2098,9 @@ public:
 };
 
 
--------------------------------------------------------------------------
-[岛屿的个数](https://leetcode-cn.com/problems/number-of-islands)    
---------------------------------------------------------------------
+ 
+##[岛屿的个数](https://leetcode-cn.com/problems/number-of-islands)    
+ 
 回溯就是使用多个方向的dfs来搜索，过程中为了避免回环需要设置路径成员为特殊字符。找到一个岛屿计数一次
 class Solution {
 public:
@@ -2194,12 +2137,13 @@ public:
         }
     }
 };
-位操作
-======
 
--------------------------------------------------------------------------
-[2的幂](https://leetcode-cn.com/problems/power-of-two)
--------------------------------------------------------------------------
+#位操作
+ 
+
+ 
+##[2的幂](https://leetcode-cn.com/problems/power-of-two)
+ 
 
 class Solution {
 public:
@@ -2209,9 +2153,9 @@ bool isPowerOfTwo(int n) {
 }
 }; 
 
--------------------------------------------------------------------------
-[4的幂](https://leetcode-cn.com/problems/power-of-four)
--------------------------------------------------------------------------
+ 
+##[4的幂](https://leetcode-cn.com/problems/power-of-four)
+ 
 因为整形是4字节的，再利用1位的特性。
 class Solution {
 public:
@@ -2222,9 +2166,9 @@ public:
     }
 };
 
--------------------------------------------------------------------------
-[位1的个数](https://leetcode-cn.com/problems/number-of-1-bits) 
----------------------------------------------------------------
+ 
+##[位1的个数](https://leetcode-cn.com/problems/number-of-1-bits) 
+ 
 
 每次去掉最后一位
 class Solution {
@@ -2240,9 +2184,9 @@ public:
     }
 };
 
--------------------------------------------------------------------------
-[只出现一次的数字](https://leetcode-cn.com/problems/single-number)
-------------------------------------------------------------------
+ 
+##[只出现一次的数字](https://leetcode-cn.com/problems/single-number)
+ 
 异或两相同数会抵消，剩下的就是一次的
 class Solution {
 public:
@@ -2255,9 +2199,9 @@ public:
         return res;
     }
 };
--------------------------------------------------------------------------
-[只出现一次的数字 II](https://leetcode-cn.com/problems/single-number-ii)
---------------------------------------------------------------------
+ 
+##[只出现一次的数字 II](https://leetcode-cn.com/problems/single-number-ii)
+ 
 
 遍历，记录出现一次的位，出现2次的位为之前出现一次且本数，算了2次后才能算3次，3次的为出现1次且2次
 class Solution {
@@ -2277,9 +2221,8 @@ public:
         return ones;
     }
 };
--------------------------------------------------------------------------
-[只出现一次的数字 III](https://leetcode-cn.com/problems/single-number-iii)
---------------------------------------------------------------------------
+ 
+##[只出现一次的数字 III](https://leetcode-cn.com/problems/single-number-iii)
 
 异或操作让出现两次的会抵消了，剩下的两个数发异或，与其自身补码与操作，则是获取某数中的一位，
 该位只存在于该数中；再重新遍历判断和异或所有数
@@ -2304,17 +2247,14 @@ public:
     }
 };
 
----------------------------------------------------------
+ 
 
-常用结构
-========
-链表
-====
-（缓存）
-
----------------------------------------------------------
-[LRU缓存机制](https://leetcode-cn.com/problems/lru-cache)
----------------------------------------------------------
+#常用结构
+ 
+##链表
+ （缓存）
+##[LRU缓存机制](https://leetcode-cn.com/problems/lru-cache)
+ 
 利用哈希表的快速访问，记录的是链表迭代器，因为迭代器需要被移动；链表的访问顺序判断访问热度
 class LRUCache {
 public:
@@ -2356,9 +2296,9 @@ private:  
     list<pair<int,int>> l;//key value
     int s;
 };
------------------------------------------------------
-[LFU缓存](https://leetcode-cn.com/problems/lfu-cache)
------------------------------------------------------
+ 
+##[LFU缓存](https://leetcode-cn.com/problems/lfu-cache)
+ 
 lfu（最不经常使用的淘汰掉算法）可以处理缓存污染问题（是指系统将不常用的数据从内存移到缓存，造成常用数据的挤出，降低了缓存效率的现象）
 需要记录最少使用次数，需要用哈希表记录次数对应的键列表，再用哈希表记录键、值和次数，还有哈希表记录键在次数列表中的迭代器。
 每次获取键则需要更新次数对应的键列表，和其键对应的迭代器（因为所在的列表变了）。
@@ -2409,13 +2349,13 @@ keyVFre[key].second;//键的使用次数，修改次数，记录键的使用次�
     unordered_map<int, list<int>> freKeys;// fre : keys
     unordered_map<int, list<int>::iterator> keyFreIter;// key : freKeys iter
 };
------------------------------------------------------
+ 
 
 （其他）
 
------------------------------------------------------
-[复制带随机指针的链表](https://leetcode-cn.com/problems/copy-list-with-random-pointer)    
-------------------------------------------------------------------------------------------
+ 
+##[复制带随机指针的链表](https://leetcode-cn.com/problems/copy-list-with-random-pointer)    
+ 
 class Solution {
 public:
     Node* copyRandomList(Node* head) {
@@ -2434,11 +2374,11 @@ public:
         return dummy->next;
     }
 };
------------------------------------------------------
+ 
 
------------------------------------------------------
-[删除链表中的节点](https://leetcode-cn.com/problems/delete-node-in-a-linked-list)    
--------------------------------------------------------------------------------------
+ 
+##[删除链表中的节点](https://leetcode-cn.com/problems/delete-node-in-a-linked-list)    
+ 
 class Solution {
 public:
     void deleteNode(ListNode* node) {
@@ -2449,9 +2389,9 @@ public:
     }
 };
 
------------------------------------------------------
-[相交链表](https://leetcode-cn.com/problems/intersection-of-two-linked-lists)    
----------------------------------------------------------------------------------
+ 
+##[相交链表](https://leetcode-cn.com/problems/intersection-of-two-linked-lists)    
+ 
 class Solution {
 public:
     ListNode *getIntersectionNode(ListNode *headA, ListNode *headB) {
@@ -2472,14 +2412,13 @@ public:
         return NULL;
     }
 };
------------------------------------------------------
+ 
 
------------------------------------------------------
-[对链表进行插入排序](https://leetcode-cn.com/problems/insertion-sort-list)    
----------------------------------------------------------------------
------------------------------------------------------
-[排序链表](https://leetcode-cn.com/problems/sort-list)    
-----------------------------------------------------------
+ 
+##[对链表进行插入排序](https://leetcode-cn.com/problems/insertion-sort-list)    
+ 
+##[排序链表](https://leetcode-cn.com/problems/sort-list)    
+ 
 class Solution {
 public:
     ListNode* sortList(ListNode* head) {
@@ -2501,11 +2440,11 @@ public:
         return head;
     }
 };
------------------------------------------------------
+ 
 
------------------------------------------------------
-[对链表进行插入排序](https://leetcode-cn.com/problems/insertion-sort-list)    
-------------------------------------------------------------------------------
+ 
+##[对链表进行插入排序](https://leetcode-cn.com/problems/insertion-sort-list)    
+ 
 class Solution {
 public:
     ListNode* insertionSortList(ListNode* head) {
@@ -2532,9 +2471,9 @@ public:
         return head;
     }
 };
------------------------------------------------------
-[环形链表](https://leetcode-cn.com/problems/linked-list-cycle)
---------------------------------------------------------------
+ 
+##[环形链表](https://leetcode-cn.com/problems/linked-list-cycle)
+ 
 使用快慢指针的方式遍历判断
 class Solution {
 public:
@@ -2549,9 +2488,9 @@ public:
         return false;
     }
 };
------------------------------------------------------
-[环形链表 II](https://leetcode-cn.com/problems/linked-list-cycle-ii)
---------------------------------------------------------------------
+ 
+##[环形链表 II](https://leetcode-cn.com/problems/linked-list-cycle-ii)
+ 
 使用快慢指针找到重叠，重置慢指针，再找到重叠就是入环点
 class Solution {
 public:
@@ -2577,9 +2516,9 @@ public:
         return sp;  
     }
 };
------------------------------------------------------
-[重排链表](https://leetcode-cn.com/problems/reorder-list)
----------------------------------------------------------
+ 
+##[重排链表](https://leetcode-cn.com/problems/reorder-list)
+ 
 class Solution {
 public:
     //先使用快慢指针将链表从中间分割成两段，然后后半段就地逆置．之后合并插入到前半段链表即可，时间复杂度O(n)。
@@ -2608,14 +2547,14 @@ public:
         }  
     }
 };
------------------------------------------------------
-[删除排序链表中的重复元素](https://leetcode-cn.com/problems/remove-duplicates-from-sorted-list)    
----------------------------------------------------------------------------------------------------
------------------------------------------------------
-[删除排序链表中的重复元素 II](https://leetcode-cn.com/problems/remove-duplicates-from-sorted-list-ii)    
------------------------------------------------------------------------------------------------
-[分隔链表](https://leetcode-cn.com/problems/partition-list)    
----------------------------------------------------------------
+ 
+##[删除排序链表中的重复元素](https://leetcode-cn.com/problems/remove-duplicates-from-sorted-list)    
+ 
+ 
+##[删除排序链表中的重复元素 II](https://leetcode-cn.com/problems/remove-duplicates-from-sorted-list-ii)    
+ 
+##[分隔链表](https://leetcode-cn.com/problems/partition-list)    
+ 
 class Solution {
 public:
     ListNode* partition(ListNode* head, int x) {
@@ -2643,9 +2582,9 @@ public:
         return small.get()->next;
     }
 };
------------------------------------------------------
-[旋转链表](https://leetcode-cn.com/problems/rotate-list)    
-------------------------------------------------------------
+ 
+##[旋转链表](https://leetcode-cn.com/problems/rotate-list)    
+ 
 连成一圈再断开，注意计算断开位置
 class Solution {
 public:
@@ -2668,9 +2607,9 @@ public:
 		return head;
     }
 };
------------------------------------------------------
-[移除链表元素](https://leetcode-cn.com/problems/remove-linked-list-elements)    
---------------------------------------------------------------------------------
+ 
+##[移除链表元素](https://leetcode-cn.com/problems/remove-linked-list-elements)    
+ 
 class Solution {
 public:
     ListNode* removeElements(ListNode* head, int val) {
@@ -2690,9 +2629,9 @@ public:
         return head;
     }
 };
------------------------------------------------------
-[反转链表](https://leetcode-cn.com/problems/reverse-linked-list)    
---------------------------------------------------------------------
+ 
+##[反转链表](https://leetcode-cn.com/problems/reverse-linked-list)    
+ 
 class Solution {
 public:
     ListNode* reverseList(ListNode* head) 
@@ -2710,9 +2649,9 @@ public:
         return pre;
     }
 };
------------------------------------------------------
-[反转链表 II](https://leetcode-cn.com/problems/reverse-linked-list-ii)    
---------------------------------------------------------------------------
+ 
+##[反转链表 II](https://leetcode-cn.com/problems/reverse-linked-list-ii)    
+ 
 class Solution {
 public:
     ListNode* reverseBetween(ListNode* head, int m, int n) {
@@ -2744,9 +2683,9 @@ public:
     }
 };
 
------------------------------------------------------
-[合并两个有序链表](https://leetcode-cn.com/problems/merge-two-sorted-lists)    
--------------------------------------------------------------------------------
+ 
+##[合并两个有序链表](https://leetcode-cn.com/problems/merge-two-sorted-lists)    
+ 
 class Solution {
 public:
     ListNode* mergeTwoLists(ListNode* l1, ListNode* l2) 
@@ -2773,9 +2712,9 @@ public:
         return dummy->next;
     }
 };
------------------------------------------------------
-[合并K个排序链表](https://leetcode-cn.com/problems/merge-k-sorted-lists)    
-----------------------------------------------------------------------------
+ 
+##[合并K个排序链表](https://leetcode-cn.com/problems/merge-k-sorted-lists)    
+ 
 class Solution {
 public:
     ListNode * dummy;
@@ -2829,19 +2768,19 @@ O(KN* logK)
 空间复杂度是O(1)。
     */
 };
------------------------------------------------------
-[两两交换链表中的节点](https://leetcode-cn.com/problems/swap-nodes-in-pairs)    
---------------------------------------------------------------------------------
-[k个一组翻转链表](https://leetcode-cn.com/problems/reverse-nodes-in-k-group)    
---------------------------------------------------------------------------------
-[删除链表的倒数第N个节点](https://leetcode-cn.com/problems/remove-nth-node-from-end-of-list)    
-------------------------------------------------------------------------------------------------
-[回文链表](https://leetcode-cn.com/problems/palindrome-linked-list)    
------------------------------------------------------------------------
-[奇偶链表](https://leetcode-cn.com/problems/odd-even-linked-list)    
----------------------------------------------------------------------
-[两数相加](https://leetcode-cn.com/problems/add-two-numbers)    
-----------------------------------------------------------------
+ 
+##[两两交换链表中的节点](https://leetcode-cn.com/problems/swap-nodes-in-pairs)    
+ 
+##[k个一组翻转链表](https://leetcode-cn.com/problems/reverse-nodes-in-k-group)    
+ 
+##[删除链表的倒数第N个节点](https://leetcode-cn.com/problems/remove-nth-node-from-end-of-list)    
+ 
+##[回文链表](https://leetcode-cn.com/problems/palindrome-linked-list)    
+
+##[奇偶链表](https://leetcode-cn.com/problems/odd-even-linked-list)    
+ 
+##[两数相加](https://leetcode-cn.com/problems/add-two-numbers)    
+ 
 class Solution {
 public:
     ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) 
@@ -2865,19 +2804,19 @@ public:
     }
 };
 
-----------------------------------------------------------------------
-[两数相加 II](https://leetcode-cn.com/problems/add-two-numbers-ii)    
-----------------------------------------------------------------------
-栈
-==
+ 
+##[两数相加 II](https://leetcode-cn.com/problems/add-two-numbers-ii)    
+ 
+#栈
+ 
 
-----------------------------------------------------------------------
-[用队列实现栈](https://leetcode-cn.com/problems/implement-stack-using-queues)    
----------------------------------------------------------------------------------
-[用栈实现队列](https://leetcode-cn.com/problems/implement-queue-using-stacks)    
----------------------------------------------------------------------------------
-[最小栈](https://leetcode-cn.com/problems/min-stack)    
---------------------------------------------------------
+ 
+##[用队列实现栈](https://leetcode-cn.com/problems/implement-stack-using-queues)    
+ 
+##[用栈实现队列](https://leetcode-cn.com/problems/implement-queue-using-stacks)    
+ 
+##[最小栈](https://leetcode-cn.com/problems/min-stack)    
+ 
 class MinStack {
 public:
     /** initialize your data structure here. */
@@ -2902,9 +2841,9 @@ public:
     stack<int> sMin;
 };
 
-----------------------------------------------------------------
-[有效的括号](https://leetcode-cn.com/problems/valid-parentheses)
-----------------------------------------------------------------
+ 
+##[有效的括号](https://leetcode-cn.com/problems/valid-parentheses)
+ 
 class Solution {
 public:
     bool isValid(string s)
@@ -2936,9 +2875,9 @@ public:
     }
 };
 
----------------------------------------------------------------------------
-[下一个更大元素 I](https://leetcode-cn.com/problems/next-greater-element-i)
----------------------------------------------------------------------------
+ 
+##[下一个更大元素 I](https://leetcode-cn.com/problems/next-greater-element-i)
+ 
 class Solution {
 public:
     vector<int> nextGreaterElement(vector<int>& findNums, vector<int>&
@@ -2960,9 +2899,9 @@ nums) {
     }
 };
 
----------------------------------------------------------------------------
-[下一个更大元素 II](https://leetcode-cn.com/problems/next-greater-element-ii)    
----------------------------------------------------------------------------------
+ 
+##[下一个更大元素 II](https://leetcode-cn.com/problems/next-greater-element-ii)    
+ 
 class Solution {
 public:
     vector<int> nextGreaterElements(vector<int>& nums) {
@@ -2988,9 +2927,9 @@ public:
     }
 };
 
----------------------------------------------------------------------------
-堆
-==
+ 
+#堆
+
 
 例如，常用数据处理方式
 最小堆用于处理前k大
@@ -3018,9 +2957,9 @@ pq;  //次数的最小堆（字母的最大堆）
 set 也可以当做唯一性的最小堆（因为红黑树的有序性，map同理）
 
 
----------------------------------------------------------------------------
-[数据流的中位数](https://leetcode-cn.com/problems/find-median-from-data-stream)    
------------------------------------------------------------------------------------
+ 
+##[数据流的中位数](https://leetcode-cn.com/problems/find-median-from-data-stream)    
+ 
 class MedianFinder {
 public:
     priority_queue<int> big;
@@ -3054,9 +2993,9 @@ public:
         return big.size() > small.size() ?  big.top() :double(big.top() + small.top())/2;
     }
 };
------------------------------------------------------------------------------------
-[前K个高频元素](https://leetcode-cn.com/problems/top-k-frequent-elements)    
------------------------------------------------------------------------------
+ 
+##[前K个高频元素](https://leetcode-cn.com/problems/top-k-frequent-elements)    
+ 
 class Solution {
 public:
     struct cmp
@@ -3088,9 +3027,9 @@ pq;//最小堆
     }
 };
 
------------------------------------------------------------------------------------
-[前K个高频单词](https://leetcode-cn.com/problems/top-k-frequent-words)    
---------------------------------------------------------------------------
+ 
+##[前K个高频单词](https://leetcode-cn.com/problems/top-k-frequent-words)    
+ 
 class Solution {
 public:
     struct cmp{  
@@ -3125,23 +3064,23 @@ pq;  
     }
 };
 
------------------------------------------------------------------------------------
-[最长有效括号](https://leetcode-cn.com/problems/longest-valid-parentheses)    
-------------------------------------------------------------------------------
+ 
+##[最长有效括号](https://leetcode-cn.com/problems/longest-valid-parentheses)    
+ 
 
-数字
-====
+#数字
+ 
 （找规律）
 
------------------------------------------------------------------------------------
-[整数拆分](https://leetcode-cn.com/problems/integer-break)    
---------------------------------------------------------------
-[Nim游戏](https://leetcode-cn.com/problems/nim-game)    
---------------------------------------------------------
-[加一](https://leetcode-cn.com/problems/plus-one)    
------------------------------------------------------
-[完全平方数](https://leetcode-cn.com/problems/perfect-squares)    
-------------------------------------------------------------------
+ 
+##[整数拆分](https://leetcode-cn.com/problems/integer-break)    
+ 
+##[Nim游戏](https://leetcode-cn.com/problems/nim-game)    
+ 
+##[加一](https://leetcode-cn.com/problems/plus-one)    
+ 
+##[完全平方数](https://leetcode-cn.com/problems/perfect-squares)    
+ 
 class Solution {
 public:
     int numSquares(int n) 
@@ -3159,12 +3098,12 @@ public:
         return dp[n];
     }
 };
-------------------------------------------------------------------
-[超级丑数](https://leetcode-cn.com/problems/super-ugly-number)    
-------------------------------------------------------------------
+ 
+##[超级丑数](https://leetcode-cn.com/problems/super-ugly-number)    
+ 
 
-[x 的平方根](https://leetcode-cn.com/problems/sqrtx)    
---------------------------------------------------------
+##[x 的平方根](https://leetcode-cn.com/problems/sqrtx)    
+ 
 class Solution {
 public:
     int mySqrt(int x) {
@@ -3180,9 +3119,9 @@ public:
         return (int)mid;  
     }
 };
------------------------------------------------------------------------------------
-[快乐数](https://leetcode-cn.com/problems/happy-number) 
---------------------------------------------------------
+ 
+##[快乐数](https://leetcode-cn.com/problems/happy-number) 
+ 
 就是检查是否会循环
 class Solution {
 public:
@@ -3204,9 +3143,9 @@ public:
         return true;
     }
 };
------------------------------------------------------------------------------------
-[计数质数](https://leetcode-cn.com/problems/count-primes)    
--------------------------------------------------------------
+ 
+##[计数质数](https://leetcode-cn.com/problems/count-primes)    
+ 
 贪心方式填数
 class Solution {
 public:
@@ -3229,14 +3168,14 @@ public:
         return c;
     }
 };
------------------------------------------------------------------------------------
-[整数替换](https://leetcode-cn.com/problems/integer-replacement)    
---------------------------------------------------------------------
-[求众数 II](https://leetcode-cn.com/problems/majority-element-ii)    
----------------------------------------------------------------------
------------------------------------------------------------------------------------
-[数字1的个数](https://leetcode-cn.com/problems/number-of-digit-one)    
------------------------------------------------------------------------------------
+ 
+##[整数替换](https://leetcode-cn.com/problems/integer-replacement)    
+ 
+##[求众数 II](https://leetcode-cn.com/problems/majority-element-ii)    
+ 
+ 
+##[数字1的个数](https://leetcode-cn.com/problems/number-of-digit-one)    
+ 
 class Solution {
 public:
     int countDigitOne(int n) {
@@ -3273,67 +3212,67 @@ public:
 };
 
 
-其他
-====
-[Excel表列序号](https://leetcode-cn.com/problems/excel-sheet-column-number)    
--------------------------------------------------------------------------------
-[数字范围按位与](https://leetcode-cn.com/problems/bitwise-and-of-numbers-range)    
------------------------------------------------------------------------------------
------------------------------------------------------------------------------------
-[颠倒二进制位](https://leetcode-cn.com/problems/reverse-bits)    
------------------------------------------------------------------------------------
-[分数到小数](https://leetcode-cn.com/problems/fraction-to-recurring-decimal)    
------------------------------------------------------------------------------------
-[阶乘后的零](https://leetcode-cn.com/problems/factorial-trailing-zeroes)    
------------------------------------------------------------------------------------
-[最大数](https://leetcode-cn.com/problems/largest-number)    
------------------------------------------------------------------------------------
-[移除元素](https://leetcode-cn.com/problems/remove-element)    
------------------------------------------------------------------------------------
-[两数相除](https://leetcode-cn.com/problems/divide-two-integers)    
------------------------------------------------------------------------------------
-[二进制求和](https://leetcode-cn.com/problems/add-binary)    
------------------------------------------------------------------------------------
+#其他
+ 
+##[Excel表列序号](https://leetcode-cn.com/problems/excel-sheet-column-number)    
+ 
+##[数字范围按位与](https://leetcode-cn.com/problems/bitwise-and-of-numbers-range)    
+ 
+ 
+##[颠倒二进制位](https://leetcode-cn.com/problems/reverse-bits)    
+ 
+##[分数到小数](https://leetcode-cn.com/problems/fraction-to-recurring-decimal)    
+ 
+##[阶乘后的零](https://leetcode-cn.com/problems/factorial-trailing-zeroes)    
+ 
+##[最大数](https://leetcode-cn.com/problems/largest-number)    
+ 
+##[移除元素](https://leetcode-cn.com/problems/remove-element)    
+ 
+##[两数相除](https://leetcode-cn.com/problems/divide-two-integers)    
+ 
+##[二进制求和](https://leetcode-cn.com/problems/add-binary)    
+ 
 
-[整数转罗马数字](https://leetcode-cn.com/problems/integer-to-roman)    
------------------------------------------------------------------------
-[罗马数字转整数](https://leetcode-cn.com/problems/roman-to-integer)    
------------------------------------------------------------------------
+##[整数转罗马数字](https://leetcode-cn.com/problems/integer-to-roman)    
 
-[电话号码的字母组合](https://leetcode-cn.com/problems/letter-combinations-of-a-phone-number)    
-------------------------------------------------------------------------------------------------
-[整数反转](https://leetcode-cn.com/problems/reverse-integer)    
-----------------------------------------------------------------
-[字符串转换整数 (atoi)](https://leetcode-cn.com/problems/string-to-integer-atoi)    
-------------------------------------------------------------------------------------
-[回文数](https://leetcode-cn.com/problems/palindrome-number)    
-----------------------------------------------------------------
-[3的幂](https://leetcode-cn.com/problems/power-of-three)    
-------------------------------------------------------------
-[比特位计数](https://leetcode-cn.com/problems/counting-bits)    
-----------------------------------------------------------------
-[各位相加](https://leetcode-cn.com/problems/add-digits)    
------------------------------------------------------------
-[丑数](https://leetcode-cn.com/problems/ugly-number)    
---------------------------------------------------------
-[丑数 II](https://leetcode-cn.com/problems/ugly-number-ii)    
---------------------------------------------------------------
-[缺失数字](https://leetcode-cn.com/problems/missing-number)    
----------------------------------------------------------------
-[两整数之和](https://leetcode-cn.com/problems/sum-of-two-integers)    
-----------------------------------------------------------------------
-[查找和最小的K对数字](https://leetcode-cn.com/problems/find-k-pairs-with-smallest-sums)    
--------------------------------------------------------------------------------------------
-[猜数字大小](https://leetcode-cn.com/problems/guess-number-higher-or-lower)    
--------------------------------------------------------------------------------
-[猜数字大小 II](https://leetcode-cn.com/problems/guess-number-higher-or-lower-ii)    
--------------------------------------------------------------------------------------
-[寻找两个有序数组的中位数](https://leetcode-cn.com/problems/median-of-two-sorted-arrays)    
---------------------------------------------------------------------------------------------
-[汉明距离](https://leetcode-cn.com/problems/hamming-distance)    
------------------------------------------------------------------
-[第三大的数](https://leetcode-cn.com/problems/third-maximum-number)    
------------------------------------------------------------------------
+##[罗马数字转整数](https://leetcode-cn.com/problems/roman-to-integer)    
+
+
+##[电话号码的字母组合](https://leetcode-cn.com/problems/letter-combinations-of-a-phone-number)    
+ 
+##[整数反转](https://leetcode-cn.com/problems/reverse-integer)    
+ 
+##[字符串转换整数 (atoi)](https://leetcode-cn.com/problems/string-to-integer-atoi)    
+ 
+##[回文数](https://leetcode-cn.com/problems/palindrome-number)    
+ 
+##[3的幂](https://leetcode-cn.com/problems/power-of-three)    
+ 
+##[比特位计数](https://leetcode-cn.com/problems/counting-bits)    
+ 
+##[各位相加](https://leetcode-cn.com/problems/add-digits)    
+ 
+##[丑数](https://leetcode-cn.com/problems/ugly-number)    
+ 
+##[丑数 II](https://leetcode-cn.com/problems/ugly-number-ii)    
+ 
+##[缺失数字](https://leetcode-cn.com/problems/missing-number)    
+ 
+##[两整数之和](https://leetcode-cn.com/problems/sum-of-two-integers)    
+ 
+##[查找和最小的K对数字](https://leetcode-cn.com/problems/find-k-pairs-with-smallest-sums)    
+ 
+##[猜数字大小](https://leetcode-cn.com/problems/guess-number-higher-or-lower)    
+ 
+##[猜数字大小 II](https://leetcode-cn.com/problems/guess-number-higher-or-lower-ii)    
+ 
+##[寻找两个有序数组的中位数](https://leetcode-cn.com/problems/median-of-two-sorted-arrays)    
+ 
+##[汉明距离](https://leetcode-cn.com/problems/hamming-distance)    
+ 
+##[第三大的数](https://leetcode-cn.com/problems/third-maximum-number)    
+
 利用了set的唯一性和有序性
 class Solution {
 public:
@@ -3348,59 +3287,59 @@ s.erase(s.begin());//删除小的，类似最小堆，但是是唯一的，因�
     }
 };
 
---------------------------------------------------------------------
-[数字的补数](https://leetcode-cn.com/problems/number-complement)    
---------------------------------------------------------------------
-[七进制数](https://leetcode-cn.com/problems/base-7)    
--------------------------------------------------------
-[学生出勤记录 I](https://leetcode-cn.com/problems/student-attendance-record-i)    
-----------------------------------------------------------------------------------
-[自除数](https://leetcode-cn.com/problems/self-dividing-numbers)    
---------------------------------------------------------------------
-[宝石与石头](https://leetcode-cn.com/problems/jewels-and-stones)    
---------------------------------------------------------------------
-[机器人能否返回原点](https://leetcode-cn.com/problems/robot-return-to-origin)    
----------------------------------------------------------------------------------
+ 
+##[数字的补数](https://leetcode-cn.com/problems/number-complement)    
+ 
+##[七进制数](https://leetcode-cn.com/problems/base-7)    
+ 
+##[学生出勤记录 I](https://leetcode-cn.com/problems/student-attendance-record-i)    
+ 
+##[自除数](https://leetcode-cn.com/problems/self-dividing-numbers)    
+ 
+##[宝石与石头](https://leetcode-cn.com/problems/jewels-and-stones)    
+ 
+##[机器人能否返回原点](https://leetcode-cn.com/problems/robot-return-to-origin)    
+ 
 
 
-数组
-====
+#数组
+ 
 
-排列组合
-====
+##排列组合
+ 
 
-----------------------------------------------------------------------
-[第k个排列](https://leetcode-cn.com/problems/permutation-sequence)    
-----------------------------------------------------------------------
-[目标和](https://leetcode-cn.com/problems/target-sum)    
----------------------------------------------------------
-[四数相加 II](https://leetcode-cn.com/problems/4sum-ii)    
------------------------------------------------------------
-[下一个排列](https://leetcode-cn.com/problems/next-permutation)    
--------------------------------------------------------------------
+ 
+##[第k个排列](https://leetcode-cn.com/problems/permutation-sequence)    
+ 
+##[目标和](https://leetcode-cn.com/problems/target-sum)    
+ 
+##[四数相加 II](https://leetcode-cn.com/problems/4sum-ii)    
+ 
+##[下一个排列](https://leetcode-cn.com/problems/next-permutation)    
+ 
 
 
-区间和
-====
+#区间和
 
-----------------------------------------------------------------------
+
+ 
 [和为K的子数组](https://leetcode-cn.com/problems/subarray-sum-equals-k)    
-----------------------------------------------------------------------
+ 
 
-(其他数组)
-----------------------------------------------------------------------
-[在排序数组中查找元素的第一个和最后一个位置](https://leetcode-cn.com/problems/find-first-and-last-position-of-element-in-sorted-array)    
--------------------------------------------------------------------------------------------
-[寻找重复数](https://leetcode-cn.com/problems/find-the-duplicate-number)    
-----------------------------------------------------------------------------
-[除自身以外数组的乘积](https://leetcode-cn.com/problems/product-of-array-except-self)    
------------------------------------------------------------------------------------------
-[区域和检索 - 数组不可变](https://leetcode-cn.com/problems/range-sum-query-immutable)    
------------------------------------------------------------------------------------------
-[汇总区间](https://leetcode-cn.com/problems/summary-ranges)    
----------------------------------------------------------------
-[最长公共前缀](https://leetcode-cn.com/problems/longest-common-prefix)    
---------------------------------------------------------------------------
+##其他数组
+ 
+##[在排序数组中查找元素的第一个和最后一个位置](https://leetcode-cn.com/problems/find-first-and-last-position-of-element-in-sorted-array)    
+ 
+##[寻找重复数](https://leetcode-cn.com/problems/find-the-duplicate-number)    
+ 
+##[除自身以外数组的乘积](https://leetcode-cn.com/problems/product-of-array-except-self)    
+ 
+##[区域和检索 - 数组不可变](https://leetcode-cn.com/problems/range-sum-query-immutable)    
+ 
+##[汇总区间](https://leetcode-cn.com/problems/summary-ranges)    
+ 
+##[最长公共前缀](https://leetcode-cn.com/problems/longest-common-prefix)    
+ 
 跟第一个比较
 class Solution {
 public:
@@ -3419,9 +3358,9 @@ public:
         return firstStr.substr(0, len);
     }
 };
---------------------------------------------------------------------------
-[逆波兰表达式求值](https://leetcode-cn.com/problems/evaluate-reverse-polish-notation)    
------------------------------------------------------------------------------------------
+ 
+##[逆波兰表达式求值](https://leetcode-cn.com/problems/evaluate-reverse-polish-notation)    
+ 
 class Solution {
 public:
     int evalRPN(vector<string>& tokens) {
@@ -3478,9 +3417,9 @@ public:
     }
 };
 
---------------------------------------------------------------------------
-[寻找峰值](https://leetcode-cn.com/problems/find-peak-element)    
-------------------------------------------------------------------
+ 
+##[寻找峰值](https://leetcode-cn.com/problems/find-peak-element)    
+ 
 class Solution {
 public://
     int findPeakElement(vector<int>& nums) {
@@ -3507,9 +3446,9 @@ public://
     }
 };
 
---------------------------------------------------------------------------
-[同构字符串](https://leetcode-cn.com/problems/isomorphic-strings)    
----------------------------------------------------------------------
+ 
+##[同构字符串](https://leetcode-cn.com/problems/isomorphic-strings)    
+
 class Solution {
 public:
     bool isIsomorphic(string s, string t) {
@@ -3531,9 +3470,9 @@ public:
     }
 };
 
---------------------------------------------------------------------------
-[颜色分类](https://leetcode-cn.com/problems/sort-colors)    
-------------------------------------------------------------
+ 
+##[颜色分类](https://leetcode-cn.com/problems/sort-colors)    
+ 
 class Solution {
 public:
     void sortColors(vector<int>& nums) {
@@ -3553,9 +3492,9 @@ public:
     }
 };
 
---------------------------------------------------------------------------
-[两数之和 II - 输入有序数组](https://leetcode-cn.com/problems/two-sum-ii-input-array-is-sorted)    
----------------------------------------------------------------------------------------------------
+ 
+##[两数之和 II - 输入有序数组](https://leetcode-cn.com/problems/two-sum-ii-input-array-is-sorted)    
+ 
 class Solution {
 public:
     vector<int> twoSum(vector<int>& numbers, int target) {
@@ -3570,9 +3509,9 @@ public:
     }
 };
 
---------------------------------------------------------------------------
-[加油站](https://leetcode-cn.com/problems/gas-station)    
-----------------------------------------------------------
+ 
+##[加油站](https://leetcode-cn.com/problems/gas-station)    
+ 
 class Solution {
 public:
     int canCompleteCircuit(vector<int>& gas, vector<int>& cost) {
@@ -3595,9 +3534,9 @@ public:
     }
 };
 
---------------------------------------------------------------------------
-[旋转数组](https://leetcode-cn.com/problems/rotate-array)
----------------------------------------------------------
+ 
+##[旋转数组](https://leetcode-cn.com/problems/rotate-array)
+ 
 
 翻转会调换位置，再翻转回来就行
 class Solution {
@@ -3610,10 +3549,10 @@ public:
         reverse(nums.begin()+k,nums.end());
     }
 };
---------------------------------------------------------------------------
---------------------------------------------------------------------------
-[删除排序数组中的重复项 II](https://leetcode-cn.com/problems/remove-duplicates-from-sorted-array-ii)    
---------------------------------------------------------------------------------------------------------
+ 
+ 
+##[删除排序数组中的重复项 II](https://leetcode-cn.com/problems/remove-duplicates-from-sorted-array-ii)    
+ 
 class Solution {
 public:
     int removeDuplicates(vector<int>& nums) 
@@ -3629,9 +3568,9 @@ public:
         return count;
     }
 };
---------------------------------------------------------------------------
-[求众数](https://leetcode-cn.com/problems/majority-element)    
----------------------------------------------------------------
+ 
+##[求众数](https://leetcode-cn.com/problems/majority-element)    
+ 
 class Solution {
 public:
     int majorityElement(vector<int>& nums) {
@@ -3653,9 +3592,9 @@ public:
         return n;
     }
 };
---------------------------------------------------------------------------
-[杨辉三角](https://leetcode-cn.com/problems/pascals-triangle)    
------------------------------------------------------------------
+ 
+##[杨辉三角](https://leetcode-cn.com/problems/pascals-triangle)    
+ 
 class Solution {
 public:
     vector<vector<int>> generate(int numRows) {
@@ -3681,9 +3620,9 @@ public:
         return vecs;
     }
 };
---------------------------------------------------------------------------
-[杨辉三角 II](https://leetcode-cn.com/problems/pascals-triangle-ii)    
------------------------------------------------------------------------
+ 
+##[杨辉三角 II](https://leetcode-cn.com/problems/pascals-triangle-ii)    
+
 class Solution {
 public:
     vector<int> getRow(int rowIndex) {
@@ -3706,9 +3645,9 @@ public:
         return rows[cur];
     }
 };
---------------------------------------------------------------------------
-[合并两个有序数组](https://leetcode-cn.com/problems/merge-sorted-array)    
----------------------------------------------------------------------------
+ 
+##[合并两个有序数组](https://leetcode-cn.com/problems/merge-sorted-array)    
+ 
 class Solution {
 public:
     void merge(vector<int>& nums1, int m, vector<int>& nums2, int n) 
@@ -3730,10 +3669,9 @@ public:
         while(j >= 0)nums1[k--] = nums2[j--];
     }
 };
---------------------------------------------------------------------------
-[搜索二维矩阵](https://leetcode-cn.com/problems/search-a-2d-matrix)
--------------------------------------------------------------------
-把二维矩阵当做一维数组来计算，就是访问下标时需要转换下标
+ 
+##[搜索二维矩阵](https://leetcode-cn.com/problems/search-a-2d-matrix)
+ 把二维矩阵当做一维数组来计算，就是访问下标时需要转换下标
 class Solution {
 public:
     bool searchMatrix(vector<vector<int>>& matrix, int target) {
@@ -3753,9 +3691,9 @@ public:
         return false;
     }
 };
---------------------------------------------------------------------------
-[螺旋矩阵](https://leetcode-cn.com/problems/spiral-matrix)    
---------------------------------------------------------------
+ 
+##[螺旋矩阵](https://leetcode-cn.com/problems/spiral-matrix)    
+ 
 注意边界条件
 class Solution {
 public:
@@ -3788,9 +3726,9 @@ public:
         return ret;
     }
 };
---------------------------------------------------------------------------
-[螺旋矩阵 II](https://leetcode-cn.com/problems/spiral-matrix-ii)    
---------------------------------------------------------------------
+ 
+##[螺旋矩阵 II](https://leetcode-cn.com/problems/spiral-matrix-ii)    
+ 
 class Solution {
 public:
     vector<vector<int>> generateMatrix(int n) 
@@ -3820,13 +3758,13 @@ public:
         return res;
     }
 };
---------------------------------------------------------------------------
-[搜索旋转排序数组](https://leetcode-cn.com/problems/search-in-rotated-sorted-array)    
----------------------------------------------------------------------------------------
-[搜索旋转排序数组 II](https://leetcode-cn.com/problems/search-in-rotated-sorted-array-ii)    
----------------------------------------------------------------------------------------------
-[数组中的第K个最大元素](https://leetcode-cn.com/problems/kth-largest-element-in-an-array) 
-------------------------------------------------------------------------------------------
+ 
+##[搜索旋转排序数组](https://leetcode-cn.com/problems/search-in-rotated-sorted-array)    
+ 
+##[搜索旋转排序数组 II](https://leetcode-cn.com/problems/search-in-rotated-sorted-array-ii)    
+ 
+##[数组中的第K个最大元素](https://leetcode-cn.com/problems/kth-largest-element-in-an-array) 
+ 
 class Solution {
 public:
     int findKthLargest(vector<int>& nums, int k) {
@@ -3839,9 +3777,9 @@ public:
         return pq.top();
     }
 };
---------------------------------------------------------------------------
-[存在重复元素](https://leetcode-cn.com/problems/contains-duplicate)    
------------------------------------------------------------------------
+ 
+##[存在重复元素](https://leetcode-cn.com/problems/contains-duplicate)    
+
 哈希表
 class Solution {
 public:
@@ -3854,9 +3792,9 @@ public:
         return false;
     }
 };
---------------------------------------------------------------------------
-[存在重复元素 II](https://leetcode-cn.com/problems/contains-duplicate-ii)    
------------------------------------------------------------------------------
+ 
+##[存在重复元素 II](https://leetcode-cn.com/problems/contains-duplicate-ii)    
+ 
 遍历时检查下标差
 class Solution {
 public:
@@ -3877,9 +3815,9 @@ k)
         return false;
     }
 };
----------------------------------------------------------------------------
-[存在重复元素 III](https://leetcode-cn.com/problems/contains-duplicate-iii)
----------------------------------------------------------------------------
+ 
+##[存在重复元素 III](https://leetcode-cn.com/problems/contains-duplicate-iii)
+ 
 利用set的有序性计算键的差值，消除非法下标，就可以获取合法条件值
 class Solution {
 public:
@@ -3897,9 +3835,9 @@ t);//获取和小于等于t的下一个数（n >= nums[i] - t)  ,nums[i] - n <
         return false;
     }
 };
----------------------------------------------------------------------------
-[长度最小的子数组](https://leetcode-cn.com/problems/minimum-size-subarray-sum)    
-----------------------------------------------------------------------------------
+ 
+##[长度最小的子数组](https://leetcode-cn.com/problems/minimum-size-subarray-sum)    
+ 
 class Solution {
 public:
     int minSubArrayLen(int s, vector<int>& nums) {
@@ -3914,9 +3852,9 @@ public:
             return res == INT_MAX ? 0 : res;
     }
 };
----------------------------------------------------------------------------
-[合并区间](https://leetcode-cn.com/problems/merge-intervals)    
-----------------------------------------------------------------
+ 
+##[合并区间](https://leetcode-cn.com/problems/merge-intervals)    
+ 
 先排序，再遍历检查和合并
 class Solution {
 public:
@@ -3945,15 +3883,15 @@ public:
         return val1.start < val2.start;  
     }  
 };
----------------------------------------------------------------------------
-[插入区间](https://leetcode-cn.com/problems/insert-interval)    
-----------------------------------------------------------------
-[删除排序数组中的重复项](https://leetcode-cn.com/problems/remove-duplicates-from-sorted-array)    
---------------------------------------------------------------------------------------------------
-[递增的三元子序列](https://leetcode-cn.com/problems/increasing-triplet-subsequence)    
----------------------------------------------------------------------------------------
-[滑动窗口最大值](https://leetcode-cn.com/problems/sliding-window-maximum)
--------------------------------------------------------------------------
+ 
+##[插入区间](https://leetcode-cn.com/problems/insert-interval)    
+ 
+##[删除排序数组中的重复项](https://leetcode-cn.com/problems/remove-duplicates-from-sorted-array)    
+ 
+##[递增的三元子序列](https://leetcode-cn.com/problems/increasing-triplet-subsequence)    
+ 
+##[滑动窗口最大值](https://leetcode-cn.com/problems/sliding-window-maximum)
+ 
 
 使用链表保存窗口中的从大到小的列表，表头的就是需要的值
 class Solution {
@@ -3977,9 +3915,9 @@ l;//链表表头始终保存的是最大的元素，递减较小的成员会排�
     }
 };
 
----------------------------------------------------------------------------
-[移动零](https://leetcode-cn.com/problems/move-zeroes)
-------------------------------------------------------
+ 
+##[移动零](https://leetcode-cn.com/problems/move-zeroes)
+ 
 从前往后边遍历交换，保持稳定性
 class Solution {
 public:
@@ -3995,21 +3933,21 @@ public:
     }
 };
 
----------------------------------------------------------------------------
-[计算右侧小于当前元素的个数](https://leetcode-cn.com/problems/count-of-smaller-numbers-after-self)    
-------------------------------------------------------------------------------------------------------
-[打乱数组](https://leetcode-cn.com/problems/shuffle-an-array)    
------------------------------------------------------------------
-[有序矩阵中第K小的元素](https://leetcode-cn.com/problems/kth-smallest-element-in-a-sorted-matrix)    
------------------------------------------------------------------------------------------------------
-[摆动排序 II](https://leetcode-cn.com/problems/wiggle-sort-ii)    
-------------------------------------------------------------------
-[组合总和 Ⅳ](https://leetcode-cn.com/problems/combination-sum-iv)    
----------------------------------------------------------------------
-[找到所有数组中消失的数字](https://leetcode-cn.com/problems/find-all-numbers-disappeared-in-an-array)    
-------------------------------------------------------------------------------------------------
-[两个数组的交集](https://leetcode-cn.com/problems/intersection-of-two-arrays)
------------------------------------------------------------------------------
+ 
+##[计算右侧小于当前元素的个数](https://leetcode-cn.com/problems/count-of-smaller-numbers-after-self)    
+ 
+##[打乱数组](https://leetcode-cn.com/problems/shuffle-an-array)    
+ 
+##[有序矩阵中第K小的元素](https://leetcode-cn.com/problems/kth-smallest-element-in-a-sorted-matrix)    
+ 
+##[摆动排序 II](https://leetcode-cn.com/problems/wiggle-sort-ii)    
+ 
+##[组合总和 Ⅳ](https://leetcode-cn.com/problems/combination-sum-iv)    
+ 
+##[找到所有数组中消失的数字](https://leetcode-cn.com/problems/find-all-numbers-disappeared-in-an-array)    
+ 
+##[两个数组的交集](https://leetcode-cn.com/problems/intersection-of-two-arrays)
+ 
 
 使用哈希表的快速访问
 class Solution {
@@ -4029,11 +3967,11 @@ public:
     }
 };
 
----------------------------------------------------------------------------
-[两个数组的交集 II](https://leetcode-cn.com/problems/intersection-of-two-arrays-ii)    
----------------------------------------------------------------------------------------
-[最大连续1的个数](https://leetcode-cn.com/problems/max-consecutive-ones)
-------------------------------------------------------------------------
+ 
+##[两个数组的交集 II](https://leetcode-cn.com/problems/intersection-of-two-arrays-ii)    
+ 
+##[最大连续1的个数](https://leetcode-cn.com/problems/max-consecutive-ones)
+ 
 遍历数组和判断
 class Solution {
 public:
@@ -4049,25 +3987,25 @@ public:
     }
 };
 
----------------------------------------------------------------------------
-[连续的子数组和](https://leetcode-cn.com/problems/continuous-subarray-sum)    
-------------------------------------------------------------------------------
-[数组拆分 I](https://leetcode-cn.com/problems/array-partition-i)    
---------------------------------------------------------------------
-[错误的集合](https://leetcode-cn.com/problems/set-mismatch)    
----------------------------------------------------------------
-[数组的度](https://leetcode-cn.com/problems/degree-of-an-array)    
--------------------------------------------------------------------
-[划分为k个相等的子集](https://leetcode-cn.com/problems/partition-to-k-equal-sum-subsets)    
---------------------------------------------------------------------------------------------
-[转置矩阵](https://leetcode-cn.com/problems/transpose-matrix)    
------------------------------------------------------------------
-[最长连续递增序列](https://leetcode-cn.com/problems/longest-continuous-increasing-subsequence)    
---------------------------------------------------------------------------------------------------
-[最短无序连续子数组](https://leetcode-cn.com/problems/shortest-unsorted-continuous-subarray)    
-------------------------------------------------------------------------------------------------
-[任务调度器](https://leetcode-cn.com/problems/task-scheduler)    
------------------------------------------------------------------
+ 
+##[连续的子数组和](https://leetcode-cn.com/problems/continuous-subarray-sum)    
+ 
+##[数组拆分 I](https://leetcode-cn.com/problems/array-partition-i)    
+ 
+##[错误的集合](https://leetcode-cn.com/problems/set-mismatch)    
+ 
+##[数组的度](https://leetcode-cn.com/problems/degree-of-an-array)    
+ 
+##[划分为k个相等的子集](https://leetcode-cn.com/problems/partition-to-k-equal-sum-subsets)    
+ 
+##[转置矩阵](https://leetcode-cn.com/problems/transpose-matrix)    
+ 
+##[最长连续递增序列](https://leetcode-cn.com/problems/longest-continuous-increasing-subsequence)    
+ 
+##[最短无序连续子数组](https://leetcode-cn.com/problems/shortest-unsorted-continuous-subarray)    
+ 
+##[任务调度器](https://leetcode-cn.com/problems/task-scheduler)    
+ 
 因为任务的等待时间，制约的就是数量最大的任务，时间=（该类任务等待时间 + 1） *
 （该类任务数量 -1） + 该类任务同样数量的任务的类数  ，或者任务数中的较大的
 class Solution {
@@ -4083,20 +4021,18 @@ public:
         return max((mVec.back()-1)*(n+1)+i,(int)tasks.size());
     }
 };
----------------------------------------------------------------------------
+ 
 
-字符串
-======
-(排列)
+#字符串
+ 
+##(排列)
+ 
+##[下一个更大元素 III](https://leetcode-cn.com/problems/next-greater-element-iii)
+ 
+##(切分)
 
----------------------------------------------------------------------------
-[下一个更大元素 III](https://leetcode-cn.com/problems/next-greater-element-iii)
--------------------------------------------------------------------------------
-(切分)
-
----------------------------------------------------------------------------
-[简化路径](https://leetcode-cn.com/problems/simplify-path) 
------------------------------------------------------------
+##[简化路径](https://leetcode-cn.com/problems/simplify-path) 
+ 
 字节流的分割和遍历
 class Solution {
 public:
@@ -4118,26 +4054,27 @@ public:
         return res.size() ? res:"/";
     }
 };
-（字符数组）
----------------------------------------------------------------------------
-[压缩字符串](https://leetcode-cn.com/problems/string-compression)    
----------------------------------------------------------------------
-(其他)
----------------------------------------------------------------------------
-[基本计算器 II](https://leetcode-cn.com/problems/basic-calculator-ii)    
--------------------------------------------------------------------------
-[最后一个单词的长度](https://leetcode-cn.com/problems/length-of-last-word)    
-------------------------------------------------------------------------------
-[实现strStr()](https://leetcode-cn.com/problems/implement-strstr)    
----------------------------------------------------------------------
-[验证回文串](https://leetcode-cn.com/problems/valid-palindrome)   
-------------------------------------------------------------------
-[报数](https://leetcode-cn.com/problems/count-and-say)    
-----------------------------------------------------------
-[字符串相乘](https://leetcode-cn.com/problems/multiply-strings)    
--------------------------------------------------------------------
-[找不同](https://leetcode-cn.com/problems/find-the-difference)    
-------------------------------------------------------------------
+
+##（字符数组）
+
+##[压缩字符串](https://leetcode-cn.com/problems/string-compression)    
+
+##(其他)
+
+##[基本计算器 II](https://leetcode-cn.com/problems/basic-calculator-ii)    
+ 
+##[最后一个单词的长度](https://leetcode-cn.com/problems/length-of-last-word)    
+ 
+##[实现strStr()](https://leetcode-cn.com/problems/implement-strstr)    
+ 
+##[验证回文串](https://leetcode-cn.com/problems/valid-palindrome)   
+ 
+##[报数](https://leetcode-cn.com/problems/count-and-say)    
+ 
+##[字符串相乘](https://leetcode-cn.com/problems/multiply-strings)    
+ 
+##[找不同](https://leetcode-cn.com/problems/find-the-difference)    
+ 
 class Solution {
 public:
     char findTheDifference(string s, string t) {
@@ -4151,9 +4088,9 @@ public:
         return 0;
     }
 };
----------------------------------------------------------------------------
-[去除重复字母](https://leetcode-cn.com/problems/remove-duplicate-letters)
--------------------------------------------------------------------------
+ 
+##[去除重复字母](https://leetcode-cn.com/problems/remove-duplicate-letters)
+ 
 贪心计算字符
 class Solution {
 public:
@@ -4176,9 +4113,9 @@ continue;//同样的字符前面访问过的就不再访问，因为没意义
         return res.substr(1);
     }
 };
----------------------------------------------------------------------------
-[最长回文子串](https://leetcode-cn.com/problems/longest-palindromic-substring)    
-----------------------------------------------------------------------------------
+ 
+##[最长回文子串](https://leetcode-cn.com/problems/longest-palindromic-substring)    
+ 
 class Solution {
 public:
     int begin = 0;int maxLen = 0;
@@ -4202,9 +4139,9 @@ public:
         }
     }
 };
----------------------------------------------------------------------------
-[反转字符串](https://leetcode-cn.com/problems/reverse-string)    
------------------------------------------------------------------
+ 
+##[反转字符串](https://leetcode-cn.com/problems/reverse-string)    
+ 
 class Solution {
 public:
     void reverseString(vector<char>& s) {
@@ -4216,19 +4153,19 @@ public:
         }
     }
 };
----------------------------------------------------------------------------
-[反转字符串中的元音字母](https://leetcode-cn.com/problems/reverse-vowels-of-a-string)    
------------------------------------------------------------------------------------------
-[至少有K个重复字符的最长子串](https://leetcode-cn.com/problems/longest-substring-with-at-least-k-repeating-characters)    
-------------------------------------------------------------------------------------------
-[字符串中的第一个唯一字符](https://leetcode-cn.com/problems/first-unique-character-in-a-string)    
----------------------------------------------------------------------------------------------------
-[字符串解码](https://leetcode-cn.com/problems/decode-string)    
-----------------------------------------------------------------
-[找到字符串中所有字母异位词](https://leetcode-cn.com/problems/find-all-anagrams-in-a-string)    
-------------------------------------------------------------------------------------------------
-[无重复字符的最长子串](https://leetcode-cn.com/problems/longest-substring-without-repeating-characters)
--------------------------------------------------------------------------------------------------------
+ 
+##[反转字符串中的元音字母](https://leetcode-cn.com/problems/reverse-vowels-of-a-string)    
+ 
+##[至少有K个重复字符的最长子串](https://leetcode-cn.com/problems/longest-substring-with-at-least-k-repeating-characters)    
+ 
+##[字符串中的第一个唯一字符](https://leetcode-cn.com/problems/first-unique-character-in-a-string)    
+ 
+##[字符串解码](https://leetcode-cn.com/problems/decode-string)    
+ 
+##[找到字符串中所有字母异位词](https://leetcode-cn.com/problems/find-all-anagrams-in-a-string)    
+ 
+##[无重复字符的最长子串](https://leetcode-cn.com/problems/longest-substring-without-repeating-characters)
+ 
 class Solution {
 public:
   int lengthOfLongestSubstring(string s)
@@ -4251,9 +4188,9 @@ public:
       return global;
   }
 };
----------------------------------------------------------------------------
-[有效的字母异位词](https://leetcode-cn.com/problems/valid-anagram)    
-----------------------------------------------------------------------
+ 
+##[有效的字母异位词](https://leetcode-cn.com/problems/valid-anagram)    
+ 
 class Solution {
 public:
     bool isAnagram(string s, string t) 
@@ -4277,9 +4214,9 @@ public:
         return true;
     }
 };
----------------------------------------------------------------------------
-[Fizz Buzz](https://leetcode-cn.com/problems/fizz-buzz)    
------------------------------------------------------------
+ 
+##[Fizz Buzz](https://leetcode-cn.com/problems/fizz-buzz)    
+ 
 class Solution {
 public:
     vector<string> fizzBuzz(int n) {
@@ -4306,9 +4243,9 @@ public:
         return res;
     }
 };
----------------------------------------------------------------------------
-[字符串相加](https://leetcode-cn.com/problems/add-strings)    
---------------------------------------------------------------
+ 
+##[字符串相加](https://leetcode-cn.com/problems/add-strings)    
+ 
 class Solution {
 public:
     string addStrings(string num1, string num2) {
@@ -4336,9 +4273,9 @@ public:
         return res;
     }
 };
----------------------------------------------------------------------------
-[字符串中的单词数](https://leetcode-cn.com/problems/number-of-segments-in-a-string)    
----------------------------------------------------------------------------------------
+ 
+##[字符串中的单词数](https://leetcode-cn.com/problems/number-of-segments-in-a-string)    
+ 
 class Solution {
 public:
     int countSegments(string s) {
@@ -4351,11 +4288,11 @@ public:
         return res;
     }
 };
----------------------------------------------------------------------------
-[最长回文串](https://leetcode-cn.com/problems/longest-palindrome)    
----------------------------------------------------------------------
-[重复的子字符串](https://leetcode-cn.com/problems/repeated-substring-pattern)    
----------------------------------------------------------------------------------
+ 
+##[最长回文串](https://leetcode-cn.com/problems/longest-palindrome)    
+ 
+##[重复的子字符串](https://leetcode-cn.com/problems/repeated-substring-pattern)    
+ 
 class Solution {
 public:
     bool repeatedSubstringPattern(string s) {
@@ -4364,9 +4301,9 @@ public:
         return newStr.find(s) != -1;
     }
 };
----------------------------------------------------------------------------
-[键盘行](https://leetcode-cn.com/problems/keyboard-row)    
------------------------------------------------------------
+ 
+##[键盘行](https://leetcode-cn.com/problems/keyboard-row)    
+ 
 class Solution {
 public:
     vector<string> findWords(vector<string>& words) {
@@ -4392,9 +4329,9 @@ public:
         return res;
     }
 };
----------------------------------------------------------------------------
-[检测大写字母](https://leetcode-cn.com/problems/detect-capital)    
--------------------------------------------------------------------
+ 
+##[检测大写字母](https://leetcode-cn.com/problems/detect-capital)    
+ 
 class Solution {
 public:
     bool detectCapitalUse(string word) {
@@ -4405,9 +4342,9 @@ public:
         return cnt == 0 || cnt == n || (cnt == 1 && word[0] <= 'Z');
     }
 };
----------------------------------------------------------------------------
-[单词替换](https://leetcode-cn.com/problems/replace-words)    
---------------------------------------------------------------
+ 
+##[单词替换](https://leetcode-cn.com/problems/replace-words)    
+ 
 class Solution {
 public:
     string replaceWords(vector<string>& dict, string sentence) {
@@ -4436,9 +4373,9 @@ public:
         return res;
     }
 };
----------------------------------------------------------------------------
-[词典中最长的单词](https://leetcode-cn.com/problems/longest-word-in-dictionary)    
------------------------------------------------------------------------------------
+ 
+##[词典中最长的单词](https://leetcode-cn.com/problems/longest-word-in-dictionary)
+ 
 class Solution {
 public:
     string longestWord(vector<string>& words) {
@@ -4454,9 +4391,9 @@ public:
         return res;
     }
 };
----------------------------------------------------------------------------
-[仅仅反转字母](https://leetcode-cn.com/problems/reverse-only-letters)    
--------------------------------------------------------------------------
+ 
+##[仅仅反转字母](https://leetcode-cn.com/problems/reverse-only-letters)    
+ 
 class Solution {
 public:
     string reverseOnlyLetters(string S) 
@@ -4481,9 +4418,9 @@ public:
         return S;
     }
 };
----------------------------------------------------------------------------
-[反转字符串 II](https://leetcode-cn.com/problems/reverse-string-ii)    
------------------------------------------------------------------------
+ 
+##[反转字符串 II](https://leetcode-cn.com/problems/reverse-string-ii)    
+
 class Solution {
 public:
     string reverseStr(string s, int k) {
@@ -4494,9 +4431,9 @@ public:
         return s;
     }
 };
-----------------------------------------------------------------------------
-[反转字符串中的单词 III](https://leetcode-cn.com/problems/reverse-words-in-a-string-iii)    
---------------------------------------------------------------------------------------------
+ 
+##[反转字符串中的单词 III](https://leetcode-cn.com/problems/reverse-words-in-a-string-iii)    
+ 
 class Solution {
 public:
     string reverseWords(string s) {
@@ -4512,9 +4449,9 @@ public:
         return s;
     }
 };
----------------------------------------------------------------------------
-[实现一个魔法字典](https://leetcode-cn.com/problems/implement-magic-dictionary)    
------------------------------------------------------------------------------------
+ 
+##[实现一个魔法字典](https://leetcode-cn.com/problems/implement-magic-dictionary)    
+ 
 class MagicDictionary {
 public:
     /** Initialize your data structure here. */
@@ -4541,11 +4478,11 @@ public:
     }
     unordered_set<string> words;
 };
-----------------------------------------------------------------------------
-[验证回文字符串 Ⅱ](https://leetcode-cn.com/problems/valid-palindrome-ii)    
---------------------------------------------------------------------------------
-[字母大小写全排列](https://leetcode-cn.com/problems/letter-case-permutation)    
---------------------------------------------------------------------------------
+ 
+##[验证回文字符串 Ⅱ](https://leetcode-cn.com/problems/valid-palindrome-ii)    
+ 
+##[字母大小写全排列](https://leetcode-cn.com/problems/letter-case-permutation)    
+ 
 class Solution {
 public:
     vector<string> res;
@@ -4573,18 +4510,18 @@ public:
         }
     }
 };
-----------------------------------------------------------------
-[旋转字符串](https://leetcode-cn.com/problems/rotate-string)    
-----------------------------------------------------------------
+ 
+##[旋转字符串](https://leetcode-cn.com/problems/rotate-string)    
+ 
 class Solution {
 public:
     bool rotateString(string A, string B) {
         return (A.length() == B.length()) && ((A + A).find(B) != string::npos);
     }
 };
-----------------------------------------------------------------
-[字符的最短距离](https://leetcode-cn.com/problems/shortest-distance-to-a-character)    
----------------------------------------------------------------------------------------
+ 
+##[字符的最短距离](https://leetcode-cn.com/problems/shortest-distance-to-a-character)    
+ 
 class Solution {
 public:
     vector<int> shortestToChar(string S, char C) {
@@ -4603,12 +4540,12 @@ public:
         return res;
     }
 };
-----------------------------------------------------------------
-哈希表
-====
-----------------------------------------------------------------
-[验证外星语词典](https://leetcode-cn.com/problems/verifying-an-alien-dictionary)    
-------------------------------------------------------------------------------------
+ 
+#哈希表
+
+ 
+##[验证外星语词典](https://leetcode-cn.com/problems/verifying-an-alien-dictionary)    
+ 
 class Solution {
 public:
     bool isAlienSorted(vector<string>& words, string order) {
@@ -4631,9 +4568,9 @@ public:
         return true;
     }
 };
-----------------------------------------------------------------
-[键值映射](https://leetcode-cn.com/problems/map-sum-pairs)    
-------------------------------------------------------------------------------------
+ 
+##[键值映射](https://leetcode-cn.com/problems/map-sum-pairs)    
+ 
 class MapSum {
 public:
     /** Initialize your data structure here. */
@@ -4654,14 +4591,14 @@ public:
     }
     unordered_map<string,int> m;
 };
-----------------------------------------------------------------
-二叉树
-======
+ 
+#二叉树
+ 
 常用dfs或者bfs，前序、中序、后序遍历，dfs一般需要递归
 
-----------------------------------------------------------------
-[求根到叶子节点数字之和](https://leetcode-cn.com/problems/sum-root-to-leaf-numbers)    
----------------------------------------------------------------------------------------
+ 
+##[求根到叶子节点数字之和](https://leetcode-cn.com/problems/sum-root-to-leaf-numbers)    
+ 
 class Solution {
 public:
     vector<int> sums;
@@ -4681,9 +4618,9 @@ public:
         if (root->right)dfs(root->right,num * 10 + root->val);
     }
 };
---------------------------------------------------------------------------------------
-[完全二叉树的节点个数](https://leetcode-cn.com/problems/count-complete-tree-nodes)    
---------------------------------------------------------------------------------------
+ 
+##[完全二叉树的节点个数](https://leetcode-cn.com/problems/count-complete-tree-nodes)    
+ 
 class Solution {
 public:
     int countNodes(TreeNode* root) {
@@ -4696,9 +4633,9 @@ public:
         return countNodes(root->left)+countNodes(root->right)+1;
     }
 };
---------------------------------------------------------------------------------------
-[二叉树中的最大路径和](https://leetcode-cn.com/problems/binary-tree-maximum-path-sum)    
------------------------------------------------------------------------------------------
+ 
+##[二叉树中的最大路径和](https://leetcode-cn.com/problems/binary-tree-maximum-path-sum)    
+ 
 class Solution {
 public:
     int maxPathSum(TreeNode* root) {
@@ -4717,9 +4654,9 @@ public:
         return max(0,max(root->val + leftPath,root->val + rightPath));//边路径最大值
     }
 };
---------------------------------------------------------------------------------------
-[二叉树的右视图](https://leetcode-cn.com/problems/binary-tree-right-side-view)    bfs 
---------------------------------------------------------------------------------------
+ 
+##[二叉树的右视图](https://leetcode-cn.com/problems/binary-tree-right-side-view)    bfs 
+ 
 class Solution {
 public:
     vector<TreeNode*> level[2];
@@ -4746,9 +4683,9 @@ public:
         bfs();
     }
 };
---------------------------------------------------------------------------------------
-[路径总和](https://leetcode-cn.com/problems/path-sum)    
----------------------------------------------------------
+ 
+##[路径总和](https://leetcode-cn.com/problems/path-sum)    
+ 
 class Solution {
 public:
     bool hasPathSum(TreeNode* root, int sum) {
@@ -4765,9 +4702,9 @@ public:
         return dfs(root->left,root->val + s,sum)||dfs(root->right,root->val + s,sum);
     }
 };
---------------------------------------------------------------------------------------
-[路径总和 II](https://leetcode-cn.com/problems/path-sum-ii)  dfs
-----------------------------------------------------------------
+ 
+##[路径总和 II](https://leetcode-cn.com/problems/path-sum-ii)  dfs
+ 
 //遍历节点，选择或者不选择
 class Solution {
 public:
@@ -4792,9 +4729,9 @@ public:
     }
     vector<vector<int>> res;
 };
---------------------------------------------------------------------------------------
-[二叉树展开为链表](https://leetcode-cn.com/problems/flatten-binary-tree-to-linked-list)    
--------------------------------------------------------------------------------------------
+ 
+##[二叉树展开为链表](https://leetcode-cn.com/problems/flatten-binary-tree-to-linked-list)    
+ 
 二叉树与链表关系的处理
 void flatten(TreeNode* root) {
         while (root) {  
@@ -4809,9 +4746,9 @@ void flatten(TreeNode* root) {
             root = root->right;  
         }  
     }
---------------------------------------------------------------------------------------
-[填充每个节点的下一个右侧节点指针](https://leetcode-cn.com/problems/populating-next-right-pointers-in-each-node)    
---------------------------------------------------------------------------------- 
+ 
+##[填充每个节点的下一个右侧节点指针](https://leetcode-cn.com/problems/populating-next-right-pointers-in-each-node)    
+  
 class Solution {
 public:
     void connect(TreeLinkNode *root) {
@@ -4834,9 +4771,9 @@ public:
         }
     }
 };
---------------------------------------------------------------------------------------
-[填充每个节点的下一个右侧节点指针 II](https://leetcode-cn.com/problems/populating-next-right-pointers-in-each-node-ii)    
--------------------------------------------------------------------------------------------- 
+ 
+##[填充每个节点的下一个右侧节点指针 II](https://leetcode-cn.com/problems/populating-next-right-pointers-in-each-node-ii)    
+  
 class Solution {
 public:
     Node* connect(Node  *root) {
@@ -4861,9 +4798,9 @@ public:
         return root;
     }
 };
---------------------------------------------------------------------------------------
-[二叉树的前序遍历](https://leetcode-cn.com/problems/binary-tree-preorder-traversal)    
----------------------------------------------------------------------------------------
+ 
+##[二叉树的前序遍历](https://leetcode-cn.com/problems/binary-tree-preorder-traversal)    
+ 
 class Solution {
 public:
     vector<int> preorderTraversal(TreeNode* root) {
@@ -4886,9 +4823,9 @@ public:
         return res;
     }
 };
-----------------------------------------------------------------------------------------
-[二叉树的后序遍历](https://leetcode-cn.com/problems/binary-tree-postorder-traversal)    
-----------------------------------------------------------------------------------------
+ 
+##[二叉树的后序遍历](https://leetcode-cn.com/problems/binary-tree-postorder-traversal)    
+ 
 class Solution {
 public:
     vector<int> postorderTraversal(TreeNode* root) 
@@ -4914,9 +4851,9 @@ public:
     }
 };
 
----------------------------------------------------------------------
-[翻转二叉树](https://leetcode-cn.com/problems/invert-binary-tree)    
----------------------------------------------------------------------
+ 
+##[翻转二叉树](https://leetcode-cn.com/problems/invert-binary-tree)    
+ 
 class Solution {
 public:
     TreeNode* invertTree(TreeNode* root) {
@@ -4936,9 +4873,9 @@ public:
     }
     queue<TreeNode*> q;
 };
---------------------------------------------------------------------------------------------------
-[二叉树的序列化与反序列化](https://leetcode-cn.com/problems/serialize-and-deserialize-binary-tree)
---------------------------------------------------------------------------------------------------
+ 
+##[二叉树的序列化与反序列化](https://leetcode-cn.com/problems/serialize-and-deserialize-binary-tree)
+ 
 //先序遍历序列化，对应的就可以使用dfs来反序列化了
 class Codec {
 public:
@@ -5005,9 +4942,9 @@ public:
         return node;
     }
 };
------------------------------------------------------------------------------------------
-[二叉搜索树中第K小的元素](https://leetcode-cn.com/problems/kth-smallest-element-in-a-bst)
------------------------------------------------------------------------------------------
+ 
+##[二叉搜索树中第K小的元素](https://leetcode-cn.com/problems/kth-smallest-element-in-a-bst)
+ 
 因为是二叉搜索树，使用中序遍历就可以，就是从小到大。使用栈来遍历
 class Solution {
 public:
@@ -5033,9 +4970,9 @@ public:
         return 0;
     }
 };
------------------------------------------------------------------------------------------
-[二叉搜索树的最近公共祖先](https://leetcode-cn.com/problems/lowest-common-ancestor-of-a-binary-search-tree)
------------------------------------------------------------------------------------------------------------
+ 
+##[二叉搜索树的最近公共祖先](https://leetcode-cn.com/problems/lowest-common-ancestor-of-a-binary-search-tree)
+ 
 因为是二叉搜索树，则可以根据值选择哪边，在中间的为本节点，大了或小了就选边，然后遍历下去
 class Solution {
 public:
@@ -5060,9 +4997,9 @@ public:
         return root;
     }
 };
------------------------------------------------------------------------------------------
-[二叉树的最近公共祖先](https://leetcode-cn.com/problems/lowest-common-ancestor-of-a-binary-tree) 
--------------------------------------------------------------------------------------------------
+ 
+##[二叉树的最近公共祖先](https://leetcode-cn.com/problems/lowest-common-ancestor-of-a-binary-tree) 
+ 
 因为是二叉树，求的是最近的，递归下去获取需求的节点，在两边的就是本节点，在一边的就是该边返回的
 class Solution {
 public:
@@ -5075,31 +5012,31 @@ public:
         return left ? left:right;
     }
 };
------------------------------------------------------------------------------------------
-[左叶子之和](https://leetcode-cn.com/problems/sum-of-left-leaves)    
----------------------------------------------------------------------
-[二叉树的中序遍历](https://leetcode-cn.com/problems/binary-tree-inorder-traversal)    
---------------------------------------------------------------------------------------
-[不同的二叉搜索树 II](https://leetcode-cn.com/problems/unique-binary-search-trees-ii)    
------------------------------------------------------------------------------------------
-[不同的二叉搜索树](https://leetcode-cn.com/problems/unique-binary-search-trees)    
------------------------------------------------------------------------------------
-[验证二叉搜索树](https://leetcode-cn.com/problems/validate-binary-search-tree)    
-----------------------------------------------------------------------------------
-[恢复二叉搜索树](https://leetcode-cn.com/problems/recover-binary-search-tree)    
----------------------------------------------------------------------------------
-[相同的树](https://leetcode-cn.com/problems/same-tree)    
-----------------------------------------------------------
-[对称二叉树](https://leetcode-cn.com/problems/symmetric-tree)    
------------------------------------------------------------------
-[二叉树的层次遍历](https://leetcode-cn.com/problems/binary-tree-level-order-traversal)    
-------------------------------------------------------------------------------------------
-[二叉树的锯齿形层次遍历](https://leetcode-cn.com/problems/binary-tree-zigzag-level-order-traversal)    
--------------------------------------------------------------------------------------------------------
-[二叉树的最大深度](https://leetcode-cn.com/problems/maximum-depth-of-binary-tree)    
--------------------------------------------------------------------------------------
-[从前序与中序遍历序列构造二叉树](https://leetcode-cn.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal)    
----------------------------------------------------------------------------------------------
+ 
+##[左叶子之和](https://leetcode-cn.com/problems/sum-of-left-leaves)    
+ 
+##[二叉树的中序遍历](https://leetcode-cn.com/problems/binary-tree-inorder-traversal)    
+ 
+##[不同的二叉搜索树 II](https://leetcode-cn.com/problems/unique-binary-search-trees-ii)    
+ 
+##[不同的二叉搜索树](https://leetcode-cn.com/problems/unique-binary-search-trees)    
+ 
+##[验证二叉搜索树](https://leetcode-cn.com/problems/validate-binary-search-tree)    
+ 
+##[恢复二叉搜索树](https://leetcode-cn.com/problems/recover-binary-search-tree)    
+ 
+##[相同的树](https://leetcode-cn.com/problems/same-tree)    
+ 
+##[对称二叉树](https://leetcode-cn.com/problems/symmetric-tree)    
+ 
+##[二叉树的层次遍历](https://leetcode-cn.com/problems/binary-tree-level-order-traversal)    
+ 
+##[二叉树的锯齿形层次遍历](https://leetcode-cn.com/problems/binary-tree-zigzag-level-order-traversal)    
+ 
+##[二叉树的最大深度](https://leetcode-cn.com/problems/maximum-depth-of-binary-tree)    
+ 
+##[从前序与中序遍历序列构造二叉树](https://leetcode-cn.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal)    
+ 
 class Solution {
 public:
     unordered_map<int,int> inmap;
@@ -5118,9 +5055,9 @@ public:
         return root;
     }
 };
----------------------------------------------------------------------------------------------
-[从中序与后序遍历序列构造二叉树](https://leetcode-cn.com/problems/construct-binary-tree-from-inorder-and-postorder-traversal)    
-----------------------------------------------------------------------------------------------
+ 
+##[从中序与后序遍历序列构造二叉树](https://leetcode-cn.com/problems/construct-binary-tree-from-inorder-and-postorder-traversal)    
+ 
 class Solution {
 public:
 	unordered_map<int, int> inmap;
@@ -5140,9 +5077,9 @@ public:
         return root;
     }
 };
-------------------------------------------------------------------------------------------------
-[二叉树的层次遍历 II](https://leetcode-cn.com/problems/binary-tree-level-order-traversal-ii)    
----------------------------------------------------------------------------------------
+ 
+##[二叉树的层次遍历 II](https://leetcode-cn.com/problems/binary-tree-level-order-traversal-ii)    
+ 
 class Solution {
 public:
     vector<vector<int>> levelOrderBottom(TreeNode* root) {
@@ -5168,9 +5105,9 @@ public:
         return res;
     }
 };
----------------------------------------------------------------------------------------------------
-[将有序数组转换为二叉搜索树](https://leetcode-cn.com/problems/convert-sorted-array-to-binary-search-tree)    
----------------------------------------------------------------------------------------------------
+ 
+##[将有序数组转换为二叉搜索树](https://leetcode-cn.com/problems/convert-sorted-array-to-binary-search-tree)    
+ 
 class Solution {
 public:
     TreeNode* sortedArrayToBST(vector<int>& nums) {
@@ -5187,9 +5124,9 @@ public:
     }
 };
 
--------------------------------------------------------------------------
-[有序链表转换二叉搜索树](https://leetcode-cn.com/problems/convert-sorted-list-to-binary-search-tree)    
------------------------------------------------------------------------------------------------
+ 
+##[有序链表转换二叉搜索树](https://leetcode-cn.com/problems/convert-sorted-list-to-binary-search-tree)    
+ 
 class Solution {
 public:
     vector<ListNode*> nodeslist;
@@ -5215,9 +5152,9 @@ public:
      }
 };
 
--------------------------------------------------------------------------
-[平衡二叉树](https://leetcode-cn.com/problems/balanced-binary-tree)    
------------------------------------------------------------------------
+ 
+##[平衡二叉树](https://leetcode-cn.com/problems/balanced-binary-tree)    
+
 class Solution {
 public:  
     int cntHeight(TreeNode *node) {  
@@ -5235,9 +5172,9 @@ public:
     }  
 };
 
--------------------------------------------------------------------------
-[二叉树的最小深度](https://leetcode-cn.com/problems/minimum-depth-of-binary-tree)    
--------------------------------------------------------------------------------------
+ 
+##[二叉树的最小深度](https://leetcode-cn.com/problems/minimum-depth-of-binary-tree)    
+ 
 class Solution {
 public:
     int minDepth(TreeNode* root) {
@@ -5248,9 +5185,9 @@ public:
     }
 };
 
--------------------------------------------------------------------------
-[二叉树的所有路径](https://leetcode-cn.com/problems/binary-tree-paths)    
---------------------------------------------------------------------------
+ 
+##[二叉树的所有路径](https://leetcode-cn.com/problems/binary-tree-paths)    
+ 
 class Solution {
     vector<string>  ps;
 public:
@@ -5280,9 +5217,9 @@ public:
     }
 };
 
--------------------------------------------------------------------------
-[路径总和 III](https://leetcode-cn.com/problems/path-sum-iii)    
------------------------------------------------------------------
+ 
+##[路径总和 III](https://leetcode-cn.com/problems/path-sum-iii)    
+ 
 class Solution {
 public:
     int pathSum(TreeNode* root, int sum) {
@@ -5297,9 +5234,9 @@ public:
      }
 };
 
--------------------------------------------------------------------------
-[找树左下角的值](https://leetcode-cn.com/problems/find-bottom-left-tree-value)    
-----------------------------------------------------------------------------------
+ 
+##[找树左下角的值](https://leetcode-cn.com/problems/find-bottom-left-tree-value)    
+ 
 class Solution {
 public:
     int findBottomLeftValue(TreeNode* root) {
@@ -5331,9 +5268,9 @@ public:
     int index;
 };
 
--------------------------------------------------------------------------
-[二叉搜索树中的众数](https://leetcode-cn.com/problems/find-mode-in-binary-search-tree)    
-------------------------------------------------------------------------------------------
+ 
+##[二叉搜索树中的众数](https://leetcode-cn.com/problems/find-mode-in-binary-search-tree)    
+ 
 class Solution {
 public:
     unordered_map<int,int> m;
@@ -5362,9 +5299,9 @@ public:
     }
 };
 
--------------------------------------------------------------------------
-[N叉树的最大深度](https://leetcode-cn.com/problems/maximum-depth-of-n-ary-tree)    
------------------------------------------------------------------------------------
+ 
+##[N叉树的最大深度](https://leetcode-cn.com/problems/maximum-depth-of-n-ary-tree)    
+ 
 class Solution {
 public:
     int maxDepth(Node* root) {
@@ -5392,9 +5329,9 @@ public:
     }
 };
 
--------------------------------------------------------------------------
-[二叉树的直径](https://leetcode-cn.com/problems/diameter-of-binary-tree)    
-----------------------------------------------------------------------------
+ 
+##[二叉树的直径](https://leetcode-cn.com/problems/diameter-of-binary-tree)    
+ 
 class Solution {
 public:
     int diameterOfBinaryTree(TreeNode* root) {
@@ -5412,9 +5349,9 @@ public:
     unordered_map<TreeNode*, int> m;
 };
 
--------------------------------------------------------------------------
-[最长同值路径](https://leetcode-cn.com/problems/longest-univalue-path)    
---------------------------------------------------------------------------
+ 
+##[最长同值路径](https://leetcode-cn.com/problems/longest-univalue-path)    
+ 
 class Solution {
 public:
     int res = 0;
@@ -5431,9 +5368,9 @@ public:
 	}
 };
 
--------------------------------------------------------------------------
-[两数之和 IV - 输入 BST](https://leetcode-cn.com/problems/two-sum-iv-input-is-a-bst)    
-----------------------------------------------------------------------------------------
+ 
+##[两数之和 IV - 输入 BST](https://leetcode-cn.com/problems/two-sum-iv-input-is-a-bst)    
+ 
 class Solution {
 public:
     bool findTarget(TreeNode* root, int k) {
@@ -5461,9 +5398,9 @@ public:
     }
 };
 
--------------------------------------------------------------------------
-[二叉树最大宽度](https://leetcode-cn.com/problems/maximum-width-of-binary-tree)    
------------------------------------------------------------------------------------
+ 
+##[二叉树最大宽度](https://leetcode-cn.com/problems/maximum-width-of-binary-tree)    
+ 
 class Solution {
 public:
     int widthOfBinaryTree(TreeNode* root) {
@@ -5485,9 +5422,9 @@ public:
     } 
 };
 
--------------------------------------------------------------------------
-[修剪二叉搜索树](https://leetcode-cn.com/problems/trim-a-binary-search-tree)    
---------------------------------------------------------------------------------
+ 
+##[修剪二叉搜索树](https://leetcode-cn.com/problems/trim-a-binary-search-tree)    
+ 
 class Solution {
 public:
     TreeNode* trimBST(TreeNode* root, int L, int R) {
@@ -5507,9 +5444,9 @@ public:
     }
 };
 
--------------------------------------------------------------------------
-[二叉树的层平均值](https://leetcode-cn.com/problems/average-of-levels-in-binary-tree)    
------------------------------------------------------------------------------------------
+ 
+##[二叉树的层平均值](https://leetcode-cn.com/problems/average-of-levels-in-binary-tree)    
+ 
 class Solution {
 public:
     vector<double> averageOfLevels(TreeNode* root) {
@@ -5540,9 +5477,9 @@ public:
     vector<double> res;
 };
 
--------------------------------------------------------------------------
-[二叉搜索树的最小绝对差](https://leetcode-cn.com/problems/minimum-absolute-difference-in-bst)    
--------------------------------------------------------------------------------------------------
+ 
+##[二叉搜索树的最小绝对差](https://leetcode-cn.com/problems/minimum-absolute-difference-in-bst)    
+ 
 class Solution {
 public:
     int getMinimumDifference(TreeNode* root) {
@@ -5565,9 +5502,9 @@ public:
     }
 };
 
--------------------------------------------------------------------------
-[把二叉搜索树转换为累加树](https://leetcode-cn.com/problems/convert-bst-to-greater-tree)    
---------------------------------------------------------------------------------------------
+ 
+##[把二叉搜索树转换为累加树](https://leetcode-cn.com/problems/convert-bst-to-greater-tree)    
+ 
 class Solution {
 public:
     TreeNode* convertBST(TreeNode* root) {
@@ -5586,9 +5523,9 @@ public:
     }
 };
 
--------------------------------------------------------------------------
-[二叉搜索树中的搜索](https://leetcode-cn.com/problems/search-in-a-binary-search-tree)    
------------------------------------------------------------------------------------------
+ 
+##[二叉搜索树中的搜索](https://leetcode-cn.com/problems/search-in-a-binary-search-tree)    
+ 
 class Solution {
 public:
     TreeNode* searchBST(TreeNode* root, int val) {
@@ -5604,9 +5541,9 @@ public:
     }
 };
 
--------------------------------------------------------------------------
-[二叉搜索树结点最小距离](https://leetcode-cn.com/problems/minimum-distance-between-bst-nodes)    
--------------------------------------------------------------------------------------------------
+ 
+##[二叉搜索树结点最小距离](https://leetcode-cn.com/problems/minimum-distance-between-bst-nodes)    
+ 
 class Solution {
 public:
     int minDiffInBST(TreeNode* root) {
@@ -5632,9 +5569,9 @@ public:
     }
 };
 
--------------------------------------------------------------------------
-[二叉树的坡度](https://leetcode-cn.com/problems/binary-tree-tilt)    
----------------------------------------------------------------------
+ 
+##[二叉树的坡度](https://leetcode-cn.com/problems/binary-tree-tilt)    
+ 
 class Solution {
 public:
     int findTilt(TreeNode* root) {
@@ -5662,9 +5599,9 @@ public:
     }
 };
 
--------------------------------------------------------------------------
-[另一个树的子树](https://leetcode-cn.com/problems/subtree-of-another-tree)    
-------------------------------------------------------------------------------
+ 
+##[另一个树的子树](https://leetcode-cn.com/problems/subtree-of-another-tree)    
+ 
 class Solution {
 public:
     list<TreeNode*> l;
@@ -5707,9 +5644,9 @@ public:
     }
 };
 
--------------------------------------------------------------------------
-[根据二叉树创建字符串](https://leetcode-cn.com/problems/construct-string-from-binary-tree)    
-----------------------------------------------------------------------------------------------
+ 
+##[根据二叉树创建字符串](https://leetcode-cn.com/problems/construct-string-from-binary-tree)    
+ 
 class Solution {
 public:
     string tree2str(TreeNode* t) {
@@ -5728,9 +5665,9 @@ public:
     }
 };
 
--------------------------------------------------------------------------
-[合并二叉树](https://leetcode-cn.com/problems/merge-two-binary-trees)    
--------------------------------------------------------------------------
+ 
+##[合并二叉树](https://leetcode-cn.com/problems/merge-two-binary-trees)    
+ 
 class Solution {
 public:
     TreeNode* mergeTrees(TreeNode* t1, TreeNode* t2) {
