@@ -20,6 +20,9 @@ https://www.cnblogs.com/ZeroTensor/p/11424961.html
 https://leetcode-cn.com/problems/lru-cache/
 https://leetcode-cn.com/problems/lfu-cache/
 
+##KMP匹配算法
+https://blog.csdn.net/chenjiayi_yun/article/details/90219101
+
 #网络协议的知识
 
 ##《趣谈网络协议》 学习笔记
@@ -95,33 +98,19 @@ https://www.cnblogs.com/mhq-martin/p/9035640.html
 ## epoll 和 select 区别
 https://www.cnblogs.com/aspirant/p/9166944.html
 
-
-
 ##多线程下载
 https://www.cnblogs.com/carekee/articles/1748815.html
 
 
 #代码整洁之道
-https://www.jianshu.com/p/bcdb1daa66f4
+《代码整洁之道》读书笔记
 https://www.cnblogs.com/xjnotxj/p/9690028.html
 
-zookeeper
-高性能mysql
-https://blog.csdn.net/honhong1024/article/details/81268757
-https://blog.csdn.net/weixin_42123737/article/details/91547875
-https://blog.csdn.net/ckwer2008/article/details/85676260
+#大数据算法
 
-可伸缩服务架构
-https://blog.csdn.net/u011692924/article/details/82988759
-https://blog.csdn.net/u011692924/article/details/82989820
-
-rabbitmq
-https://blog.csdn.net/hellozpc/article/details/81436980#83Topic_Exchange_1429
-https://www.cnblogs.com/ysocean/p/9251884.html
-
-#大数据
 大数据相关面试题整理-带答案
 https://blog.csdn.net/wdr2003/article/details/79597624
+
 大数据算法 十大经典算法
 https://blog.csdn.net/wdr2003/article/details/80248135
 
@@ -328,6 +317,12 @@ https://www.cnblogs.com/boothsun/p/8970952.html#autoid-7-1-0
 https://www.cnblogs.com/boothsun/p/8970952.html#autoid-6-1-0
 https://blog.csdn.net/hixiaoxiaoniao/article/details/80983709
 
+##高性能mysql
+《高性能Mysql》重点总结（一）——数据库基础
+https://blog.csdn.net/honhong1024/article/details/81268757
+MySQL逻辑架构与相关知识 ———>《高性能MySQL》
+https://blog.csdn.net/weixin_42123737/article/details/91547875
+
 ##fastdfs
 3分钟快速了解FastDFS
 https://www.cnblogs.com/liusijun113/p/11061298.html
@@ -459,6 +454,21 @@ https://blog.csdn.net/xiaopy_0508/article/details/78190102
 ##《亿级流量网站架构核心技术》概要
 https://www.cnblogs.com/jstarseven/p/9174604.html
 
+
+## 可伸缩服务架构
+《可伸缩服务架构 框架与中间件》综合（1）
+https://blog.csdn.net/u011692924/article/details/81938019
+《可伸缩服务架构 框架与中间件》综合（2）
+https://blog.csdn.net/u011692924/article/details/81938235
+《可伸缩服务架构 框架与中间件》综合（3）
+https://blog.csdn.net/u011692924/article/details/82988759
+《可伸缩服务架构 框架与中间件》综合（4）
+https://blog.csdn.net/u011692924/article/details/82989820
+
+分库分表的架构设计—《可伸缩服务架构》
+https://blog.csdn.net/ok449a6x1i6qq0g660fV/article/details/80193375
+
+
 #消息中间件
 ##kafka
 https://github.com/wurstmeister/kafka-docker
@@ -470,6 +480,9 @@ https://www.jianshu.com/p/6376936845ff
 https://pdf.us/2018/06/07/1260.html
 https://blog.csdn.net/jinyidong/article/details/80003362
 https://pdf.us/2018/06/12/1311.html
+
+https://blog.csdn.net/hellozpc/article/details/81436980#83Topic_Exchange_1429
+https://www.cnblogs.com/ysocean/p/9251884.html
 
 RabbitMQ教程
 https://blog.csdn.net/hellozpc/article/details/81436980
