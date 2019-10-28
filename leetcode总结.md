@@ -5683,3 +5683,136 @@ public:
         }
     }
 };
+
+#多线程
+##[按序打印](https://leetcode-cn.com/problems/print-in-order/)    
+class Foo {
+    mutex l1;
+    mutex l2;
+public:
+    Foo() {
+        // Initialize user defined data here.
+        l1.lock();
+        l2.lock();
+    }
+    void first(function<void()> printFirst) {
+        // printFirst() outputs "first". Do not change or remove this line.
+        printFirst();
+        l1.unlock();
+    }
+    void second(function<void()> printSecond) {
+        l1.lock();
+        // printSecond() outputs "second". Do not change or remove this line.
+        printSecond();
+        l2.unlock();
+    }
+    void third(function<void()> printThird) {
+        l2.lock();
+        // printThird() outputs "third". Do not change or remove this line.
+        printThird();
+    }
+};
+
+
+##[交替打印FooBar](https://leetcode-cn.com/problems/print-foobar-alternately/)    
+class FooBar {
+private:
+    int n;
+    mutex l1;
+    mutex l2;
+public:
+    FooBar(int n) {
+        this->n = n;
+        l2.lock();
+    }
+    void foo(function<void()> printFoo) {
+        for (int i = 0; i < n; i++) {
+        	// printFoo() outputs "foo". Do not change or remove this line.
+        	l1.lock();
+            printFoo();
+            l2.unlock();
+        }
+    }
+    void bar(function<void()> printBar) {
+        for (int i = 0; i < n; i++) {
+        	// printBar() outputs "bar". Do not change or remove this line.
+        	l2.lock();
+            printBar();
+            l1.unlock();
+        }
+    }
+};
+
+##[打印零与奇偶数](https://leetcode-cn.com/problems/print-zero-even-odd/)    
+class ZeroEvenOdd {
+private:
+    int n;
+    mutex z;
+    mutex e;
+    mutex o;
+public:
+    ZeroEvenOdd(int n) {
+        this->n = n;
+        e.lock();
+        o.lock();
+    }
+    // printNumber(x) outputs "x", where x is an integer.
+    void zero(function<void(int)> printNumber) {
+        for (int i = 1; i <= n; i++) {
+            z.lock();
+            printNumber(0);
+            if (i % 2) o.unlock();
+            else e.unlock();
+        }
+    }
+    void even(function<void(int)> printNumber) {
+        for (int i = 2; i <= n; i+=2) {
+            e.lock();
+            printNumber(i);
+            z.unlock();
+        }
+    }
+    void odd(function<void(int)> printNumber) {
+        for (int i = 1; i <= n; i+=2) {
+            o.lock();
+            printNumber(i);
+            z.unlock();
+        }
+    }
+};
+
+##[H2O 生成](https://leetcode-cn.com/problems/building-h2o/)    
+class H2O {
+    mutex h;
+    mutex o;
+    int n;
+public:
+    H2O() {
+        n = 2;
+        o.lock();
+    }
+    void hydrogen(function<void()> releaseHydrogen) {
+        // releaseHydrogen() outputs "H". Do not change or remove this line.
+        h.lock();
+        if (n > 0)
+        {
+            releaseHydrogen();
+            n--;
+            if (n > 0)h.unlock();
+            else o.unlock();
+        }
+    }
+    void oxygen(function<void()> releaseOxygen) {
+        // releaseOxygen() outputs "O". Do not change or remove this line.
+        o.lock();
+        if (n == 0)
+        {
+            releaseOxygen();
+            n = 2;
+            h.unlock();
+        }
+    }
+};
+
+
+

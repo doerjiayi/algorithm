@@ -23,6 +23,10 @@ https://leetcode-cn.com/problems/lfu-cache/
 ##KMP匹配算法
 https://blog.csdn.net/chenjiayi_yun/article/details/90219101
 
+##面试算法
+程序员面试、算法研究、编程艺术、红黑树、机器学习5大系列集锦
+https://blog.csdn.net/v_JULY_v/article/details/6543438
+
 #网络协议的知识
 
 ##《趣谈网络协议》 学习笔记
@@ -250,6 +254,38 @@ leveldb api
 https://blog.csdn.net/qq_32293345/article/details/85063531
 
 ##redis
+
+https://www.cnblogs.com/leeSmall/p/8398401.html Redis系列八：redis主从复制和哨兵
+https://blog.csdn.net/fouy_yun/article/details/81590252  Redis Cluster流程原理
+https://blog.csdn.net/qq2430/article/details/80716313  浅谈Redis Cluster
+
+https://blog.csdn.net/carlosfu/article/details/84749049 美团在Redis上踩过的一些坑-5.redis cluster遇到的一些问题
+但是讲演者反复强调，不要听信网上对于Redis-Cluster的毁谤（实践出真知），对于这一点我很赞同，我们从Redis-Cluster beta版 RC1~4 到现在的3.0-release均没有遇到什么大问题（线上维护600个实例）。
+
+https://blog.51cto.com/13690439/2119973 Redis集群节点的选举（实验）
+
+https://segmentfault.com/a/1190000017578588  Redis Cluster
+https://segmentfault.com/a/1190000016359421 redis cluster 扩容
+
+https://blog.csdn.net/cqk0100/article/details/80400811  浅谈Redis中的Rehash机制
+
+https://blog.csdn.net/zh15732621679/article/details/80614091 Redis五种数据类型
+
+redis集群核心原理:gossip通信、jedis Smart定位、主备切换
+https://blog.csdn.net/r_p_j/article/details/78813265
+
+redis cluster 扩容
+https://segmentfault.com/a/1190000016359421
+
+《Redis设计与实现总结》
+https://blog.csdn.net/qq_39843374/article/details/80979936
+
+《Redis设计与实现》学习笔记
+https://www.cnblogs.com/mengchunchen/p/9025139.html
+
+一文看懂 Redis5 搭建集群  
+https://my.oschina.net/ruoli/blog/2252393 
+
 Why Redis 4.0?
 https://www.liangzl.com/get-article-detail-5391.html
 
@@ -527,6 +563,9 @@ https://blog.csdn.net/weixin_34362790/article/details/86443986
 ##tcp dump
 https://www.cnblogs.com/f-ck-need-u/p/7064286.html
 
+##awk sed
+https://www.cnblogs.com/-zyj/p/5763303.html
+
 #设计模式
 
 ##责任链
@@ -537,6 +576,23 @@ https://blog.csdn.net/chengyuqiang/article/details/79222294
 
 ##状态机
 https://blog.csdn.net/xinghuanmeiying/article/details/81586954
+
+
+#内存
+##共享内存
+mmap映射区和shm共享内存的区别总结
+https://blog.csdn.net/hj605635529/article/details/73163513
+
+mmap 还是 shmget ？
+https://blog.csdn.net/wlh_flame/article/details/6328380
+
+##如何定位内存泄露
+https://blog.csdn.net/ydyang1126/article/details/72667411
+
+#makefile
+https://www.cnblogs.com/tp-16b/p/8955462.html
+
+
 
 #并发
 ##多线程
@@ -749,6 +805,15 @@ https://blog.csdn.net/anthony_ju/article/details/82078362#sudo_200
 ##yum 源
 https://blog.csdn.net/BigData_Mining/article/details/88568336
 
+
+#nlp
+https://www.julyedu.com/weekend/nlpjiuye2
+
+#金融
+http://www.julyedu.com/employment/finance
+
+#七月
+https://www.julyedu.com/category/index
 
 #内核
 
