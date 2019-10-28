@@ -5814,5 +5814,33 @@ public:
     }
 };
 
+#shell
+##[统计词频](https://leetcode-cn.com/problems/word-frequency/)   
+grep -oE  '[a-z]+' words.txt |sort|uniq -c |sort -r|awk '{print $2" "$1}'
 
+##[有效电话号码](https://leetcode-cn.com/problems/valid-phone-numbers/)   
 
+^(\([0-9]{3}\) ){1}[0-9]{3}-[0-9]{4}$ 匹配形如(123) 456-7890的电话号码
+^([0-9]{3}-){2}[0-9]{4}$ 匹配形如987-123-4567的电话号码
+
+grep -oE '^\([0-9]{3}\) [0-9]{3}-[0-9]{4}$|^[0-9]{3}-[0-9]{3}-[0-9]{4}$' file.txt 
+
+##[转置文件](https://leetcode-cn.com/problems/transpose-file/)   
+
+一共执行了三次for循环,每次分别读取一行的内容。
+
+第一次读取的是第一行的内容 name age: 
+NF等于2,NR等于1,然后s[1] = name , s[2] = age。
+
+第二次读取的是第二行的内容 alice 21: 
+NF等于2,NR等于2,然后s[1] = name alice ,s[2] = age 21。
+第三次读取的是第三行的内容 ryan 30: 
+NF等于2,NR等于2,然后s[1] = name alice ryan,s[2] = age 21 30。
+
+最后执行END里面的,将其输出即可。
+
+awk '{for (i = 1;i <= NF;++i) { if (NR == 1) s[i] = $i; else s[i] = s[i] " " $i; }}  END { for (i = 1;i <= NF;++i) {print s[i];} } ' file.txt  
+
+##[第十行](https://leetcode-cn.com/problems/tenth-line/)  
+
+awk 'NR == 10' file.txt
