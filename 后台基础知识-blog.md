@@ -692,22 +692,6 @@ https://www.cnblogs.com/zhanghu52030/p/9167014.html
 ##字节对齐
 https://blog.csdn.net/cclethe/article/details/79659590
 
-##c++ future
-https://blog.csdn.net/lijinqi1987/article/details/78909479
-
-##c++11 智能指针 unique_ptr、shared_ptr与weak_ptr
-https://www.cnblogs.com/lsgxeva/p/7788061.html
-
-##c++11 move 
-https://www.cnblogs.com/SZxiaochun/p/8017475.html
-https://www.jianshu.com/p/f027aaf95fcf
-https://www.cnblogs.com/xiaoshiwang/p/9582325.html
-https://www.cnblogs.com/LearningTheLoad/p/7690052.html
-
-##c++11 forward
-https://www.cnblogs.com/xiaoshiwang/p/9589008.html
-
-
 ##operator()
 http://www.360doc.com/content/18/0526/09/54097382_757112296.shtml
 
@@ -734,13 +718,6 @@ https://www.cnblogs.com/yocichen/p/10574819.html
 https://www.cnblogs.com/bencai/p/9124654.html
 https://www.cnblogs.com/SZxiaochun/p/8017349.html
 
-##shared_ptr
-https://blog.csdn.net/weixin_34128839/article/details/93301673
-https://blog.csdn.net/seamanj/article/details/50507470
-https://blog.csdn.net/Richelieu_/article/details/83548000
-https://blog.csdn.net/OKasy/article/details/79817591
-https://www.cnblogs.com/mxp-neu/articles/8580062.html
-
 ##stoi
 https://blog.csdn.net/qq_33221533/article/details/82119031
 
@@ -759,9 +736,64 @@ https://blog.csdn.net/chenjiayi_yun/article/details/8719476
 https://blog.csdn.net/chenjiayi_yun/article/details/8790828
 https://blog.csdn.net/chenjiayi_yun/article/details/8797807
 
-
 ##char数组和十六进制格式化sprintf
 https://blog.csdn.net/huanghxyz/article/details/84568155
+
+#c++11
+
+##c++ future
+https://blog.csdn.net/lijinqi1987/article/details/78909479
+
+##c++11 智能指针 unique_ptr、shared_ptr与weak_ptr
+https://www.cnblogs.com/lsgxeva/p/7788061.html
+
+##c++11 move 
+https://www.cnblogs.com/SZxiaochun/p/8017475.html
+https://www.jianshu.com/p/f027aaf95fcf
+https://www.cnblogs.com/xiaoshiwang/p/9582325.html
+https://www.cnblogs.com/LearningTheLoad/p/7690052.html
+
+##c++11 forward
+https://www.cnblogs.com/xiaoshiwang/p/9589008.html
+
+##shared_ptr
+https://blog.csdn.net/weixin_34128839/article/details/93301673
+https://blog.csdn.net/seamanj/article/details/50507470
+https://blog.csdn.net/Richelieu_/article/details/83548000
+https://blog.csdn.net/OKasy/article/details/79817591
+https://www.cnblogs.com/mxp-neu/articles/8580062.html
+
+##C++11多线程-mutex(2)
+https://www.jianshu.com/p/8bd389d4ed83
+
+##C++11多线程-条件变量(std::condition_variable)
+https://www.jianshu.com/p/a31d4fb5594f
+
+##C++11多线程-异步运行(1)之std::promise
+https://www.jianshu.com/p/7945428c220e
+
+##packaged_task
+https://www.jianshu.com/p/72601d82f3df
+
+##future+async
+https://www.jianshu.com/p/58dea28d1a95
+
+##thread_local
+https://www.jianshu.com/p/8df45004bbcb
+
+##C++11多线程-原子操作
+C++11多线程-原子操作(1)
+https://www.jianshu.com/p/c0da859a7ce0
+C++11多线程-原子操作(2)
+https://www.jianshu.com/p/fc6fce6543a9
+C++11多线程-内存模型
+https://www.jianshu.com/p/7d237771dc94
+
+##C++11泛型-函数模板
+https://www.jianshu.com/p/949afb64be86
+
+##C++11泛型 - 类模板
+https://www.jianshu.com/p/91650b5312c3
 
 #ide
 ##mingw
