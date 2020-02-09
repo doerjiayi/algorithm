@@ -584,8 +584,7 @@ private:
 class Solution {
 public:
     vector<string> generateParenthesis(int n) {
-        if (n == 0)
-            return vector<string>();
+        if (n == 0) return {};
         vector<string > ret;
         dfs(ret, "", n, n);
         return ret;
@@ -650,8 +649,7 @@ class Solution {
 public:
     int firstBadVersion(int n) {
         if(n < 1)return -1;
-        int low = 1;
-        int high = n;
+        int low = 1,high = n;
         int mid;
         while(low + 1< high)// +1
 条件是为了保证low比high至少小1，来确认第一个bad version
@@ -663,7 +661,7 @@ public:
             }
             else
             {
-                low = mid;//需要包含该bad version
+                low = mid;//需要包含该good version
             }
         }
         if(isBadVersion(low))//需要先判断low
@@ -1305,8 +1303,7 @@ class Solution {
 public:
     int uniquePathsWithObstacles(vector<vector<int>>& obstacleGrid) {
         if (!obstacleGrid.size() || !obstacleGrid[0].size())return 0;
-        int m = obstacleGrid.size();
-        int n = obstacleGrid[0].size();
+        int m = obstacleGrid.size(), n = obstacleGrid[0].size();
         vector<vector<long long>> array(m,vector<long long>(n,0));  
         for(int i = 0;i < m && !obstacleGrid[i][0];++i)array[i][0] = 1;
         for(int i = 0;i < n && !obstacleGrid[0][i];++i)array[0][i] = 1;
@@ -2961,9 +2958,9 @@ set 也可以当做唯一性的最小堆（因为红黑树的有序性，map同�
 ##[数据流的中位数](https://leetcode-cn.com/problems/find-median-from-data-stream)    
  
 class MedianFinder {
-public:
-    priority_queue<int> big;
-    priority_queue<int,vector<int>,greater<int>> small;
+public://priority_queue，  https://www.cnblogs.com/huashanqingzhu/p/11040390.html
+    priority_queue<int> big;//大顶堆  ，等同于 priority_queue<int, vector<int>, less<int> >
+    priority_queue<int,vector<int>,greater<int>> small;//小顶堆
     /** initialize your data structure here. */
     MedianFinder() {}
     void addNum(int num) {
@@ -2998,7 +2995,7 @@ public:
  
 class Solution {
 public:
-    struct cmp
+    struct cmp//规则：pair默认的比较，先比较第一个元素，第一个相等比较第二个。修改为cmp
     {
         bool operator() (const pair<int, int> &a,const pair<int, int>
 &b)const
@@ -3012,7 +3009,7 @@ public:
         unordered_map<int,int> m;
         for(auto n:nums)m[n]++;
         priority_queue<pair<int,int>,vector<pair<int,int>>,cmp>
-pq;//最小堆
+pq;//小顶堆，装最大的k个数
         for(auto i:m)
         {
             pq.push(i);//使用pair成员比较容易兼容map的遍历成员
@@ -3035,16 +3032,15 @@ public:
     struct cmp{  
         bool operator() (const pair<string, int> &a,const pair<string, int>
 &b)
-        {  
-            if (a.second != b.second) return a.second >
-b.second;//b.second优先级高(次数最小堆)
-            return a.first < b.first;  //a.first优先级高(字符串最大堆)
+        {  //b.second优先级高(次数，小顶堆，需要保存次数比较大的)
+            if (a.second != b.second) return a.second > b.second;
+            return a.first < b.first;  //a.first优先级高(字符串,大顶堆，需要保存字符串值比较小的)
         }  
     };
     vector<string> topKFrequent(vector<string>& words, int k) {
         unordered_map<string, int> map;  
         priority_queue<pair<string, int>, vector<pair<string, int>>,cmp>
-pq;  
+pq;  //小顶堆
         vector<string> res;  
         for (string& s : words)  
         {  
