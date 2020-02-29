@@ -451,7 +451,6 @@ public:
             result.push_back(path);
             return;
         }
-
         for(int i=pos;i<candidates.size();i++)
         {
             path.push_back(candidates[i]);
@@ -2803,15 +2802,174 @@ public:
 
  
 ##[两数相加 II](https://leetcode-cn.com/problems/add-two-numbers-ii)    
- 
+class Solution {
+public:
+    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) 
+    {
+        if (!l1)return l2;
+        if (!l2)return l1;
+        int len1(0),len2(0);
+        ListNode* p1 = l1, *p2 = l2;
+        while(p1)
+        {
+            ++len1;
+            p1 = p1->next;
+        }
+        while(p2)
+        {
+            ++len2;
+            p2 = p2->next;
+        }
+        p1 = l1, p2 = l2;
+        vector<ListNode*> v;
+        ListNode* pre =  new ListNode(-1);
+        ListNode* dummy =  pre;
+        if (len1 > len2)
+        {
+            p1 = l1;
+            for(int i = 0;i < len1 - len2;++i)
+            {
+                pre->next = new ListNode(p1->val);
+                pre = pre->next;
+                p1 = p1->next;
+                v.push_back(pre);
+                //printf("1 %d\n",pre->val);
+            }
+        }
+        else if (len1 < len2)
+        {
+            p2 = l2;
+            for(int i = 0;i < len2 - len1;++i)
+            {
+                pre->next = new ListNode(p2->val);
+                pre = pre->next;
+                p2 = p2->next;
+                v.push_back(pre);
+                //printf("2 %d\n",pre->val);
+            }
+        }
+        while(p1 && p2)
+        {
+            pre->next = new ListNode(p1->val+p2->val);
+            pre = pre->next;
+            p1 = p1->next;
+            p2 = p2->next;
+            v.push_back(pre);
+            //printf("3 %d\n",pre->val);
+        }
+        int c(0);
+        for(int i = v.size()-1;i >= 0;--i)
+        {
+            int n = v[i]->val + c;
+            v[i]->val = n % 10;
+            c = n /10;
+        }
+        if (c) 
+        {
+            ListNode* ne =  new ListNode(c);
+            ne->next = dummy->next;
+            dummy->next = ne;
+        }
+        pre = dummy->next;
+        delete dummy;
+        return pre;
+    }
+};
+
 #栈
  
-
- 
 ##[用队列实现栈](https://leetcode-cn.com/problems/implement-stack-using-queues)    
- 
+class MyStack {
+    int cur;
+    queue<int> q[2];
+public:
+    /** Initialize your data structure here. */
+    MyStack():cur(0) {
+    }
+    /** Push element x onto stack. */
+    void push(int x) {
+         q[cur].push(x);
+    }
+    /** Removes the element on top of the stack and returns that element. */
+    int pop() {
+        while (q[cur].size() > 1) 
+        {
+             q[1 - cur].push(q[cur].front());
+             q[cur].pop();
+          }
+          int t = q[cur].front();
+          q[cur].pop();
+          cur = 1 - cur;
+          return t;
+    }
+    /** Get the top element. */
+    int top() {
+        while (q[cur].size() > 1) 
+        {
+             q[1 - cur].push(q[cur].front());
+             q[cur].pop();
+          }
+          int t = q[cur].front();
+          q[1 - cur].push(q[cur].front());
+          q[cur].pop();
+          cur = 1 - cur;
+          return t;
+    }
+    /** Returns whether the stack is empty. */
+    bool empty() {
+        return q[cur].empty();
+    }
+};
+
 ##[用栈实现队列](https://leetcode-cn.com/problems/implement-queue-using-stacks)    
- 
+class MyQueue {
+public:
+    /** Initialize your data structure here. */
+    MyQueue() {
+    }
+    /** Push element x to the back of queue. */
+    void push(int x) {
+        s.push(x);
+    }
+    /** Removes the element from in front of queue and returns that element. */
+    int pop() {
+        while(s.size() > 1)
+        {
+            tmp.push(s.top());
+            s.pop();
+        }
+        int res = s.top();
+        s.pop();
+        while(tmp.size() > 0)
+        {
+            s.push(tmp.top());
+            tmp.pop();
+        }
+        return res;
+    }
+    /** Get the front element. */
+    int peek() {
+        while(s.size() > 1)
+        {
+            tmp.push(s.top());
+            s.pop();
+        }
+        int res = s.top();
+        while(tmp.size() > 0)
+        {
+            s.push(tmp.top());
+            tmp.pop();
+        }
+        return res;
+    }
+    /** Returns whether the queue is empty. */
+    bool empty() {
+        return s.size() == 0;
+    }
+    stack<int> s;
+    stack<int> tmp;
+};
+
 ##[最小栈](https://leetcode-cn.com/problems/min-stack)    
  
 class MinStack {
@@ -3062,21 +3220,79 @@ pq;  //小顶堆
 
  
 ##[最长有效括号](https://leetcode-cn.com/problems/longest-valid-parentheses)    
- 
+给定一个只包含 '(' 和 ')' 的字符串，找出最长的包含有效括号的子串的长度。
+class Solution {
+public:
+    int longestValidParentheses(string s) {
+         int res = 0, l = 0;
+         stack<int> si;
+         for(int i = 0; i < s.size(); ++ i)
+         {
+             if(s[i] == '(') si.push(i);
+             else
+             {
+                 if(si.empty())l = i + 1;//不是有效括号，记录一下，跳过
+                 else
+                 {
+                     si.pop();
+                     if(si.empty())res = max(res, i - l + 1);
+                     else res = max(res, i - si.top());
+                 }
+             }
+         }
+         return res;
+    }
+};
 
-#数字
- 
-（找规律）
-
- 
+#数字--找规律
 ##[整数拆分](https://leetcode-cn.com/problems/integer-break)    
- 
+class Solution {
+public:
+    int integerBreak(int n) 
+    {
+        if (n <= 3)return n -1;
+        int res(1);
+        while(n >= 5)
+        {
+            res *= 3;
+            n -= 3;
+        }
+        res *= n;
+        return res;
+    }
+};
+
 ##[Nim游戏](https://leetcode-cn.com/problems/nim-game)    
- 
+class Solution {
+public:
+    bool canWinNim(int n) {
+        return n % 4 != 0;
+    }
+};
+
 ##[加一](https://leetcode-cn.com/problems/plus-one)    
- 
+class Solution {
+public:
+    vector<int> plusOne(vector<int>& digits) {
+        // 从后往前，碰到第一个不是9的就对其加1，然后返回即可
+         for(int i = digits.size() - 1; i >= 0; -- i)
+         {
+             if(digits[i] == 9)
+                 digits[i] = 0;
+             else
+             {
+                 ++ digits[i];
+                 return digits;
+             }
+         }
+         // 最高位改成1，最后再添加个0
+         digits[0] = 1;
+         digits.push_back(0);
+         return digits;
+    }
+};
+
 ##[完全平方数](https://leetcode-cn.com/problems/perfect-squares)    
- 
 class Solution {
 public:
     int numSquares(int n) 
@@ -3166,9 +3382,58 @@ public:
 };
  
 ##[整数替换](https://leetcode-cn.com/problems/integer-replacement)    
- 
+class Solution {
+public:
+    int integerReplacement(int n) {
+        if (n <=3) return n-1;
+        int cnt(0);
+        long k = n;
+        while(k > 3)
+        {
+            if (k % 2 == 1)
+            {
+                if ((k + 1) % 4 == 0) 
+                {
+                    ++k;
+                }
+                else --k;
+                ++cnt;
+            }
+            else 
+            {
+                k /= 2;
+                ++cnt;
+            }
+        }
+        cnt += k-1;
+        return cnt;
+    }
+};
+
 ##[求众数 II](https://leetcode-cn.com/problems/majority-element-ii)    
- 
+class Solution {
+public:
+    vector<int> majorityElement(vector<int>& nums) {
+        vector<int> res;
+        int m = 0, n = 0, cm = 0, cn = 0;//最多2个
+        for (auto a : nums) {
+            if (a == m) ++cm;
+            else if (a ==n) ++cn;
+            else if (cm == 0) m = a, cm = 1;
+            else if (cn == 0) n = a, cn = 1;
+            else --cm, --cn;
+        }
+        //验证
+        cm = cn = 0;
+        for (auto a : nums) {
+            if (a == m) ++cm;
+            else if (a == n) ++cn;
+        }
+        if (cm > nums.size() / 3) res.push_back(m);
+        if (cn > nums.size() / 3) res.push_back(n);
+        return res;
+    }
+};
  
 ##[数字1的个数](https://leetcode-cn.com/problems/number-of-digit-one)    
  
@@ -3213,22 +3478,228 @@ public:
 ##[Excel表列序号](https://leetcode-cn.com/problems/excel-sheet-column-number)    
  
 ##[数字范围按位与](https://leetcode-cn.com/problems/bitwise-and-of-numbers-range)    
- 
+class Solution {
+public:
+    int rangeBitwiseAnd(int m, int n) {
+        while(n > m)
+        {
+            n = n & (n-1);
+        }
+        return n;
+    }
+};
  
 ##[颠倒二进制位](https://leetcode-cn.com/problems/reverse-bits)    
- 
+class Solution {
+public:
+    uint32_t reverseBits(uint32_t n) {
+        uint32_t k(0);
+        for(int i = 0;i <32;++i)
+        {
+            k |= n & (1<<i) ? 1<<(31 - i) :0; 
+        }
+        return k;
+    }
+};
+
 ##[分数到小数](https://leetcode-cn.com/problems/fraction-to-recurring-decimal)    
- 
+class Solution {
+public:
+    string fractionToDecimal(int numerator, int denominator) {
+        int s1 = numerator > 0 ? 1 : -1;
+        int s2 = denominator > 0 ? 1 : -1;
+        s1 = s1 * s2;
+        long num = abs( (long)numerator );
+        long den = abs( (long)denominator );
+        long d = num / den;
+        long rem = num % den;
+        string res = to_string(d);
+        if (rem == 0) 
+        {
+            if (d > 0 && s1 == -1)return res = "-" + res;
+            return res;
+        }
+        if (s1 == -1)res = "-" + res;
+        unordered_map<long long, int> m;
+        res += ".";
+        string s = "";
+        int pos = 0;
+        while (rem != 0) 
+        {
+            if (m.find(rem) != m.end())//余数重复则循环开始重复 
+            {
+                s.insert(m[rem], "("); 
+                s += ")";
+                return res + s;
+            }
+            //printf("pos:%d rem:%d\n",pos,rem);
+            m[rem] = pos;//余数前面的位置
+            s += to_string((rem * 10) / den);
+            rem = (rem * 10) % den;
+            ++pos;
+        }
+        return res + s;
+    }
+};
+
 ##[阶乘后的零](https://leetcode-cn.com/problems/factorial-trailing-zeroes)    
- 
+class Solution {
+public:
+    int trailingZeroes(int n) {
+        int count(0);
+        while (n > 0)
+        {
+            count += n /5;
+            n /=5;
+        }
+        return count;
+    }
+};
+
 ##[最大数](https://leetcode-cn.com/problems/largest-number)    
- 
+class Solution {
+public:
+    struct Node
+    {
+        string str;
+        Node(const string &s):str(s){}
+        bool operator > (const Node& n)const
+        {
+            return compare(str,n.str);
+        }
+        bool compare(string str1,string str2)const
+        {
+            if (str1.size() == str2.size())
+            {
+                return str1 > str2;
+            }
+            else if (str1.size() < str2.size())
+            {
+                string part1(str2.c_str(),str1.size()),part2(str2.c_str()+str1.size());//str2
+                if (str1 != part1)
+                {
+                    return str1 > part1;
+                }
+                else //较短的跟较长的剩余部分比较
+                {
+                    return compare(str1,part2);
+                }
+            }
+            else //if (str1.size() > str2.size())
+            {
+                string part1(str1.c_str(),str2.size()),part2(str1.c_str()+str2.size());//str1
+                if (part1 != str2)
+                {
+                    return part1 > str2;
+                }
+                else //较短的跟较长的剩余部分比较
+                {
+                    return compare(part2,str2);
+                }
+            }
+        }
+    };
+    string largestNumber(vector<int>& nums) 
+    {
+        if (nums.size() == 0)return "";
+        vector<Node> l;
+        for(auto& num:nums)l.push_back(Node(to_string(num)));
+        sort(l.begin(),l.end(),greater<Node>());//从大到小,重载 operator >
+        string res;
+        for(int i = 0;i < l.size();++i)
+        {
+            if (res.size() == 0 && l[i].str == "0")continue;//开头0的要去掉
+            res += l[i].str;
+        }
+        return res.size() ? res :"0";
+    }
+};
+
+
 ##[移除元素](https://leetcode-cn.com/problems/remove-element)    
- 
+class Solution {
+public:
+    int removeElement(vector<int>& nums, int val) {
+        int num=0;  
+        for(int i=0;i<nums.size();++i)  
+            if(nums[i]!=val)nums[num++]=nums[i];  
+        return num;
+    }
+};
+
 ##[两数相除](https://leetcode-cn.com/problems/divide-two-integers)    
- 
+class Solution {
+public:
+    int divide(int dividend, int divisor) {
+        if (dividend == 0 || divisor == 0) return 0;  
+        if (dividend == INT_MIN && divisor == -1) return INT_MAX; 
+        long a = abs((long)dividend);  
+        long b = abs((long)divisor);  
+        long ret = 0;  
+        while (a >= b) {  
+            long c = b;  
+            for (int i = 0; a >= c; ++i, c <<= 1) {  
+                a -= c;  
+                ret += 1 << i;  
+            }  
+        }  
+        return ((dividend^divisor)>>31) ? (int)(-ret) : (int)(ret);  
+    }
+};
+
 ##[二进制求和](https://leetcode-cn.com/problems/add-binary)    
- 
+class Solution {
+public:
+    int myAtoi(string str) 
+    {
+        if (str.size() == 0)return 0;
+        int i = 0;
+        int op = 1;
+        int num = 0;
+        int sign = 0;
+        for(;i < str.size();++i)
+        {
+            //printf("%c\n",str[i]);
+            if (str[i] == ' ')
+            {
+                if (sign > 0) return num;
+                continue;
+            }
+            else if (str[i] == '+')
+            {
+                if (sign++ > 0) return num;
+                continue;
+            }
+            else if (str[i] == '-')
+            {
+                if (sign++ > 0) return num;
+                op = -1;
+                continue;
+            }
+            else if (isdigit(str[i])) 
+            {
+                break;
+            }
+            return num;
+        }
+        //printf("%d\n",i);
+        for(;i < str.size();++i)
+        {
+            //printf("%c\n",str[i]);
+            if (isdigit(str[i]))
+            {
+                if (abs((long)num * 10 + (str[i] - '0')) > (long)INT_MAX) 
+                {
+                    return op == 1? INT_MAX: INT_MIN;
+                }
+                num *= 10;
+                num += (str[i] - '0');
+            }
+            else break;
+        }
+        return op * num;
+    }
+};
 
 ##[整数转罗马数字](https://leetcode-cn.com/problems/integer-to-roman)    
 
@@ -3242,19 +3713,120 @@ public:
 ##[字符串转换整数 (atoi)](https://leetcode-cn.com/problems/string-to-integer-atoi)    
  
 ##[回文数](https://leetcode-cn.com/problems/palindrome-number)    
- 
+class Solution {
+public:
+    bool isPalindrome(int x) 
+    {
+         if(x < 0)   return false;
+         int len = 1;
+         while(x / len >= 10) len *= 10;
+         int left,right;
+         while(x > 0)    
+         {
+             left = x / len;
+             right = x % 10;
+             if(left != right) return false;
+             x = (x % len) / 10;
+             len /= 100;
+         }
+         return true;
+    }
+};
+
 ##[3的幂](https://leetcode-cn.com/problems/power-of-three)    
- 
+long i=1;
+class Solution {
+public:
+    Solution(){while(i * 3 < (long)INT_MAX) i *=3;}
+    bool isPowerOfThree(int n) {
+        if (n < 1)return false;
+        return (i % n) == 0;
+    }
+};
+class Solution {
+public:
+    bool isPowerOfThree(int n) {
+        // 1162261467 is 3^19,  3^20 is bigger than int  
+        return ( n>0 &&  1162261467%n==0);
+    }
+};
+
+
 ##[比特位计数](https://leetcode-cn.com/problems/counting-bits)    
- 
+class Solution {
+public:
+    vector<int> countBits(int num) {
+        vector<int> ret(1, 0);  
+        int cnt = 0;  
+        while(cnt < num) {  
+            int sz = ret.size();  
+            for(int i=0; i<sz&&cnt<num; ++i,++cnt) {  
+                ret.push_back(ret[i]+1);  
+            }  
+        }  
+        return ret;  
+    }
+};
+
 ##[各位相加](https://leetcode-cn.com/problems/add-digits)    
- 
+class Solution {
+public:
+    /*
+        通过输入距离来发现规律
+123456789 10 11 12 13 14 15
+123456789 1 2 3 4 5 6
+    */
+    int addDigits(int num) {
+        if (num == 0)return 0;
+        return 1 + (num-1)%9;  
+    }
+};
+
 ##[丑数](https://leetcode-cn.com/problems/ugly-number)    
- 
+class Solution {
+public:
+    bool isUgly(int num) {
+         if(num == 0)return false;
+         int num1 = 0,num2 = 0,num3 = 0;
+         while(0 == num1|| 0 == num2 || 0 == num3)
+         {
+             num1 = num %2;
+             num2 = num %3;
+             num3 = num %5;
+             if (0 == num1)
+             {
+                 num /=2;
+             }
+             if(0 == num2)
+             {
+                 num /=3;
+             }
+             if(0 == num3)
+             {
+                 num /=5;
+             }
+         }
+         return 1 == num; 
+    }
+};
+
 ##[丑数 II](https://leetcode-cn.com/problems/ugly-number-ii)    
  
 ##[缺失数字](https://leetcode-cn.com/problems/missing-number)    
- 
+class Solution {
+public:
+    int missingNumber(vector<int>& nums) {
+        int size = nums.size();
+        if(size < 1)
+            return 0;
+        int total = size*(size + 1)/2;
+        int i,temp = 0;
+        for(i = 0;i < size;++i)
+            temp += nums[i];
+        return total - temp;
+    }
+};
+
 ##[两整数之和](https://leetcode-cn.com/problems/sum-of-two-integers)    
  
 ##[查找和最小的K对数字](https://leetcode-cn.com/problems/find-k-pairs-with-smallest-sums)    
@@ -3931,13 +4503,64 @@ public:
 
  
 ##[计算右侧小于当前元素的个数](https://leetcode-cn.com/problems/count-of-smaller-numbers-after-self)    
- 
+class Solution {
+public:
+    vector<int> countSmaller(vector<int>& nums) {
+        if (nums.size() == 0)return {};
+        vector<int> res(nums.size());//从后面往前查找
+        vector<int> sorted;
+        for(int i = nums.size()-1;i >=0;--i)
+        {
+            //在sorted中寻找插入的坐标（递增排序）
+            int pos = lower_bound(sorted.begin(),sorted.end(),nums[i]) - sorted.begin();
+            sorted.insert(sorted.begin()+pos,nums[i]);
+            res[i] = pos;
+        }
+        return res;
+    }
+};
+
 ##[打乱数组](https://leetcode-cn.com/problems/shuffle-an-array)    
- 
+class Solution {
+public:
+    Solution(vector<int> nums) {
+        m_numsOri = m_nums = nums;
+    }
+    /** Resets the array to its original configuration and return it. */
+    vector<int> reset() {
+        return m_numsOri;   
+    }
+    /** Returns a random shuffling of the array. */
+    vector<int> shuffle() {
+        for(int i = 0;i < m_nums.size();++i)
+        {
+            swap(m_nums[i],m_nums[rand() % m_nums.size()]);
+        }
+        return m_nums;
+    }
+    vector<int> m_nums;
+    vector<int> m_numsOri;
+};
+
 ##[有序矩阵中第K小的元素](https://leetcode-cn.com/problems/kth-smallest-element-in-a-sorted-matrix)    
  
 ##[摆动排序 II](https://leetcode-cn.com/problems/wiggle-sort-ii)    
- 
+class Solution {
+public:
+    void wiggleSort(vector<int>& nums) 
+    {
+        vector<int> tmp = nums;
+        sort(tmp.begin(),tmp.end());
+        int mid = (tmp.size() + 1)/2 -1;
+        int n = tmp.size() -1;
+        for(int i = 0;i < nums.size();++i)
+        {
+            if (i % 2 == 0)nums[i] = tmp[mid--];
+            else nums[i] = tmp[n--];
+        }
+    }
+};
+
 ##[组合总和 Ⅳ](https://leetcode-cn.com/problems/combination-sum-iv)    
  
 ##[找到所有数组中消失的数字](https://leetcode-cn.com/problems/find-all-numbers-disappeared-in-an-array)    
