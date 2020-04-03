@@ -2772,6 +2772,53 @@ O(KN* logK)
 ##[删除链表的倒数第N个节点](https://leetcode-cn.com/problems/remove-nth-node-from-end-of-list)    
  
 ##[回文链表](https://leetcode-cn.com/problems/palindrome-linked-list)    
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    bool isPalindrome(ListNode* head) {
+        if (!head || !head->next)return true;
+        int len(0);
+        ListNode* tmp = head;
+        while(tmp)
+        {
+            ++len;
+            tmp = tmp->next;
+        }
+        tmp = head;
+        ListNode* pre = head;
+        int skip = len % 2 == 0 ? len /2 :len/2 +1;
+        for(int i = 0;i < skip;++i)
+        {
+            pre = tmp;
+            tmp = tmp->next;
+        }
+        ListNode* head2 = tmp;
+        pre = head;
+        ListNode* cur = pre->next;
+        for(int i =  len/2 - 1;i > 0;--i)
+        {
+            ListNode* ne = cur->next;
+            cur->next = pre;
+            pre = cur;
+            cur = ne;
+        }
+        head->next = NULL;
+        while(pre)
+        {
+            if (pre->val != head2->val) return false;
+            pre = pre->next;
+            head2 = head2->next;
+        }
+        return true;
+    }
+};
 
 ##[奇偶链表](https://leetcode-cn.com/problems/odd-even-linked-list)    
  
@@ -3857,17 +3904,105 @@ s.erase(s.begin());//删除小的，类似最小堆，但是是唯一的，因�
 
  
 ##[数字的补数](https://leetcode-cn.com/problems/number-complement)    
- 
+
+class Solution {
+public:
+    int findComplement(int num) {
+        if (!num)return 1;
+        int complement(0);
+        int n(0);
+        while (num)
+        {
+            if ((num & 1) == 0) complement |= 1 << n;
+            num = num >> 1;
+            ++n;
+        }
+        return complement;
+    }
+};
+
 ##[七进制数](https://leetcode-cn.com/problems/base-7)    
- 
+
+class Solution {
+public:
+    string convertToBase7(int num) {
+        if (!num)return "0";
+        string res;
+        bool flag(false);
+        if (num > 0) flag = true;
+        num = abs(num);
+        while (num)
+        {
+            res.push_back('0' + (num % 7));
+            num /=7;
+        }
+        std::reverse(res.begin(),res.end());
+        return flag ? res:'-' + res;
+    }
+};
+
 ##[学生出勤记录 I](https://leetcode-cn.com/problems/student-attendance-record-i)    
- 
+
+class Solution {
+public:
+    bool checkRecord(string s) {
+        int cntA = 0, cntL = 0;
+        for (char c : s) {
+            if (c == 'A') {
+                if (++cntA > 1) return false;
+                cntL = 0;
+            } else if (c == 'L') {
+                if (++cntL > 2) return false;
+            } else {
+                cntL = 0;
+            }
+        }
+        return true;
+    }
+};
+
 ##[自除数](https://leetcode-cn.com/problems/self-dividing-numbers)    
- 
+
+class Solution {
+public:
+    vector<int> selfDividingNumbers(int left, int right) {
+        vector<int> v;
+        for(int i = left ;i <= right;++i)
+        {
+            int n = i;
+            while (n > 0)
+            {
+                int d = n % 10;
+                if (d == 0)break;
+                else if (i % d != 0)break;
+                n /= 10;
+                if (n == 0)v.push_back(i);
+            }
+        }
+        return v;
+    }
+};
+
 ##[宝石与石头](https://leetcode-cn.com/problems/jewels-and-stones)    
+
+
  
 ##[机器人能否返回原点](https://leetcode-cn.com/problems/robot-return-to-origin)    
- 
+
+class Solution {
+public:
+    bool judgeCircle(string moves) {
+        int x = 0, y = 0;  
+        for (int i = 0; i < moves.length(); i++)  
+        {  
+            if (moves[i] == 'L') x--;  
+            else if (moves[i] == 'R') x++;  
+            else if (moves[i] == 'U') y++;  
+            else y--;  
+        }  
+        return x == 0 && y == 0;  
+    }
+};
 
 
 #数组
