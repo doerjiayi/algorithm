@@ -4010,16 +4010,125 @@ public:
 
 ##排列组合
  
-
- 
 ##[第k个排列](https://leetcode-cn.com/problems/permutation-sequence)    
+ 
+class Solution {
+public:
+    string getPermutation(int n, int k) {
+        vector<int> permutation(n, 1);
+        for (int i = 1; i < n; ++i) {
+            permutation[i] = permutation[i - 1] * i;
+        }
+        vector<char> digits = { '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+        int num = n;
+        string res;
+        while (--num) {
+            int t = (k - 1) / (permutation[num]);//找首位
+            res.push_back(digits[t]);
+            digits.erase(digits.begin() + t);
+            k = k - t * permutation[num];//剩下的
+        }
+        res.push_back(digits[k - 1]);
+        return res;
+    }
+};
  
 ##[目标和](https://leetcode-cn.com/problems/target-sum)    
  
+class Solution {
+public:
+    int res = 0;
+    int findTargetSumWays(vector<int>& nums, int S) 
+    {
+        int sum = 0;
+        for(int i = 0; i < nums.size(); ++i) 
+        {
+            sum += nums[i];  
+        }
+        if(sum == S) res++;  
+        dfs(nums, sum, 0, S);  
+        return res;  
+    }
+    void dfs(vector<int>& nums,int sum, int pos, int S)
+    {
+        for(int i = pos; i < nums.size(); ++i)
+        {  
+            int tmp = sum - 2 * nums[i];                           
+            if(tmp == S) res++;   
+            if(tmp >= S) dfs(nums, tmp, i+1, S);
+        }                                    
+    } 
+};
+ 
 ##[四数相加 II](https://leetcode-cn.com/problems/4sum-ii)    
+ 
+class Solution {
+public:
+    int fourSumCount(vector<int>& A, vector<int>& B, vector<int>& C, vector<int>& D) 
+    {
+        int res(0);
+        unordered_map<int,int> m1,m2;
+        for(int i = 0;i < A.size();++i)
+        {
+            for(int j = 0;j < B.size();++j)
+            {
+                m1[A[i] + B[j]]++;
+            }
+        }
+        for(int i = 0;i < C.size();++i)
+        {
+            for(int j = 0;j < D.size();++j)
+            {
+                m2[C[i] + D[j]]++;
+            }
+        }
+        for(auto& iter:m1)
+        {
+            res += m2[-iter.first] * iter.second;//能够组合成的元组的数
+        }
+        return res;
+    }
+};
  
 ##[下一个排列](https://leetcode-cn.com/problems/next-permutation)    
  
+class Solution {
+public:
+    void nextPermutation(vector<int>& nums) {
+        int j=-1,k=0;
+        for( int i=nums.size()-2;i>=0;i-- )//j=max{i|pi<pi+1}
+        {
+            if( nums[i]<nums[i+1] )
+            {
+                j=i;break;
+            }
+        }
+        if( j==-1 )
+        {//3 2 1
+            reverse(nums.begin(),nums.end());
+        }
+        else
+        {
+            for( int i=nums.size()-1;i>=0;i-- )//k=max{i|pi>pj}
+            {
+               if( nums[i]>nums[j] )
+               {
+                  k=i;break;
+               }
+            }
+            swap(nums[j],nums[k]);//swap pj pk
+            reverse(nums.begin()+j+1,nums.end());//reverse pj+1 pn
+        }
+    }
+    /*
+    字典序：
+1234的全排列从小到大的顺序也就是字典序的顺序，依次如下：
+1234,1243,1324,1342,1423,1432,
+2134,2143,2314,2341,2413,2431,
+3124,3142,3214,3241,3412,3421,
+4123,4132,4213,4231,4312,4321
+    */
+};
 
 
 #区间和
@@ -4035,9 +4144,70 @@ public:
  
 ##[寻找重复数](https://leetcode-cn.com/problems/find-the-duplicate-number)    
  
+class Solution {
+public:
+    int findDuplicate(vector<int>& nums)
+    {
+        //因为两个值相同，若作为下标则会有环
+        if (nums.size() < 1)return -1;
+        int sp(0),fp(0);
+        do
+        {
+            sp = nums[sp];
+            fp = nums[nums[fp]];
+        }while(sp != fp);
+        fp = 0;
+        do
+        {
+            sp = nums[sp];
+            fp = nums[fp];
+        }while(sp != fp);//最终的是相同的数
+        return sp;
+    }
+};
+ 
 ##[除自身以外数组的乘积](https://leetcode-cn.com/problems/product-of-array-except-self)    
  
+class Solution {
+public:
+    vector<int> productExceptSelf(vector<int>& nums) {
+        vector<int> res(nums.size(),1);
+        int left = 1,right = 1;
+        for(int i = 0;i < nums.size();++i)
+        {
+            res[i] *= left;
+            left *= nums[i];
+        }
+        for(int i = nums.size()-1;i >= 0;--i)
+        {
+            res[i] *= right;
+            right *= nums[i];
+        }
+        return res;
+    }
+};
+ 
 ##[区域和检索 - 数组不可变](https://leetcode-cn.com/problems/range-sum-query-immutable)    
+ 
+class NumArray {
+public:
+    NumArray(vector<int> nums) {
+        if (nums.size() > 0)
+        {
+            sums.emplace_back(nums[0]);
+            for(int i = 1;i < nums.size();++i)
+            {
+                sums.emplace_back(sums[i - 1] + nums[i]);
+            }
+        }
+    }
+    int sumRange(int i, int j) {
+        if (i < 0|| j < i|| j >= sums.size())return 0;
+        if (i == 0)return sums[j];
+        return sums[j] - sums[i-1];
+    }
+    vector<int> sums;
+};
  
 ##[汇总区间](https://leetcode-cn.com/problems/summary-ranges)    
  
@@ -4816,17 +4986,134 @@ public:
 ##(其他)
 
 ##[基本计算器 II](https://leetcode-cn.com/problems/basic-calculator-ii)    
- 
+
+class Solution {
+public:
+    int calculate(string s) {
+        char op = '+';
+        stack<long> sk;
+        long num(0);
+        for(int i = 0;i <= s.size();++i)
+        {
+            if (s[i] >= '0' && s[i] <= '9')
+            {
+                num = num * 10 + s[i] - '0';
+            }
+            else if (s[i] != ' '|| s[i] == 0)//符号或者结束
+            {
+                //检查上个数之前的符号
+                if (op == '+')sk.push(num);
+                else if (op == '-') sk.push(-num);
+                else if (op == '*') 
+                {
+                    sk.top() *=  num;
+                }
+                else if (op == '/')
+                {
+                    sk.top() /= num;
+                }
+                op = s[i];//新的符号或者结束
+                num = 0;
+            }
+        }
+        num = 0;
+        while(sk.size())
+        {
+            num += sk.top();//累加
+            sk.pop();
+        }
+        return num;
+    }
+};
+
 ##[最后一个单词的长度](https://leetcode-cn.com/problems/length-of-last-word)    
- 
+
+class Solution {
+public:
+    int lengthOfLastWord(string s) {
+        if(s.size() == 0)  return 0;  
+        int sLen = s.size() -1;  
+        while(sLen >= 0 && s[sLen]==' ') sLen--;  
+        int nCount = 0;  
+        for(int i = sLen;i>=0 && s[i] != ' ';i--) nCount++;  
+        return nCount;  
+    }
+};
+
 ##[实现strStr()](https://leetcode-cn.com/problems/implement-strstr)    
- 
+
+class Solution {
+public:
+    int strStr(string haystack, string needle) {
+        if (needle.size() == 0)return 0;
+        if (needle.size()> haystack.size())return -1;
+        for(int i = 0;i < haystack.size() - needle.size()+1;++i)
+        {
+            if (haystack.substr(i,needle.size()) == needle)return i;
+        }
+        return -1;
+    }
+};
+
 ##[验证回文串](https://leetcode-cn.com/problems/valid-palindrome)   
- 
+
+class Solution {
+public:
+    bool isPalindrome(string s) {
+        int left = 0,right = s.size()-1;
+        while(left <= right)
+        {
+            while (left <= right && !isalpha(s[left]) && !isdigit(s[left]) )//跳过非字母和数字（只考虑字母和数字）
+            {
+                ++left;
+            }
+            while (left <= right && !isalpha(s[right]) && !isdigit(s[right]) )//跳过非字母和数字（只考虑字母和数字）
+            {
+                --right;
+            }
+            if (left > right)break;
+            if (tolower(s[left]) != tolower(s[right]))return false;//tolower不会处理数字
+            ++left,--right;
+        }
+        return true;
+    }
+};
+
 ##[报数](https://leetcode-cn.com/problems/count-and-say)    
  
 ##[字符串相乘](https://leetcode-cn.com/problems/multiply-strings)    
- 
+
+class Solution {
+public:
+    string multiply(string num1, string num2) 
+    {
+        string res;
+        vector<int> mul(num1.size() + num2.size(),0);
+        for(int i = 0;i < num1.size();++i)
+        {
+            for(int j = 0;j < num2.size();++j)
+            {
+                mul[i + j] += (num1[num1.size() - 1 - i] - '0') * (num2[num2.size() - 1 - j] - '0');
+                //printf("1) %d %d   %d\n",i,j,mul[i+j]);
+            }
+        }
+        for(int i = 0,c = 0,tmp = 0;i < mul.size();++i)
+        {
+            tmp = mul[i];
+            mul[i] = (tmp + c) % 10;
+            c = (tmp + c) /10;
+        }
+        int i = mul.size() -1; 
+        while(mul[i] == 0 && i > 0)--i;
+        for(;i >= 0;--i)
+        {
+            //printf("2)%d\n",mul[i]);
+            res.push_back('0' + mul[i]);
+        }
+        return res;
+    }
+};
+
 ##[找不同](https://leetcode-cn.com/problems/find-the-difference)    
  
 class Solution {
