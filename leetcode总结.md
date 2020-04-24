@@ -5249,13 +5249,98 @@ public:
 };
 
 ##[划分为k个相等的子集](https://leetcode-cn.com/problems/partition-to-k-equal-sum-subsets)    
- 
+class Solution {
+public:
+    bool canPartitionKSubsets(vector<int>& nums, int k) {
+        int sum = accumulate(nums.begin(), nums.end(), 0);
+        if (sum % k != 0) return false;
+        vector<bool> visited(nums.size(), false);
+        return dfs(nums, k, sum / k, 0, 0, visited);
+    }
+    bool dfs(vector<int>& nums, int k, int target, int start, int curSum, vector<bool>& visited) {
+        if (k == 1) return true;
+        if (curSum == target) return dfs(nums, k - 1, target, 0, 0, visited);//下一个
+        if( curSum > target)return false;
+        for (int i = start; i < nums.size(); ++i) {
+            if (visited[i]) continue;
+            visited[i] = true;
+            if (dfs(nums, k, target, i + 1, curSum + nums[i], visited))
+           {
+                visited[i] = false;
+               return true;
+           }
+            visited[i] = false;
+        }
+        return false;
+    }
+};
+
 ##[转置矩阵](https://leetcode-cn.com/problems/transpose-matrix)    
- 
+class Solution {
+public:
+    vector<vector<int>> transpose(vector<vector<int>>& A) 
+    {
+        if (A.size() == 0|| A[0].size() == 0)return {};
+        int m = A.size();
+        int n = A[0].size();
+        vector<vector<int>> B(n,vector<int>(m,0));
+        for(int i = 0;i < m;++i)
+        {
+            for(int j = 0; j < n;++j)
+            {
+                B[j][i] = A[i][j];
+            }
+        }
+        return B;
+    }
+};
+
 ##[最长连续递增序列](https://leetcode-cn.com/problems/longest-continuous-increasing-subsequence)    
+class Solution {
+public:
+    int findLengthOfLCIS(vector<int>& nums) 
+    {
+        if (nums.size() <= 1)return nums.size();
+        int global(INT_MIN);    
+        int local(0);
+        for(int i = 1;i < nums.size();++i)
+        {
+            if (nums[i] > nums[i-1])
+            {
+                local++;
+            }
+            else
+            {
+                global = max(global,local+1);
+                local = 0;
+            }
+        }
+        global = max(global,local+1);;
+        return global;
+    }
+};
  
 ##[最短无序连续子数组](https://leetcode-cn.com/problems/shortest-unsorted-continuous-subarray)    
- 
+class Solution {
+public:
+    int findUnsortedSubarray(vector<int>& nums) {
+        vector<int> nums2 = nums;  
+        sort(nums.begin(),nums.end());  
+        int begin = -1;  
+        int end = -1;  
+        for(int i = 0;i < nums.size(); i++)  
+        {  
+            if(nums[i] != nums2[i])   
+            {  
+                if(begin == -1)  
+                    begin = i;  
+                end = i;  
+            }  
+        }  
+        return end == -1 ? 0 :end - begin + 1;  
+    }
+};
+
 ##[任务调度器](https://leetcode-cn.com/problems/task-scheduler)    
  
 因为任务的等待时间，制约的就是数量最大的任务，时间=（该类任务等待时间 + 1） *
