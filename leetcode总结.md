@@ -5170,13 +5170,84 @@ public:
 
  
 ##[连续的子数组和](https://leetcode-cn.com/problems/continuous-subarray-sum)    
- 
+class Solution {
+public:
+    bool checkSubarraySum(vector<int>& nums, int k) 
+    {
+        if (nums.size() < 2)return false;
+        vector<int> dp(nums.size(),0);
+        for(int i = 0;i < nums.size();++i)
+        {
+            dp[i] = nums[i];//断开
+            for(int j = i+1; j < nums.size();++j)
+            {
+                dp[j] = dp[j-1] + nums[j];
+                if ((dp[j] == k) || (k != 0 && dp[j] % k == 0))return true;
+            }
+        }
+        return false;
+    }
+};
+
 ##[数组拆分 I](https://leetcode-cn.com/problems/array-partition-i)    
- 
+class Solution {
+public:
+    int arrayPairSum(vector<int>& nums) {
+        sort(nums.begin(),nums.end());
+        int sum(0);
+        for(int i =0;i < nums.size();i += 2)
+        {
+            sum += nums[i];
+        }
+        return sum;
+    }
+};
+
 ##[错误的集合](https://leetcode-cn.com/problems/set-mismatch)    
- 
+class Solution {
+public:
+    vector<int> findErrorNums(vector<int>& nums) {
+        if (nums.size() == 0)return {};
+        vector<int> res;
+        unordered_map<int,int> m;
+        for(auto n:nums)
+        {
+            m[n]++;
+        }
+        for(int i = 1;i <=nums.size();++i)
+        {
+            if (m[i] > 1)res.insert(res.begin(),i);
+            else if (m[i] == 0)res.push_back(i);
+        }
+        return res;
+    }
+};
 ##[数组的度](https://leetcode-cn.com/problems/degree-of-an-array)    
- 
+class Solution {
+public:
+    int findShortestSubArray(vector<int>& nums) {
+        unordered_map<int, int> start;
+        unordered_map<int, int> end;
+        unordered_map<int, int> count;
+        int maxCount = 0;
+        for (int i = 0; i < nums.size(); i++){
+            if (!count[nums[i]]){
+                start[nums[i]] = i;
+            }
+            ++count[nums[i]];
+            end[nums[i]] = i;
+            maxCount = max(maxCount, count[nums[i]]);
+        }
+        int minLength = INT_MAX;
+        for (auto it : count){
+            if (it.second == maxCount){
+                minLength = min(minLength,end[it.first]-start[it.first]+1);
+            }
+        }
+        return minLength;
+    }
+};
+
 ##[划分为k个相等的子集](https://leetcode-cn.com/problems/partition-to-k-equal-sum-subsets)    
  
 ##[转置矩阵](https://leetcode-cn.com/problems/transpose-matrix)    
@@ -5209,7 +5280,36 @@ public:
 ##(排列)
  
 ##[下一个更大元素 III](https://leetcode-cn.com/problems/next-greater-element-iii)
- 
+class Solution {
+public:
+    //只是为了测试next_permutation的实现，next_permutation 可以是stl的
+    static bool next_permutation(string::iterator start,string::iterator end)
+    {
+        auto cur = end - 1,pre= cur - 1;
+        while(cur > start && *pre >= *cur) cur--,pre--;//找到后缀的升序（为了替换）
+        if(cur <= start) return false;
+        for(cur=end-1;*cur <= *pre;cur--);//找到比*pre大的
+        swap(*cur,*pre);
+        reverse(pre+1,end);//逆序到正序
+        return true;
+    }
+    int nextGreaterElement(int n) {
+        string s = to_string(n);
+        sort(s.begin(), s.end());
+        while(next_permutation(s.begin(), s.end())) 
+        {
+            int tmp = atoll(s.c_str());
+            if (tmp > n)return tmp;
+        } 
+        return -1;
+    }
+    /*
+    next_permutation:
+    1 2 3
+    1 3 2
+    */
+};
+
 ##(切分)
 
 ##[简化路径](https://leetcode-cn.com/problems/simplify-path) 
@@ -5815,7 +5915,39 @@ public:
 };
  
 ##[验证回文字符串 Ⅱ](https://leetcode-cn.com/problems/valid-palindrome-ii)    
- 
+class Solution {
+public:
+    bool validPalindrome(string s) {
+        int i = 0, j = s.length() - 1, count = 0;  
+        while (i < j)  
+        {  
+            if (s[i] == s[j])  
+            {  
+                i++;  
+                j--;  
+            }  
+            else  
+            {  
+                if (++count > 1) return false;  
+                if (s[i + 1] != s[j] && s[i] != s[j - 1]) return false;  
+                if (s[i + 1] == s[j])  
+                {  
+                    if (j > i + 2 && s[i + 2] != s[j - 1])
+                    {
+                    }
+                    else
+                    {
+                        ++i;
+                        continue;
+                    }
+                }  
+                --j;  
+            }  
+        }  
+        return true; 
+    }
+};
+
 ##[字母大小写全排列](https://leetcode-cn.com/problems/letter-case-permutation)    
  
 class Solution {
