@@ -843,7 +843,6 @@ LDREOEIIECIHNTSG
 
 #哈希表
 ##[两数之和](https://leetcode-cn.com/problems/two-sum)    
-
 class Solution {
 public:
     vector<int> twoSum(vector<int>& nums, int target) {
@@ -1372,7 +1371,34 @@ public:
 };
 
 ##[最大整除子集](https://leetcode-cn.com/problems/largest-divisible-subset) 
-
+class Solution {
+public:
+    /*
+    这道题给了我们一个数组，让我们求这样一个子集合，集合中的任意两个数相互取余均为0，而且提示中说明了要使用DP来解。那么我们考虑，较小数对较大数取余一定不为0，那么问题就变成了看较大数能不能整除这个较小数。那么如果数组是无序的，处理起来就比较麻烦，所以我们首先可以先给数组排序，这样我们每次就只要看后面的数字能否整除前面的数字。定义一个动态数组dp，其中dp[i]表示到数字nums[i]位置最大可整除的子集合的长度，还需要一个一维数组parent，来保存上一个能整除的数字的位置，两个整型变量mx和mx_idx分别表示最大子集合的长度和起始数字的位置，我们可以从后往前遍历数组，对于某个数字再遍历到末尾，在这个过程中，如果nums[j]能整除nums[i], 且dp[i] < dp[j] + 1的话，更新dp[i]和parent[i]，如果dp[i]大于mx了，还要更新mx和mx_idx，最后循环结束后，我们来填res数字，根据parent数组来找到每一个数字
+    */
+    vector<int> largestDivisibleSubset(vector<int>& nums) {
+        sort(nums.begin(), nums.end());
+        vector<int> dp(nums.size(), 0), parent(nums.size(), 0), res;
+        int mx = 0, mx_idx = 0;
+        for (int i = nums.size() - 1; i >= 0; --i) {//从后往前计算，这样才能获得起始位置
+            for (int j = i; j < nums.size(); ++j) {
+                if (nums[j] % nums[i] == 0 && dp[i] < dp[j] + 1) {
+                    dp[i] = dp[j] + 1;//dp[i]表示到数字nums[i]位置最大可整除的子集合的长度
+                    parent[i] = j;//保存上一个能整除的数字的位置
+                    if (mx < dp[i]) {
+                        mx = dp[i];//最大子集合的长度
+                        mx_idx = i;//起始数字的位置
+                    }
+                }
+            }
+        }
+        for (int i = 0; i < mx; ++i) {
+            res.push_back(nums[mx_idx]);
+            mx_idx = parent[mx_idx];
+        }
+        return res;
+    }
+};
 
  
 ##[H指数](https://leetcode-cn.com/problems/h-index)    
@@ -1533,7 +1559,6 @@ public:
 };
  
 ##[鸡蛋掉落](https://leetcode-cn.com/problems/super-egg-drop)
- 
 class Solution {
 public:
     int superEggDrop(int K, int N) {
@@ -1549,13 +1574,35 @@ public:
 };
  
 #集合
-
- 
 ##[天际线问题](https://leetcode-cn.com/problems/the-skyline-problem)    
  
  
 ##[常数时间插入、删除和获取随机元素](https://leetcode-cn.com/problems/insert-delete-getrandom-o1)    
- 
+class RandomizedSet {
+public:
+    /** Initialize your data structure here. */
+    RandomizedSet() {
+    }
+    /** Inserts a value to the set. Returns true if the set did not already contain the specified element. */
+    bool insert(int val) {
+        auto p = s.insert(val);
+        return p.second;
+    }
+    /** Removes a value from the set. Returns true if the set contained the specified element. */
+    bool remove(int val) {
+        auto i = s.erase(val);
+        return i > 0;
+    }
+    /** Get a random element from the set. */
+    int getRandom() {
+        int n = rand() % s.size();
+        auto iter = s.begin();
+        for(int i = 0;i < n;++i)iter++;
+        return *iter;
+    }
+    unordered_set<int> s;
+};
+
 #几何
 
 ##[矩形面积](https://leetcode-cn.com/problems/rectangle-area)    
@@ -1814,9 +1861,6 @@ endWord.size() || wordList.size() == 0)return 0;
 
  
 #前缀树
- 
-
- 
 ##[实现 Trie (前缀树)](https://leetcode-cn.com/problems/implement-trie-prefix-tree) 
  
 本质上是多叉树，利用了当前的访问的状态能够依赖之前访问的状态
@@ -2164,8 +2208,6 @@ public:
 
  
 ##[位1的个数](https://leetcode-cn.com/problems/number-of-1-bits) 
- 
-
 每次去掉最后一位
 class Solution {
 public:
@@ -2182,7 +2224,6 @@ public:
 
  
 ##[只出现一次的数字](https://leetcode-cn.com/problems/single-number)
- 
 异或两相同数会抵消，剩下的就是一次的
 class Solution {
 public:
@@ -2545,10 +2586,82 @@ public:
 };
  
 ##[删除排序链表中的重复元素](https://leetcode-cn.com/problems/remove-duplicates-from-sorted-list)    
- 
+class Solution {
+public:
+    ListNode* deleteDuplicates(ListNode* head) {
+        if(head == NULL)  
+            return head;  
+        ListNode* pre = head;  
+        ListNode* cur = head->next;
+        ListNode* del(NULL);
+        while(cur!=NULL)  
+        {  
+            if(cur->val == pre->val)  
+            {
+                del = cur;
+                pre->next = cur->next;
+                cur = cur->next;
+                delete del;
+            }
+            else
+            {
+                pre = cur;
+                cur = cur->next; 
+            }
+        }  
+        return head;  
+    }
+};
  
 ##[删除排序链表中的重复元素 II](https://leetcode-cn.com/problems/remove-duplicates-from-sorted-list-ii)    
- 
+class Solution {
+public:
+    ListNode* deleteDuplicates(ListNode* head) {
+        if (!head || !head->next)return head;
+        ListNode* dummy = new ListNode(-1);
+        ListNode* pre = dummy;
+        ListNode* cur = head;
+        pre->next = cur;
+        bool boDel(false);
+        while(cur && cur->next)
+        {
+            if (cur->val == cur->next->val)
+            {
+                ListNode* del = cur->next;
+                cur->next = cur->next->next;
+                delete del;
+                boDel = true;
+            }
+            else
+            {
+                if (boDel)//之前删除了的,这里cur是最后一个
+                {
+                    ListNode* del = cur;
+                    cur = cur->next;
+                    delete del;
+                    pre->next = cur;
+                    boDel = false;
+                }
+                else
+                {
+                    pre = cur;
+                    cur = cur->next;
+                }
+            }
+        }
+        if (boDel)//之前删除了的,这里cur是最后一个
+        {
+            ListNode* del = cur;
+            cur = cur->next;
+            delete del;
+            pre->next = cur;
+        }
+        head = dummy->next;
+        delete dummy;
+        return head;
+    }
+};
+
 ##[分隔链表](https://leetcode-cn.com/problems/partition-list)    
  
 class Solution {
@@ -2766,11 +2879,98 @@ O(KN* logK)
 };
  
 ##[两两交换链表中的节点](https://leetcode-cn.com/problems/swap-nodes-in-pairs)    
- 
+class Solution {
+public:
+    ListNode* swapPairs(ListNode* head) {
+        ListNode* dummy = new ListNode(-1);
+        dummy->next = head;
+        ListNode* pre = dummy;
+        ListNode* cur = head;
+        while (cur && cur->next)
+        {
+            ListNode* next = cur->next;
+            cur->next = next->next;//先连接后面
+            pre->next = next;//连接前面
+            next->next = cur;//连接中间
+            pre = cur;//继续
+            cur = cur->next;
+        }
+        head = dummy->next;
+        delete dummy;
+        return head;
+    }
+};
+
 ##[k个一组翻转链表](https://leetcode-cn.com/problems/reverse-nodes-in-k-group)    
- 
+class Solution {
+public:
+    ListNode* dummy = nullptr;
+    Solution(){}
+    ~Solution(){if (dummy) {delete dummy;}}
+    ListNode* reverseKGroup(ListNode* head, int k) {
+        dummy = new ListNode(-1);
+        dummy->next = head;
+        ListNode* pre = dummy;
+        ListNode* cur = head;
+        list<ListNode*> vec;
+        while (cur)
+        {
+            ListNode* tmp = cur;
+            for(;tmp && vec.size() < k; tmp = tmp->next)
+            {
+                vec.emplace_back(tmp);
+            }
+            if(vec.size() == k)
+            {
+                while(vec.size())
+                {
+                    pre->next = vec.back();
+                    pre = pre->next;
+                    vec.pop_back();
+                }
+                pre->next = tmp;
+            }
+            cur = tmp;
+        }
+        head = dummy->next;
+        return head;
+    }
+};
+
 ##[删除链表的倒数第N个节点](https://leetcode-cn.com/problems/remove-nth-node-from-end-of-list)    
- 
+class Solution {
+public:
+    ListNode* removeNthFromEnd(ListNode* head, int n) {
+        if (!head)return head;
+        int len(0);
+        ListNode* tmp = head;
+        while(tmp)
+        {
+            ++len;
+            tmp = tmp->next;
+        }
+        tmp = head;
+        if (n == len)
+        {
+            ListNode* del = head;
+            head = del->next;
+            delete del;
+            return head;
+        }
+        for(int k = len - n -1; k > 0;--k)
+        {
+            tmp = tmp ->next;
+        }
+        ListNode* del = tmp ->next;
+        if (del)
+        {
+            tmp->next = del->next;
+            delete del;
+        }
+        return head;
+    }
+};
+
 ##[回文链表](https://leetcode-cn.com/problems/palindrome-linked-list)    
 /**
  * Definition for singly-linked list.
@@ -2821,7 +3021,39 @@ public:
 };
 
 ##[奇偶链表](https://leetcode-cn.com/problems/odd-even-linked-list)    
- 
+class Solution {
+public:
+    ListNode* dummy1;
+    ListNode* dummy2;
+    Solution(){dummy1 = new ListNode(-1);dummy2 = new ListNode(-1);}
+    ~Solution(){delete dummy1;delete dummy2;}
+    ListNode* oddEvenList(ListNode* head) 
+    {
+        if (!head || !head->next)return head;
+        ListNode* tmp1 = dummy1;
+        ListNode* tmp2 = dummy2;
+        int i(0);
+        while(head)
+        {
+            if (i % 2 == 0)
+            {
+                tmp1->next = head;
+                tmp1 = tmp1->next;
+            }
+            else
+            {
+                tmp2->next = head;
+                tmp2 = tmp2->next;
+            }
+            ++i;
+            head = head->next;
+        }
+        tmp2->next = NULL;
+        tmp1->next = dummy2->next;
+        return dummy1->next;
+    }
+};
+
 ##[两数相加](https://leetcode-cn.com/problems/add-two-numbers)    
  
 class Solution {
@@ -4141,9 +4373,34 @@ public:
 ##其他数组
  
 ##[在排序数组中查找元素的第一个和最后一个位置](https://leetcode-cn.com/problems/find-first-and-last-position-of-element-in-sorted-array)    
- 
+class Solution {
+public:
+    vector<int> searchRange(vector<int>& nums, int target) {
+        vector<int> res;  
+        int l=0,len=nums.size(),r=len-1,mid;  
+        while(l<=r){  
+            mid=(l+r)>>1;  
+            if(nums[mid]==target)break;  
+            else if(nums[mid]>target)r=mid-1;  
+            else l=mid+1;  
+        }  
+        if(l<=r){  
+            l=mid-1;  
+            while(l>=0 && nums[l]==nums[mid])l--;  
+            r=mid+1;  
+            while(r<len && nums[r]==nums[mid])r++;  
+            res.push_back(l+1);  
+            res.push_back(r-1);  
+        }else{  
+            res.push_back(-1);  
+            res.push_back(-1);  
+        }  
+        return res;  
+    }
+};
+
+
 ##[寻找重复数](https://leetcode-cn.com/problems/find-the-duplicate-number)    
- 
 class Solution {
 public:
     int findDuplicate(vector<int>& nums)
@@ -4982,6 +5239,43 @@ public:
 ##（字符数组）
 
 ##[压缩字符串](https://leetcode-cn.com/problems/string-compression)    
+class Solution {
+public:
+    int compress(vector<char>& chars) 
+    {
+        if (chars.size() == 0)return 0;
+        char c = chars[0];
+        int num(1),left(0),cnt(0);
+        for(int i = 1;i <= chars.size();++i)
+        {
+            if (i == chars.size() || chars[i] != c)
+            {
+                chars[left++] = c;
+                if (num > 1)
+                {
+                    string n = to_string(num);
+                    for(int k = 0;k < n.size();++k)
+                    {
+                        chars[left+k] = n[k]; 
+                    }
+                    cnt += n.size()+1;
+                    left += n.size();
+                }
+                else  
+                {
+                    ++cnt;
+                }
+                c = i < chars.size() ? chars[i]:0;   
+                num = 1;
+            }
+            else
+            {
+                ++num;
+            }
+        }
+        return cnt;
+    }
+};
 
 ##(其他)
 
