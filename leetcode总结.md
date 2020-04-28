@@ -3981,16 +3981,135 @@ public:
 };
 
 ##[整数转罗马数字](https://leetcode-cn.com/problems/integer-to-roman)    
+class Solution {
+public:
+    string intToRoman(int num) {
+        string str;    
+        string symbol[]={"M","CM","D","CD","C","XC","L","XL","X","IX","V","IV","I"};    
+        int value[]=    {1000,900,500,400, 100, 90,  50, 40,  10, 9,   5,  4,   1};   
+        for(int i=0;num!=0;++i)  
+        {  
+            while(num>=value[i])  
+            {  
+                num-=value[i];  
+                str+=symbol[i];  
+            }  
+        }  
+        return str; 
+    }
+};
 
 ##[罗马数字转整数](https://leetcode-cn.com/problems/roman-to-integer)    
-
+class Solution {
+public:
+    int romanToInt(string s) {
+        int res = 0;
+        unordered_map<char, int> m{{'I', 1}, {'V', 5}, {'X', 10}, {'L', 50}, {'C', 100}, {'D', 500}, {'M', 1000}};
+        for (int i = 0; i < s.size(); ++i) {
+            int val = m[s[i]];
+            if (i == s.size() - 1 || m[s[i+1]] <= m[s[i]]) res += val;
+            else res -= val;
+        }
+        return res;
+    }
+};
 
 ##[电话号码的字母组合](https://leetcode-cn.com/problems/letter-combinations-of-a-phone-number)    
- 
+class Solution {
+public:
+    vector<string> res;
+    unordered_map<char,string> m = {{'2',"abc"},{'3',"def"},{'4',"ghi"},{'5',"jkl"},{'6',"mno"},{'7',"pqrs"},{'8',"tuv"},{'9',"wxyz"}};
+    vector<string> letterCombinations(string digits) {
+        if (digits.size() == 0)return res; 
+        string s;
+        dfs(digits,0,s);
+        return res;
+    }
+    void dfs(const string &digits,int pos,string &s)
+    {
+        if (pos == digits.size())
+        {
+            res.push_back(s);
+            return;
+        }
+        const string &tmp = m[digits[pos]];
+        for(int i = 0; i < tmp.size();++i)
+        {
+            s.push_back(tmp[i]);
+            dfs(digits,pos+1,s);
+            s.pop_back();
+        }
+    }
+};
+
 ##[整数反转](https://leetcode-cn.com/problems/reverse-integer)    
- 
+class Solution {
+public:
+    int reverse(int x) {
+        int res = 0;
+        while (x != 0) {
+            if (abs(res) > INT_MAX / 10) return 0;
+            res = res * 10 + x % 10;
+            x /= 10;
+        }
+        return res;
+    }
+};
+
 ##[字符串转换整数 (atoi)](https://leetcode-cn.com/problems/string-to-integer-atoi)    
- 
+class Solution {
+public:
+    int myAtoi(string str) 
+    {
+        if (str.size() == 0)return 0;
+        int i = 0;
+        int op = 1;
+        int num = 0;
+        int sign = 0;
+        for(;i < str.size();++i)
+        {
+            //printf("%c\n",str[i]);
+            if (str[i] == ' ')
+            {
+                if (sign > 0) return num;
+                continue;
+            }
+            else if (str[i] == '+')
+            {
+                if (sign++ > 0) return num;
+                continue;
+            }
+            else if (str[i] == '-')
+            {
+                if (sign++ > 0) return num;
+                op = -1;
+                continue;
+            }
+            else if (isdigit(str[i])) 
+            {
+                break;
+            }
+            return num;
+        }
+        //printf("%d\n",i);
+        for(;i < str.size();++i)
+        {
+            //printf("%c\n",str[i]);
+            if (isdigit(str[i]))
+            {
+                if (abs((long)num * 10 + (str[i] - '0')) > (long)INT_MAX) 
+                {
+                    return op == 1? INT_MAX: INT_MIN;
+                }
+                num *= 10;
+                num += (str[i] - '0');
+            }
+            else break;
+        }
+        return op * num;
+    }
+};
+
 ##[回文数](https://leetcode-cn.com/problems/palindrome-number)    
 class Solution {
 public:
@@ -6566,26 +6685,289 @@ public:
 };
  
 ##[左叶子之和](https://leetcode-cn.com/problems/sum-of-left-leaves)    
- 
+class Solution {
+public:
+    int sumOfLeftLeaves(TreeNode* root) {
+        int sum(0);
+        dfs(root,sum);
+        return sum;
+    }
+    void dfs(TreeNode* node,int & sum)
+    {
+        if (!node)return;
+        if (node->left) dfs(node->left,sum);
+        if (node->right) dfs(node->right,sum);
+        if (node->left && !node->left->left&& !node->left->right) 
+        {
+            sum += node->left->val;
+        }
+    }
+};
+
 ##[二叉树的中序遍历](https://leetcode-cn.com/problems/binary-tree-inorder-traversal)    
- 
+class Solution {
+public:
+    vector<int> inorderTraversal(TreeNode* root) {
+        if (!root)return {};
+        vector<int> res;
+        stack<TreeNode*> sk;
+        TreeNode* p = root;
+        while(p||sk.size())
+        {
+            while (p)
+            {
+                sk.push(p);
+                p = p->left;
+            }
+            p = sk.top();
+            sk.pop();
+            res.push_back(p->val);
+            p = p->right;
+        }
+        return res;
+    }
+};
+
 ##[不同的二叉搜索树 II](https://leetcode-cn.com/problems/unique-binary-search-trees-ii)    
- 
+class Solution {
+public:
+    vector<TreeNode*> generateTrees(int n) {
+        if (n <= 0){
+            return {};
+        }
+        else{
+            return generate(1, n);
+        }
+    }//
+private:
+    // 返回根节点结合
+    vector<TreeNode*> generate(int start,int end){
+        vector<TreeNode*> subTree;
+        if(start > end){
+            subTree.push_back(NULL);
+            return subTree;
+        }//if
+        // i作为根节点
+        for(int i = start;i <= end;i++){
+            // 以i为根节点的树,其左子树由[start,i-1]构成,其右子树由[i+1,end]构成。
+            // 返回的是不同二叉查找树的根节点，几种二叉查找树就返回几个根节点
+            vector<TreeNode*> leftSubTree = generate(start,i-1);
+            vector<TreeNode*> rightSubTree = generate(i+1,end);
+            // 左子树右子树跟根节点连接
+            // 以i为根的树的个数，等于左子树的个数乘以右子树的个数
+            for(int j = 0;j < leftSubTree.size();j++){
+                for(int k = 0;k < rightSubTree.size();k++){
+                    TreeNode* node = new TreeNode(i);
+                    node->left = leftSubTree[j];
+                    node->right = rightSubTree[k];
+                    subTree.push_back(node);
+                }
+            }
+        }
+        return subTree;
+    }
+};
+
 ##[不同的二叉搜索树](https://leetcode-cn.com/problems/unique-binary-search-trees)    
- 
+class Solution {
+public:
+    int numTrees(int n) {
+        vector<int> G(n+1,0);  
+        G[0]=1;
+        for(int i=1;i<=n;i++)  
+        {  
+            for(int j=0;j<i;j++)  
+                G[i]+=G[j]*G[i-j-1];  
+        }  
+        return G[n];   
+    }
+};
+
 ##[验证二叉搜索树](https://leetcode-cn.com/problems/validate-binary-search-tree)    
- 
+class Solution {
+public:
+    bool isValidBST(TreeNode* root) {
+        isValid = true;
+        dfs(root,LONG_MIN,LONG_MAX);
+        return isValid;
+    }
+    void dfs(TreeNode* node,long minV,long maxV)
+    {
+        if (!node)return;
+        if (node->val <= minV||node->val >= maxV)
+        {
+            isValid=false;
+            return;
+        }
+        else
+        {
+            if (node->left) dfs(node->left,minV,node->val);
+            if (isValid && node->right) dfs(node->right,node->val,maxV);
+        }
+    }
+    bool isValid;
+};
+
 ##[恢复二叉搜索树](https://leetcode-cn.com/problems/recover-binary-search-tree)    
- 
+我们对错误的二叉树进行 中序遍历 那我们按顺序访问到的数应该是按顺序排列的 
+那如果对两个节点交换了顺序  那一定有两个地方是  不满足  前一个元素 < 当前元素 < 后一个元素
+class Solution {
+public:
+    TreeNode* first = nullptr, *second = nullptr;
+    void recoverTree(TreeNode* root) {
+        TreeNode* last = nullptr;
+        inOrder(root, last);
+        swap(first->val, second->val);
+    }
+    //中序遍历，获取两节点
+    void inOrder(TreeNode* root, TreeNode*& last) {
+        if (!root) return;
+        inOrder(root->left, last);
+        if (last) {
+            if (last->val > root->val) {
+                if (!first)  first = last;
+                second = root;
+            }
+        }
+        last = root;
+        inOrder(root->right, last);
+    }
+};
+
 ##[相同的树](https://leetcode-cn.com/problems/same-tree)    
- 
+class Solution {
+public:
+    bool isSameTree(TreeNode* p, TreeNode* q) 
+    {
+        list<TreeNode*> l;
+        l.push_back(p);
+        l.push_back(q);
+        while(l.size() > 1)
+        {
+            p = l.front();
+            l.pop_front();
+            q = l.front();
+            l.pop_front();
+            if (p || q) 
+            {
+                if (!p || !q) return false;    
+                if (p->val != q->val) return false;    
+                if ((p->left && !q->left) || (p->right && !q->right)) return false;    
+                l.push_back(p->left);
+                l.push_back(q->left);
+                l.push_back(p->right);
+                l.push_back(q->right);
+            }
+        }
+        return true;
+    }
+};
+
 ##[对称二叉树](https://leetcode-cn.com/problems/symmetric-tree)    
- 
+class Solution {
+public:
+     bool isSymmetric(TreeNode* root)
+     {
+         if(root == NULL)
+             return true;
+        list<TreeNode*> l;
+        l.push_back(root->left);
+        l.push_back(root->right);
+        while(l.size()> 1){
+            TreeNode* p1 = l.front();
+            l.pop_front();
+            TreeNode* p2 = l.front();
+            l.pop_front();
+            if (p1==NULL && p2==NULL) continue;
+            if ((p1==NULL && p2!=NULL) || (p1!=NULL && p2==NULL)) return false;
+            if (p1->val != p2->val) return false;
+            l.push_back(p1->left);
+            l.push_back(p2->right);
+            l.push_back(p1->right);
+            l.push_back(p2->left);
+        }
+        return true;
+     }
+};
+
 ##[二叉树的层次遍历](https://leetcode-cn.com/problems/binary-tree-level-order-traversal)    
+class Solution {
+public:
+    vector<vector<int>> levelOrder(TreeNode* root) {
+        if (!root) return {};
+        list<TreeNode*> l;
+        vector<vector<int>> res;
+        vector<int> tmp;
+        l.push_back(root);
+        while(l.size())
+        {
+            int count = l.size();
+            while(count--)
+            {
+                tmp.push_back(l.front()->val);
+                if (l.front()->left)l.push_back(l.front()->left);
+                if (l.front()->right)l.push_back(l.front()->right);
+                l.pop_front();
+            }
+            res.push_back(tmp);
+            tmp.clear();
+        }
+        return res;
+    }
+};
  
 ##[二叉树的锯齿形层次遍历](https://leetcode-cn.com/problems/binary-tree-zigzag-level-order-traversal)    
+class Solution {
+public:
+    int index = 0;
+    vector<TreeNode*> dataList[2];
+    vector<vector<int>> res;
+    vector<int> data;
+    vector<vector<int>> zigzagLevelOrder(TreeNode* root) {
+        if (!root)return res;
+        dataList[index].push_back(root);
+        bfs();
+        return res;
+    }
+    void bfs()
+    {
+        if (dataList[index].size() == 0)return;
+        data.clear();
+        for(int i = 0;i < dataList[index].size();++i)
+        {
+            data.push_back(dataList[index][i]->val);
+            if (dataList[index][i]->left)
+            {
+                dataList[1-index].push_back(dataList[index][i]->left);
+            }
+            if (dataList[index][i]->right)
+            {
+                dataList[1-index].push_back(dataList[index][i]->right);
+            }
+        }
+        if (index == 1)
+        {
+            reverse(data.begin(),data.end());
+            res.push_back(data);
+        }
+        else 
+        {
+            res.push_back(data);
+        }
+        dataList[index].clear();
+        index = 1 - index;
+        bfs();
+    }
+};
  
 ##[二叉树的最大深度](https://leetcode-cn.com/problems/maximum-depth-of-binary-tree)    
+class Solution {
+public:
+    int maxDepth(TreeNode* root) {
+        if(!root)return 0;
+        return max(maxDepth(root->left) + 1,maxDepth(root->right) + 1); 
+    }
+};
  
 ##[从前序与中序遍历序列构造二叉树](https://leetcode-cn.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal)    
  
