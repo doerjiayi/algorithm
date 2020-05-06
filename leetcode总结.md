@@ -5521,9 +5521,6 @@ public:
  
 
 #字符串
- 
-##(排列)
- 
 ##[下一个更大元素 III](https://leetcode-cn.com/problems/next-greater-element-iii)
 class Solution {
 public:
@@ -5555,10 +5552,7 @@ public:
     */
 };
 
-##(切分)
-
 ##[简化路径](https://leetcode-cn.com/problems/simplify-path) 
- 
 字节流的分割和遍历
 class Solution {
 public:
@@ -5580,8 +5574,6 @@ public:
         return res.size() ? res:"/";
     }
 };
-
-##（字符数组）
 
 ##[压缩字符串](https://leetcode-cn.com/problems/string-compression)    
 class Solution {
@@ -5622,10 +5614,7 @@ public:
     }
 };
 
-##(其他)
-
 ##[基本计算器 II](https://leetcode-cn.com/problems/basic-calculator-ii)    
-
 class Solution {
 public:
     int calculate(string s) {
@@ -5656,7 +5645,7 @@ public:
             }
         }
         num = 0;
-        while(sk.size())
+        while(sk.size() > 0)
         {
             num += sk.top();//累加
             sk.pop();
