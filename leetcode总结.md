@@ -430,8 +430,7 @@ candidates[i-1])++i;//本层去重
         }
     }
 };
-##
-[组合总和 III](https://leetcode-cn.com/problems/combination-sum-iii)
+##[组合总和 III](https://leetcode-cn.com/problems/combination-sum-iii)
 --------------------------------------------------------------------
 class Solution {
 public:
@@ -748,9 +747,7 @@ public:
 };
 
 #连续序列
-
 ##[乘积最大子序列](https://leetcode-cn.com/problems/maximum-product-subarray)    
-
 class Solution {
 public:
     int maxProduct(vector<int>& nums) {
@@ -765,10 +762,9 @@ public:
         return global_max;
     }
 };
-##二维数组
 
+#二维数组
 ##[旋转图像](https://leetcode-cn.com/problems/rotate-image)    
-
 class Solution {
 public:
     void rotate(vector<vector<int>>& matrix) {
@@ -791,11 +787,9 @@ public:
 4  5  6　　-->　　8  5  2　　 -->     8  5  2　　
 7  8  9 　　　 　　7  4  1　　　　　  9  6  3
 */
-##[Z 字形变换](https://leetcode-cn.com/problems/zigzag-conversion)    
 
-class Solution {
-public:
-    /*
+##[Z 字形变换](https://leetcode-cn.com/problems/zigzag-conversion)    
+ /*
     分析一下每一层下标递增的规律，找到每个内层for循环 j更新的方法即可
 第一层 和 最后一层 每次更新 (numRows - 1) * 2
 中间层按照奇偶要么更新 （numRows - 1 - i）* 2 要么更新 i*2
@@ -806,6 +800,8 @@ T     S     G
 LEETCODEISHIRING
 LDREOEIIECIHNTSG
 */
+class Solution {
+public:
     string convert(string s, int numRows) {
         if (numRows == 1) return s;
         ostringstream oss;
@@ -1575,7 +1571,32 @@ public:
  
 #集合
 ##[天际线问题](https://leetcode-cn.com/problems/the-skyline-problem)    
- 
+class Solution {
+public:
+    vector<pair<int, int>> getSkyline(vector<vector<int>>& buildings) {
+        vector<pair<int, int>> height, res;
+        for (auto &b : buildings) {
+            height.push_back({b[0], -b[2]});
+            height.push_back({b[1], b[2]});
+        }
+        sort(height.begin(), height.end());
+        //for(auto& h:height)printf("1)%d %d\n",h.first,h.second);//根据first顺序递增的
+        set<int> heap;
+        heap.insert(0);//在右边的最底下
+        int pre = 0, cur = 0;
+        for (auto &h : height) {
+            if (h.second < 0) heap.insert(-h.second);// 左
+            else heap.erase(heap.find(h.second));// 右
+            cur = *heap.rbegin();//有右边的需要下降到前一个的高度
+            //printf("2) %d %d   %u  (%d,%d) (%d,%d) \n",h.first,h.second,heap.size(),pre,cur, h.first, cur);
+            if (cur != pre) {
+                res.push_back({h.first, cur});
+                pre = cur;
+            }
+        }
+        return res;
+    }
+};
  
 ##[常数时间插入、删除和获取随机元素](https://leetcode-cn.com/problems/insert-delete-getrandom-o1)    
 class RandomizedSet {
@@ -1604,9 +1625,7 @@ public:
 };
 
 #几何
-
 ##[矩形面积](https://leetcode-cn.com/problems/rectangle-area)    
- 
 class Solution {
 public:
     int computeArea(int A, int B, int C, int D, int E, int F, int G, int H) {
@@ -1617,9 +1636,7 @@ public:
     }
 };
  
-#[直线上最多的点数](https://leetcode-cn.com/problems/max-points-on-a-line)    
- 
- 
+##[直线上最多的点数](https://leetcode-cn.com/problems/max-points-on-a-line)    
 class Solution {
 public:
     int maxPoints(vector<Point>& points) 
@@ -1666,12 +1683,8 @@ public:
     }
 };
 
-#拓扑结构
-
-
- 
+#拓扑图
 ##[课程表](https://leetcode-cn.com/problems/course-schedule)
- 
 利用了哈希表记录入度表，利用哈希表记录入度的出度，利用set来遍历
 class Solution {
 public:
@@ -1683,10 +1696,10 @@ public:
         {
             m[iter.first]++;//入度计数
             dep[iter.second].push_back(iter.first);
-            st.insert(iter.first);//只是处理有依赖的课程
+            st.insert(iter.first);//只是处理有依赖关系的所有课程
             st.insert(iter.second);
         }
-        while(st.size())
+        while(st.size() > 0)
         {
             int left = st.size();
             for(auto iter = st.begin();iter!=st.end();)
@@ -1706,46 +1719,43 @@ public:
                     iter++;                    
                 }
             }
-            if (left == st.size())return
-false;//没有减少课程的则说明不能继续       
+            if (left == st.size())return false;//没有减少课程的则说明不能继续       
         }
         return true;
     }
 };
 
  
-#[课程表 II](https://leetcode-cn.com/problems/course-schedule-ii)
- 
+##[课程表 II](https://leetcode-cn.com/problems/course-schedule-ii)
 因为只需要返回一种，可以直接遍历
-
 class Solution {
 public:
     vector<int> findOrder(int numCourses, vector<pair<int, int>>& prerequisites) {
         unordered_map<int,int> inM;//入度列表
         set<int> courseSt;//课程
-        unordered_map<int,vector<int>> depM;//出度列表
+        unordered_map<int,vector<int>> depM;//出度的所有入度列表
         for(auto &iter:prerequisites)
         {
-            inM[iter.first]++;
+            inM[iter.first]++;//入度计数
             depM[iter.second].push_back(iter.first);
-            courseSt.insert(iter.first);
+            courseSt.insert(iter.first);//有依赖关系的所有课程
             courseSt.insert(iter.second);
         }
         vector<int> res;
         for(int i = 0;i < numCourses;++i)
         {
             //printf("1)%d\n",i);
-            if (!courseSt.count(i))res.push_back(i);//没有依赖的则先学习
+            if (courseSt.count(i) == 0)res.push_back(i);//没有依赖的则先学习
         }
-        while(courseSt.size())
+        while(courseSt.size() > 0)
         {
             int left = courseSt.size();
             for(auto iter = courseSt.begin();iter != courseSt.end();)
             {
-                if (inM[*iter] == 0)
+                if (inM[*iter] == 0)//没有入度的
                 {
                     //printf("2)%d\n",*iter);
-                    res.push_back(*iter);
+                    res.push_back(*iter);//学习没有入度的
                     for(auto i:depM[*iter])
                     {
                         if (inM[i]) inM[i]--; 
@@ -1765,10 +1775,8 @@ public:
 
 
  
-#[单词接龙 II](https://leetcode-cn.com/problems/word-ladder-ii)
- 
+##[单词接龙 II](https://leetcode-cn.com/problems/word-ladder-ii)
 拓扑图的方式一层层遍历获取临接节点，临接节点为修改一个字符就出现在字典内的；每遍历一层后再从字典删除该前一层的节点。每一个新的节点、新的路径，需要拷贝，因为需要发现所有的可能的路径（所有的有向无环图）。
-
 class Solution {
 public:
     vector<vector<string>> findLadders(string beginWord, string endWord,
@@ -1784,12 +1792,10 @@ vector<string>& wordList)
         while (paths.size()) {
             auto path = paths.front(); paths.pop();//每个path都处理
             if (path.size() > level) {//到了新的一层
-                for (string w : words)
-dict.erase(w);//处理掉前一层的词，否则会回环
+                for (string w : words)dict.erase(w);//处理掉前一层的词，否则会回环
                 words.clear();
                 level = path.size();
-                if (level > minLevel)
-break;//长度已超过最短长度，则表示已到最后一层
+                if (level > minLevel)break;//长度已超过最短长度，则表示已到最后一层
             }
             string last = path.back();
             for (int i = 0; i < last.size(); ++i) {
@@ -1816,7 +1822,6 @@ break;//长度已超过最短长度，则表示已到最后一层
 
  
 ##[单词接龙](https://leetcode-cn.com/problems/word-ladder) 
- 
 拓扑图的方式一层层遍历获取临接节点，临接节点为修改一个字符就出现在字典内的；每遍历一个临接节点就从字典删除该节点
 class Solution {
 public:
