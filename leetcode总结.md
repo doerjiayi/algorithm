@@ -927,7 +927,6 @@ nums[ vec[k].second ] });//a≤b≤c≤d
 };
 
 ##[单词模式](https://leetcode-cn.com/problems/word-pattern)
-
 class Solution {
 public:
     bool wordPattern(string pattern, string str) {
@@ -950,10 +949,53 @@ public:
     }
 };
 
+##[验证外星语词典](https://leetcode-cn.com/problems/verifying-an-alien-dictionary)    
+class Solution {
+public:
+    bool isAlienSorted(vector<string>& words, string order) {
+        int m[26];
+        for (int i = 0; i < 26; i++) {
+            m[order[i] - 'a'] = i;//字母顺序（固定26个字母）
+        }
+        vector<string> newWords;
+        for (string w: words) 
+        {
+            for (int i = 0; i < w.size(); i++)
+            {
+                w[i] = 'a' + m[w[i] - 'a'];//字母替换
+            }
+            newWords.push_back(w);
+        }
+        for (int i = 1; i < newWords.size(); i++)
+            if (newWords[i] < newWords[i-1]) return false;//排序检查
+        return true;
+    }
+};
+ 
+##[键值映射](https://leetcode-cn.com/problems/map-sum-pairs)    
+class MapSum {
+public:
+    /** Initialize your data structure here. */
+    MapSum() {
+    }
+    void insert(string key, int val) {
+        m[key] = val; 
+    }
+    int sum(string prefix) {
+        int sum = 0;
+        for (auto s : m) {
+            if (prefix == s.first.substr(0,prefix.size()))
+            {
+                sum += s.second;
+            }
+        }
+        return sum;
+    }
+    unordered_map<string,int> m;
+};
+
 #动规
-
 需要找到前面k-1个成员（或者第k-1个）与第k个成员的关系
-
 ##[单词拆分](https://leetcode-cn.com/problems/word-break)    
 
 哈希表是为了快速访问，保存动规状态才能递推
@@ -2289,15 +2331,9 @@ public:
     }
 };
 
- 
-
-#常用结构
- 
-##链表
- （缓存）
+#链表
 ##[LRU缓存机制](https://leetcode-cn.com/problems/lru-cache)
- 
-利用哈希表的快速访问，记录的是链表迭代器，因为迭代器需要被移动；链表的访问顺序判断访问热度
+ （缓存）利用哈希表的快速访问，记录的是链表迭代器，因为迭代器需要被移动；链表的访问顺序判断访问热度
 class LRUCache {
 public:
     LRUCache(int capacity)
@@ -3528,7 +3564,7 @@ public:
     }
 };
 
-#数字--找规律
+#数字规律
 ##[整数拆分](https://leetcode-cn.com/problems/integer-break)    
 class Solution {
 public:
@@ -6217,62 +6253,9 @@ public:
     }
 };
  
-#哈希表
-
- 
-##[验证外星语词典](https://leetcode-cn.com/problems/verifying-an-alien-dictionary)    
- 
-class Solution {
-public:
-    bool isAlienSorted(vector<string>& words, string order) {
-        int m[26];
-        for (int i = 0; i < 26; i++) {
-            m[order[i] - 'a'] = i;
-        }
-        vector<string> newWords;
-        for (string w: words) 
-        {
-            for (int i = 0; i < w.size(); i++)
-            {
-                w[i] = 'a' + m[w[i] - 'a'];
-            }
-            newWords.push_back(w);
-        }
-        for (int i = 1; i < newWords.size(); i++)
-            if (newWords[i] < newWords[i-1])
-                return false;
-        return true;
-    }
-};
- 
-##[键值映射](https://leetcode-cn.com/problems/map-sum-pairs)    
- 
-class MapSum {
-public:
-    /** Initialize your data structure here. */
-    MapSum() {
-    }
-    void insert(string key, int val) {
-        m[key] = val; 
-    }
-    int sum(string prefix) {
-        int sum = 0;
-        for (auto s : m) {
-            if (prefix == s.first.substr(0,prefix.size()))
-            {
-                sum += s.second;
-            }
-        }
-        return sum;
-    }
-    unordered_map<string,int> m;
-};
  
 #二叉树
- 
 常用dfs或者bfs，前序、中序、后序遍历，dfs一般需要递归
-
- 
 ##[求根到叶子节点数字之和](https://leetcode-cn.com/problems/sum-root-to-leaf-numbers)    
  
 class Solution {
