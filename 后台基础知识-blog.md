@@ -41,24 +41,6 @@ https://blog.csdn.net/modi000/article/details/80718070
 ##linux高并发设计
 https://blog.csdn.net/u010761477/article/details/83381835
 
-##libev
-libev 源码浅析
-https://www.cnblogs.com/foxmailed/archive/2013/02/04/2891077.html
-libev源码解析——I/O模型
-https://cloud.tencent.com/developer/article/1383771
-https://blog.csdn.net/breaksoftware/article/details/76737425
-https://www.cnblogs.com/leng2052/p/5392638.html
-https://cloud.tencent.com/developer/article/1383770
- 
-libev源码解析——调度策略
-https://cloud.tencent.com/developer/article/1383768
-
-libev源码解析——定时器监视器和组织形式
-https://cloud.tencent.com/developer/article/1383767
-
-libev源码解析——I/O模型
-绑定CPU逻辑核心的利器——taskset
-
 ##Nginx + CGI/FastCGI + C/Cpp
 https://www.cnblogs.com/skynet/p/4173450.html
 
@@ -122,10 +104,10 @@ https://blog.csdn.net/wdr2003/article/details/79597624
 https://blog.csdn.net/wdr2003/article/details/80248135
 
 #go
-《go程序设计语言》
-
+##《go程序设计语言》
 golang 基于共享变量的并发
 https://blog.csdn.net/u012045188/article/details/80280781
+
 ide
 https://www.runoob.com/go/go-ide.html
 
@@ -134,10 +116,11 @@ https://blog.csdn.net/qq_25870633/article/details/83445946
 
 runtime.Gosched()的作用分析
 https://www.cnblogs.com/yorkyang/p/7889344.html
+
 Golang cpu的使用设置--GOMAXPROCS
 https://blog.csdn.net/lanyang123456/article/details/80832929
-Golang 语言如何获取线程ID(Thread ID)？
 
+Golang 语言如何获取线程ID(Thread ID)？
 https://blog.csdn.net/weixin_40622673/article/details/83146061
 
 #搜索
@@ -166,6 +149,7 @@ https://blog.csdn.net/yin4302008/article/details/86104662
 https://blog.csdn.net/laoyang360/article/details/75933314
 
 https://blog.csdn.net/xiaoyu_BD/article/details/82423749
+
 公式 
 https://www.jianshu.com/p/c6554e73aa85
 https://blog.csdn.net/asdfsadfasdfsa/article/details/78093093
@@ -362,7 +346,6 @@ https://blog.csdn.net/snow_5288/article/details/72982594
 #brpc
 
 ##rpc
-
 https://github.com/doerjiayi/incubator-brpc/blob/master/docs/cn/threading_overview.md
 https://github.com/doerjiayi/incubator-brpc/blob/master/docs/cn/thrift.md#client端访问thrift-server
 https://github.com/doerjiayi/incubator-brpc/blob/master/docs/cn/redis_client.md
