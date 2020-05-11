@@ -1,14 +1,27 @@
+#shell
+find grep 联合使用 过滤所有子目录、文件
+find . -type f -name '*.json' | xargs grep --color -n '27019'
+find . -type f -name '*.log*' | xargs grep --color -n 'GetConnectIdentify'
+find . -type f -name '*.log*' | xargs grep --color -n 'cmd 507'
+find . -type f -name '*.log*' | xargs grep --color -n 'cmd(508)'
+
+
+
+
 #算法
 ##外部排序
 https://www.cnblogs.com/haimishasha/p/10898715.html
+
 ##胜者树
 https://blog.csdn.net/wypblog/article/details/8074831
 https://www.cnblogs.com/qianye/archive/2012/11/25/2787923.html
 https://www.iteblog.com/archives/93.html
 https://bbs.csdn.net/topics/320080544
+
 ##败者树
 https://www.xuebuyuan.com/3227668.html
 https://blog.csdn.net/ltyqljhwcm/article/details/53434466
+
 ##生成树
 https://blog.csdn.net/liupeifeng3514/article/details/83828519
 
@@ -178,14 +191,13 @@ https://www.jianshu.com/p/31cf87a313d3
 https://www.cnblogs.com/jalja/archive/2018/02/23/8371869.html
 https://www.cnblogs.com/bigshark/p/7906530.html
 
-
 ##索引
 https://blog.51cto.com/fengjicheng/2310777
 https://blog.csdn.net/daicooper/article/details/88874441
 https://blog.csdn.net/sinat_35930259/article/details/80282710
+
 ##正排
 https://www.cnblogs.com/bkyXyt/p/8621716.html
-
 
 #虚拟化
 ##docker
@@ -406,132 +418,6 @@ https://blog.csdn.net/baidu_38172402/article/details/80789042
 ##rtsp
 https://blog.csdn.net/deliapu/article/details/79199023
 
-#微服务
-
-##服务降级、熔断、限流、排队
-https://www.jianshu.com/p/33f394c0ee2d
-
-##tars
-https://blog.csdn.net/shuishishuideyingzi/article/details/89460973
-https://www.cnblogs.com/lidabo/p/9122132.html
-https://www.cnblogs.com/qwangxiao/p/11248817.html
-https://blog.csdn.net/u014520797/article/details/80877639
-https://www.liangzl.com/get-article-detail-18305.html
-安装
-https://blog.csdn.net/sunshine1314/article/details/81151080
-https://blog.csdn.net/qq_40477151/article/details/81166838
-
-源码
-https://cloud.tencent.com/developer/article/1381515
-https://cloud.tencent.com/developer/article/1381523?from=10680
-
-https://cloud.tencent.com/developer/article/1394046
-设计
-https://www.jianshu.com/p/cfb778c452cd
-
-##libco
-https://www.cnblogs.com/dearplain/p/9820913.html
-https://blog.csdn.net/u011579138/article/details/81839840
-https://blog.csdn.net/zimengyu2020/article/details/80217499
-
-##brpc
-
-https://github.com/apache/incubator-brpc/blob/master/docs/cn/getting_started.md
-https://cloud.tencent.com/developer/article/1383845
-https://gitee.com/mirrors/BRPC
-
-
-##grpc
-https://blog.csdn.net/weiwangchao_/article/details/82023191
-https://www.cnblogs.com/TianFang/p/4355280.html
-
-##thrift
-https://blog.csdn.net/zkp_java/article/details/81879577
-https://blog.csdn.net/jek123456/article/details/53395206
-https://www.jianshu.com/p/cf91da1e3f8d
-
-##aba
-https://blog.csdn.net/qq_42576040/article/details/88240595
-
-##zookeeper
-https://www.w3cschool.cn/zookeeper/zookeeper_cli.html
-https://www.w3cschool.cn/zookeeper/zookeeper_overview.html
-zookeeper快速入门——简介
-https://cloud.tencent.com/developer/article/1383764
-
-##eureka
-https://blog.csdn.net/rubbertree/article/details/95085507
-https://blog.csdn.net/tianyaleixiaowu/article/details/78192922
-https://www.cnblogs.com/demodashi/p/8509931.html
-https://www.cnblogs.com/feixiangdecainiao/p/10850558.html
-https://www.jianshu.com/p/c18db3a2efc6
-
-##zab
-https://www.cnblogs.com/crazylqy/p/7132133.html
-https://www.cnblogs.com/crazylqy/p/7132369.html
-https://www.imooc.com/article/260128
-
-##调用链
-https://www.jianshu.com/p/da80ea881424
-
-##灰度 共享内存
-https://my.oschina.net/izhangll/blog/884713
-
-##keepalived
-https://blog.51cto.com/superpcm/2095395
-
-##微服务设计
-https://book.douban.com/subject/26772677/
-
-##大型分布式系统的优化解决方案
-https://blog.csdn.net/xiaopy_0508/article/details/78190102
-
-
-##《亿级流量网站架构核心技术》概要
-https://www.cnblogs.com/jstarseven/p/9174604.html
-
-
-## 可伸缩服务架构
-《可伸缩服务架构 框架与中间件》综合（1）
-https://blog.csdn.net/u011692924/article/details/81938019
-《可伸缩服务架构 框架与中间件》综合（2）
-https://blog.csdn.net/u011692924/article/details/81938235
-《可伸缩服务架构 框架与中间件》综合（3）
-https://blog.csdn.net/u011692924/article/details/82988759
-《可伸缩服务架构 框架与中间件》综合（4）
-https://blog.csdn.net/u011692924/article/details/82989820
-
-分库分表的架构设计—《可伸缩服务架构》
-https://blog.csdn.net/ok449a6x1i6qq0g660fV/article/details/80193375
-
-
-#消息中间件
-##kafka
-https://github.com/wurstmeister/kafka-docker
-
-##rabbit mq
-https://github.com/alanxz/rabbitmq-c
-https://www.cnblogs.com/knowledgesea/p/6535766.html
-https://www.jianshu.com/p/6376936845ff
-https://pdf.us/2018/06/07/1260.html
-https://blog.csdn.net/jinyidong/article/details/80003362
-https://pdf.us/2018/06/12/1311.html
-
-https://blog.csdn.net/hellozpc/article/details/81436980#83Topic_Exchange_1429
-https://www.cnblogs.com/ysocean/p/9251884.html
-
-RabbitMQ教程
-https://blog.csdn.net/hellozpc/article/details/81436980
-
-RabbitMQ镜像队列的故障恢复
-http://www.360doc.com/content/15/0312/15/20874412_454584335.shtml
-rabbitMq集群之镜像模式
-https://blog.csdn.net/wexiaoword/article/details/81352045
-消息中间件面试题：消息队列的优缺点，区别
-https://blog.csdn.net/Iperishing/article/details/86674084
-
-##消息中间件（一）MQ详解及四大MQ比较
-https://blog.csdn.net/wqc19920906/article/details/82193316
 
 #工具
 

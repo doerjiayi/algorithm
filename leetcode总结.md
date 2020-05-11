@@ -1,3 +1,6 @@
+#本文档说明
+leetcode总结：leetcode的资料在网上已较多，这里对各个算法进行归纳总结和简单分析。电子书形式方便查询。持续更新。
+
 #贪心
 ##[盛最多水的容器](https://leetcode-cn.com/problems/container-with-most-water)
 矮边是乘积的成员，而宽度是一直减少的，贪心移动矮边

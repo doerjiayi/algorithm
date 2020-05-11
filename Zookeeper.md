@@ -4,6 +4,7 @@
 Zookeeper是一个分布式协调服务，可用于服务发现，分布式锁，分布式领导选举，配置管理等。
 这一切的基础，都是Zookeeper提供了一个类似于Linux文件系统的树形结构（可认为是轻量级的内存文件系统，但只适合存少量信息，完全不适合存储大量文件或者大文件），同时提供了对于每个节点的监控与通知机制。
 既然是一个文件系统，就不得不提Zookeeper是如何保证数据的一致性的。本文将介绍Zookeeper如何保证数据一致性，如何进行领导选举，以及数据监控/通知机制的语义保证。
+
 ##Zookeeper架构 角色
 Zookeeper集群是一个基于主从复制的高可用集群，每个服务器承担如下三种角色中的一种
 Leader 一个Zookeeper集群同一时间只会有一个实际工作的Leader，它会发起并维护与各Follwer及Observer间的心跳。所有的写操作必须要通过Leader完成再由Leader将写操作广播给其它服务器。
@@ -11,7 +12,6 @@ Follower 一个Zookeeper集群可能同时存在多个Follower，它会响应Lea
 Observer 角色与Follower类似，但是无投票权。
 
 ##FastLeaderElection原理
-术语介绍
 myid
 每个Zookeeper服务器，都需要在数据文件夹下创建一个名为myid的文件，该文件包含整个Zookeeper集群唯一的ID（整数）。例如某Zookeeper集群包含三台服务器，hostname分别为zoo1、zoo2和zoo3，其myid分别为1、2和3，则在配置文件中其ID与hostname必须一一对应，如下所示。在该配置文件中，server.后面的数据即为myid
 server.1=zoo1:2888:3888
@@ -19,14 +19,15 @@ server.2=zoo2:2888:3888
 server.3=zoo3:2888:3888
 zxid
 类似于RDBMS中的事务ID，用于标识一次更新操作的Proposal ID。为了保证顺序性，该zkid必须单调递增。因此Zookeeper使用一个64位的数来表示，高32位是Leader的epoch，从1开始，每次选出新的Leader，epoch加一。低32位为该epoch内的序号，每次epoch变化，都将低32位的序号重置。这样保证了zkid的全局递增性。
+
 ###支持的领导选举算法
-可通过electionAlg配置项设置Zookeeper用于领导选举的算法。
-到3.4.10版本为止，可选项有 
+可通过electionAlg配置项设置Zookeeper用于领导选举的算法。到3.4.10版本为止，可选项有 
 0 基于UDP的LeaderElection
 1 基于UDP的FastLeaderElection
 2 基于UDP和认证的FastLeaderElection
 3 基于TCP的FastLeaderElection
 在3.4.10版本中，默认值为3，也即基于TCP的FastLeaderElection。另外三种算法已经被弃用，并且有计划在之后的版本中将它们彻底删除而不再支持。
+
 ###FastLeaderElection
 FastLeaderElection选举算法是标准的Fast Paxos算法实现，可解决LeaderElection选举算法收敛速度慢的问题。
 服务器状态
@@ -42,27 +43,36 @@ self_id 当前服务器的myid
 self_zxid 当前服务器上所保存的数据的最大zxid
 vote_id 被推举的服务器的myid
 vote_zxid 被推举的服务器上所保存的数据的最大zxid
+
 投票流程
+
 自增选举轮次
 Zookeeper规定所有有效的投票都必须在同一轮次中。每个服务器在开始新一轮投票时，会先对自己维护的logicClock进行自增操作。
+
 初始化选票
 每个服务器在广播自己的选票前，会将自己的投票箱清空。该投票箱记录了所收到的选票。例：服务器2投票给服务器3，服务器3投票给服务器1，则服务器1的投票箱为(2, 3), (3, 1), (1, 1)。票箱中只会记录每一投票者的最后一票，如投票者更新自己的选票，则其它服务器收到该新选票后会在自己票箱中更新该服务器的选票。
+
 发送初始化选票
 每个服务器最开始都是通过广播把票投给自己。
+
 接收外部投票
 服务器会尝试从其它服务器获取投票，并记入自己的投票箱内。如果无法获取任何外部投票，则会确认自己是否与集群中其它服务器保持着有效连接。如果是，则再次发送自己的投票；如果否，则马上与之建立连接。
+
 判断选举轮次
 收到外部投票后，首先会根据投票信息中所包含的logicClock来进行不同处理
 外部投票的logicClock大于自己的logicClock。说明该服务器的选举轮次落后于其它服务器的选举轮次，立即清空自己的投票箱并将自己的logicClock更新为收到的logicClock，然后再对比自己之前的投票与收到的投票以确定是否需要变更自己的投票，最终再次将自己的投票广播出去。
 外部投票的logicClock小于自己的logicClock。当前服务器直接忽略该投票，继续处理下一个投票。
 外部投票的logickClock与自己的相等。当时进行选票PK。
+
 选票PK
 选票PK是基于(self_id, self_zxid)与(vote_id, vote_zxid)的对比
 外部投票的logicClock大于自己的logicClock，则将自己的logicClock及自己的选票的logicClock变更为收到的logicClock
 若logicClock一致，则对比二者的vote_zxid，若外部投票的vote_zxid比较大，则将自己的票中的vote_zxid与vote_myid更新为收到的票中的vote_zxid与vote_myid并广播出去，另外将收到的票及自己更新后的票放入自己的票箱。如果票箱内已存在(self_myid, self_zxid)相同的选票，则直接覆盖
 若二者vote_zxid一致，则比较二者的vote_myid，若外部投票的vote_myid比较大，则将自己的票中的vote_myid更新为收到的票中的vote_myid并广播出去，另外将收到的票及自己更新后的票放入自己的票箱
+
 统计选票
 如果已经确定有过半服务器认可了自己的投票（可能是更新后的投票），则终止投票。否则继续接收其它服务器的投票。
+
 更新服务器状态
 投票终止后，服务器开始更新自身状态。若过半的票投给了自己，则将自己的服务器状态更新为LEADING，否则将自己的状态更新为FOLLOWING
 
@@ -83,7 +93,6 @@ ZAB协议支持的崩溃恢复可以保证在Leader进程崩溃的时候可以�
 一个客户端无论连接到哪一台服务器，它看到的都是同样的系统视图。这意味着，如果一个客户端在同一个会话中连接到一台新的服务器，它所看到的系统状态不会比在之前服务器上所看到的更老。当一台服务器出现故障，导致它的一个客户端需要尝试连接集合体中其他的服务器时，所有滞后于故障服务器的服务器都不会接受该连接请求，除非这些服务器赶上故障服务器。
 ④ 持久性
 一个更新一旦成功，其结果就会持久存在并且不会被撤销。这表明更新不会受到服务器故障的影响。
-==========================================================================
 
 ##ZAB协议的两个基本模式：恢复模式和广播模式
 恢复模式:（选举）
@@ -131,10 +140,13 @@ Zookeeper能干嘛？！
 分布式环境下，经常需要对应用/服务进行统一命名，便于识别不同服务； 
 类似于域名与ip之间对应关系，域名容易记住； 
 通过名称来获取资源或服务的地址，提供者等信息
+
 3. 分布式锁
 碰到分布二字貌似就难理解了，其实很简单。单机程序的各个进程需要对互斥资源进行访问时需要加锁，那分布式程序分布在各个主机上的进程对互斥资源进行访问时也需要加锁。很多分布式系统有多个可服务的窗口，但是在某个时刻只让一个服务去干活，当这台服务出问题的时候锁释放，立即fail over到另外的服务。这在很多分布式系统中都是这么做，这种设计有一个更好听的名字叫Leader Election(leader选举)。举个通俗点的例子，比如银行取钱，有多个窗口，但是呢对你来说，只能有一个窗口对你服务，如果正在对你服务的窗口的柜员突然有急事走了，那咋办？找大堂经理（zookeeper）!大堂经理指定另外的一个窗口继续为你服务！
+
 4. 集群管理
 在分布式的集群中，经常会由于各种原因，比如硬件故障，软件故障，网络问题，有些节点会进进出出。有新的节点加入进来，也有老的节点退出集群。这个时候，集群中有些机器（比如Master节点）需要感知到这种变化，然后根据这种变化做出对应的决策。我已经知道HDFS中namenode是通过datanode的心跳机制来实现上述感知的，那么我们可以先假设Zookeeper其实也是实现了类似心跳机制的功能吧！
+
 Zookeeper的特点
 1 最终一致性：为客户端展示同一视图，这是zookeeper最重要的功能。 
 2 可靠性：如果消息被到一台服务器接受，那么它将被所有的服务器接受。 
@@ -142,6 +154,7 @@ Zookeeper的特点
 4 等待无关（wait-free）：慢的或者失效的client不干预快速的client的请求。 
 5 原子性：更新只能成功或者失败，没有中间状态。 
 6 顺序性：所有Server，同一消息发布顺序一致。
+
 用到Zookeeper的系统
 HDFS中的HA方案 
 YARN的HA方案 
@@ -164,16 +177,16 @@ ZkEventThread是专门用来处理事件的线程。
  
 启动ZKClient
 在创建ZKClient对象时，就完成了到ZooKeeper服务器连接的建立。具体过程是这样的：
-      
  
 1、  启动时，指定好connection string，连接超时时间，序列化工具等。
 2、  创建并启动eventThread，用于接收事件，并调度事件监听器Listener的执行。
 3、  连接到zookeeper服务器，同时将ZKClient自身作为默认的Watcher。
  
 为节点注册Watcher
-       ZooKeeper的三个方法：getData、getChildren、exists，ZKClient都提供了相应的代理方法。就拿exists来看：
- 
-可以看到，是否注册watcher，由hasListeners(path)来决定的。
+
+ZooKeeper的三个方法：getData、getChildren、exists，ZKClient都提供了相应的代理方法。
+
+就拿exists来看：可以看到，是否注册watcher，由hasListeners(path)来决定的。
  
 hasListeners就是看有没有与该数据节点绑定的listener。
  
@@ -182,8 +195,7 @@ ZKClient提供了订阅功能：
  
  
 一个新建的会话，只需要在取得响应的数据节点后，调用subscribteXxx就可以订阅上相应的事件了。
- 
- 
+
 ZooKeeper的变更操作
 Zookeeper中提供的变更操作有：节点的创建、删除，节点数据的修改。
  
@@ -191,7 +203,7 @@ Zookeeper中提供的变更操作有：节点的创建、删除，节点数据�
 
  
 删除节点的操作：
- 
+
 修改节点数据的操作：
  
 writeDataReturnStat（）：写数据并返回数据的状态。
@@ -222,3 +234,6 @@ Watcher自动重注册：这个要是依赖于hasListeners（）的判断，来�
  
 相比于ZooKeeper官方客户端，使用ZKClient时，只需要关注实际的Listener实现即可。所以这个客户端，还是推荐大家使用的。
 另外，是关于zkclient的一些接口，我们可以通过这些接口直接调用，使其完成一些相应的任务。
+
+#Zookeeper的基本概念和重要特性  https://www.cnblogs.com/takumicx/p/9508706.html
+
