@@ -18,6 +18,7 @@ https://www.cnblogs.com/-zyj/p/5763303.html
 find grep 联合使用 过滤所有子目录、文件
 find . -type f -name '*.log*' | xargs grep --color -n 'GetConnectIdentify'
 
+
 ##traceroute
 https://www.cnblogs.com/ftl1012/p/traceroute.html
 traceroute -n -m 5 -q 4 -w 3 www.baidu.com 

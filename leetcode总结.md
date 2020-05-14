@@ -42,6 +42,7 @@ public:
         return g;
     }
 };
+
 ##[最接近的三数之和](https://leetcode-cn.com/problems/3sum-closest)    
 class Solution {
 public:
@@ -70,8 +71,8 @@ public:
         return res;
     }
 };
+
 ##[搜索二维矩阵 II](https://leetcode-cn.com/problems/search-a-2d-matrix-ii)
- 
 class Solution {
 public:
     bool searchMatrix(vector<vector<int>>& matrix, int target) {
@@ -95,6 +96,7 @@ public:
         return false;
     }
 };
+
 ##[最长连续序列](https://leetcode-cn.com/problems/longest-consecutive-sequence)
 class Solution {
 public:
