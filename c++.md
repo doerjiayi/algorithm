@@ -24,6 +24,9 @@ http://www.360doc.com/content/18/0526/09/54097382_757112296.shtml
 ##operator[]()
 https://blog.csdn.net/qq_37474728/article/details/82586068
 
+##std::ref和std::cref使用
+https://blog.csdn.net/lmb1612977696/article/details/81543802
+
 ##c++可变模板
 https://www.cnblogs.com/wxquare/p/4743180.html
 
@@ -120,3 +123,14 @@ https://www.jianshu.com/p/949afb64be86
 
 ##C++11泛型 - 类模板
 https://www.jianshu.com/p/91650b5312c3
+
+##C++性能榨汁机之switch语句
+https://zhuanlan.zhihu.com/p/38139553
+
+##使用 gcc 命令把C语言程序反汇编 
+https://www.cnblogs.com/yeyeck/p/9750396.html
+
+##Eclipse开发C/C++之使用技巧小结，写给新手 
+https://www.cnblogs.com/jiftle/p/7156057.html
+
+
