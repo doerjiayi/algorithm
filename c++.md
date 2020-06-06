@@ -429,7 +429,7 @@ MI(多重继承)意味着设计的高复杂性、维护的高难度性，尽量�
 建议91：不要强制去除变量的const属性
          在C++中，const_cast<T*>(a)一般用于从一个类中去除以下这些属性：const、volatile和_unaligned.强制去除变量的const属性虽然可以带来暂时的便利，但这不仅增加了错误修改变量的几率，而且还可能会引发内存故障。
  
-第9章   提高代码的可读性
+##第9章   提高代码的可读性
 建议92：尽量使代码版面整洁优雅
 (1)、避免代码过长；
 (2)、代码缩进和对齐；
@@ -437,7 +437,7 @@ MI(多重继承)意味着设计的高复杂性、维护的高难度性，尽量�
 (4)、使用空格；
 (5)、语句行。
 建议93：给函数和变量起一个“能说话”的名字
-         (1)、名称必须直观，可望文生义，不必解码；
+(1)、名称必须直观，可望文生义，不必解码；
 (2)、长度要符合“min_length && max_information”(最小名长度最大信息量)的原则；
 (3)、与整体风格保持一致；
 (4)、变量名称应该是一个“名词”，或者是“形容词+名词”；而函数名称应该是“动词+名词”的组合；
@@ -447,7 +447,7 @@ MI(多重继承)意味着设计的高复杂性、维护的高难度性，尽量�
 (8)、单字符变量只能用作循环变量；
 (9)、类名采用“C+首字母大写的单词”形式来命名。
 建议94：合理地添加注释
-         (1)、使用统一的注释方法为每个层次的代码块添加注释；
+(1)、使用统一的注释方法为每个层次的代码块添加注释；
 (2)、避免不必要的注释；
 (3)、掌握代码注释量的一个度；
 (4)、边写代码加边注释；
@@ -695,4 +695,205 @@ _stdcall 是StandardCall的缩写，是C++的标准调用方式：所有参数�
 15.  
 16.        return(NULL);  
 17.}  
+
+#使用shared_ptr 智能指针包含引用计数，管理方便。
+
+代码如下：
+[cpp] view plain copy
+1.#include <iostream>  
+2.#include <memory>  
+3.using namespace std;  
+4.  
+5.class Point{  
+6.public:  
+7.    Point() : xval(0),yval(0){};  
+8.    Point(int x, int y): xval(x), yval(y){};  
+9.    Point(const Point & p)  
+10.    {  
+11.        if(this == &p)  
+12.            return ;  
+13.        this->xval = p.x();  
+14.        this->yval = p.y();  
+15.    }  
+16.    int x() const {return xval;};  
+17.    int y() const {return yval;};  
+18.    Point& setXY(int xv,int yv)   
+19.    {   
+20.        xval = xv;   
+21.        yval = yv;  
+22.        return *this;  
+23.    };  
+24.private:  
+25.    int xval, yval;  
+26.};  
+27.  
+28.class Handle{                       //句柄类  
+29.public:  
+30.    Handle(): up(new Point){};  
+31.    Handle(int x,int y): up(new Point(x,y)){};//按创建Point的方式构造handle，handle->UPoint->Point  
+32.    Handle(const Point& p): up(new Point(p)){};//创建Point的副本  
+33.    Handle(const Handle& h): up(h.up){};//此处复制的是handle，但是底层的point对象并未复制，只是引用计数加1  
+34.    //Handle& operator=(const Handle& h)  
+35.    //{  
+36.    //  up = h.up;  
+37.    //  return *this;  
+38.    //};  
+39.    ~Handle()  
+40.    {  
+41.    };  
+42.    Handle& setXY(int xv,int yv)  
+43.    {  
+44.        up->setXY(xv,yv);   
+45.        return *this;  
+46.    };  
+47.  
+48.    int y() const{return up->y();}  
+49.    int x() const{return up->x();}  
+50.  
+51.    int OutputU()  
+52.    {  
+53.        return up.use_count();  
+54.    }   //输出引用个数  
+55.private:  
+56.    shared_ptr<Point> up;  
+57.};  
+58.  
+59.int main()  
+60.{  
+61.    Handle h1(1,2);  
+62.    {  
+63.        Point p(8,9);  
+64.        Handle h2 = h1;        //此处调用的是构造函数Handle(const Handle& h)  
+65.        h2.setXY(3,4);                
+66.        Handle h3(5,6);          
+67.        h1 = h3;  
+68.        Handle h4(p);  
+69.        Handle h5(h4);  
+70.        h4.setXY(7,8);  
+71.        cout <<"h1(" << h1.x() <<":"<< h1.y() << "):" << h1.OutputU() <<endl;  
+72.        cout <<"h2(" << h2.x() <<":"<< h2.y() << "):" << h2.OutputU() <<endl;  
+73.        cout <<"h3(" << h3.x() <<":"<< h3.y() << "):" << h3.OutputU() <<endl;  
+74.        cout <<"h4(" << h4.x() <<":"<< h4.y() << "):" << h4.OutputU() <<endl;  
+75.        cout <<"h5(" << h5.x() <<":"<< h5.y() << "):" << h5.OutputU() <<endl;  
+76.        cout<<p.x()<<" "<<p.y()<<endl;  
+77.    }  
+78.    cout <<"h1(" << h1.x() <<":"<< h1.y() << "):" << h1.OutputU() <<endl;  
+79.    return 0;  
+80.}  
+
+运行结果：
+h1(5:6):2
+h2(3:4):1
+h3(5:6):2
+h4(7:8):2
+h5(7:8):2
+8 9
+h1(5:6):1
+
+
+#c++ STL 容器一些底层机制
+##1、vector容器
+vector的数据安排以及操作方式，与array非常相似。两者的唯一区别在于空间的运用的灵活性。array是静态空间，一旦配置了就不能改变。vector是动态空间，随着元素的加入，它的内部机制会自行扩充空间以容纳新元素。因此，vector的运用对于内存的合理利用与运用的灵活性有很大的帮助，我们再也不必因为害怕空间不足而一开始要求一个大块的array。
+
+vector动态增加大小，并不是在原空间之后持续新空间（因为无法保证原空间之后尚有可供配置的空间），而是以原大小的两倍另外配置一块较大的空间，然后将原内容拷贝过来，然后才开始在原内容之后构造新元素，并释放原空间。因此，对vector的任何操作，一旦引起空间重新配置，指向原vector的所有迭代器就都失效了。
+##2、list容器
+相对于vector的连续空间，list就显得复杂许多，它的好处是每次插入或删除一个元素，就配置或释放一个元素空间。因此，list对于空间的运用有绝对的精准，一点也不浪费。而且，对于任何位置的元素插入或元素移除，list永远是常数时间。STL中的list是一个双向链表，而且是一个环状双向链表。
+##3、deque容器
+ deque 是一种双向开口的连续线性空间。所谓双向开口，意思是可以在队尾两端分别做元素的插入和删除操作。deque和vector的最大差异，一在于deque允许于常数时间内对起头端进行元素的插入或移除操作，二在于deque没有所谓容量观念，因为它是动态地以分段连续空间组合而成，随时可以增加一段新的空间并链接在一起。换句话说，像vector那样"因旧空间不足而重新配置一块更大空间，然后复制元素，再释放旧空间"这样的事情在 deque是不会发生的。
+
+deque是由一段一段的定量连续空间构成。一旦有必要在deque的前端或尾端增加新空间，便配置一段定量连续空间，串接在整个deque的头端或尾端。deque的最大任务，便是在这些分段的定量连续空间上，维护其整体连续的假象，并提供随机存取的接口。避开了"重新配置，复制，释放"的轮回，代价则是复杂的迭代器架构。因为有分段连续线性空间，就必须有中央控制，而为了维持整体连续的假象，数据结构的设计及迭代器前进后退等操作都颇为繁琐。
+
+deque采用一块所谓的map作为主控。这里的map是一小块连续空间，其中每个元素都是指针，指向另一段连续线性空间，称为缓冲区。缓冲区才是deque的存储空间主体。SGI STL允许我们指定缓冲区大小，默认值0表示将使用512 bytes缓冲区。
+##4、stack
+stack 是一种先进后出（First In Last Out , FILO）的数据结构。它只有一个出口，stack 允许新增元素，移除元素，取得最顶端元素。但除了最顶端外，没有任何其它方法可以存取stack的其它元素，stack不允许遍历行为。
+
+以某种容器作为底部结构，将其接口改变，使之符合“先进后出”的特性，形成一个stack，是很容易做到的。deque是双向开口的数据结构，若以deque为底部结构并封闭其头端开口，便轻而易举地形成了一个stack.因此，SGI STL 便以deque作为缺省情况下的stack底部结构，由于stack 系以底部容器完成其所有工作，而具有这种"修改某物接口，形成另一种风貌"之性质者，称为adapter（配接器），因此，STL stack 往往不被归类为container(容器)，而被归类为 container adapter.
+##5、 queue
+queue是一种先进先出(First In First Out,FIFO) 的数据结构。它有两个出口，queue允许新增元素，移除元素，从最底端加入元素，取得最顶端元素。但除了最底端可以加入，最顶端可以取出外，没有任何其它方法可以存取queue的其它元素。
+以某种容器作为底部结构，将其接口改变，使之符合“先进先出”的特性，形成一个queue，是很容易做到的。deque是双向开口的数据结构，若以 deque为底部结构并封闭其底部的出口和前端的入口，便轻而易举地形成了一个queue.因此，SGI STL 便以deque作为缺省情况下的queue底部结构，由于queue 系以底部容器完成其所有工作，而具有这种"修改某物接口，形成另一种风貌"之性质者，称为adapter（配接器），因此，STL queue往往不被归类为container(容器)，而被归类为 container adapter.
+
+##6、heap
+heap并不归属于STL容器组件，它是个幕后英雄，扮演priority queue的助手。priority queue允许用户以任何次序将任何元素推入容器中，但取出时一定按从优先权最高的元素开始取。按照元素的排列方式，heap可分为max-heap和min-heap两种，前者每个节点的键值(key)都大于或等于其子节点键值，后者的每个节点键值(key)都小于或等于其子节点键值。因此， max-heap的最大值在根节点，并总是位于底层array或vector的起头处；min-heap的最小值在根节点，亦总是位于底层array或vector起头处。STL 供应的是max-heap，用c++实现。
+
+堆排序c++语言实现
+/*堆排序 实现，算法复杂度O(nlgn)*/
+/*假设节点i的左右子树都是最大堆，操作使节点i的子树变成最大堆*/
+void maxHeap(int A[],int len,int i)
+{
+    int l = 2 * i + 1;
+	int r = 2 * i + 2; 
+    int large = i;
+    if(l < len)
+    {
+        if(A[l] > A[i])
+        {
+            large = l;
+        }
+    }
+    if(r < len)
+    {
+        if(A[r] > A[large])
+        {
+            large = r;
+        }   
+    }
+    if(large != i)
+    {
+        std::swap(A[large],A[i]);
+        maxHeap(A,len,large);
+    }
+}
+
+/*建立大根堆*/
+void buildMaxHeap(int A[],int len)
+{
+    for(int i=len/2-1;i>=0;i--)
+        maxHeap(A,len,i);
+}
+
+
+/*堆排序*/
+void maxHeapSort(int A[],int len)
+{
+    buildMaxHeap(A,len);
+    printf("建立大跟堆\n");
+    for(i=0;i<len;i++)
+        printf("%d ",A[i]);
+    printf("\n");
+    for(i=len-1;i> 0;i--)
+    {
+        std::swap(A[0],A[i]);
+        printf("%d  ",A[i]);
+        buildMaxHeap(A,i);
+    }
+    printf("\n");
+}
+
+/*测试堆排序*/
+int main()
+{
+    int i;
+    int A[11]={4,1,3,2,16,9,10,14,8,7,6};
+    maxHeapSort(A,11);
+    for(i=0;i<11;i++)
+    {
+        printf("%d  ",A[i]);
+    }
+    printf("\n");
+}
+
+
+##7、priority_queue
+priority_queue是一个拥有权值观念的queue,它允许加入新元素，移除旧元素，审视元素值等功能。由于这是一个queue，所以只允许在底端加入元素，并从顶端取出元素，除此之外别无其它存取元素的途径。priority_queue带有权值观念，其内的元素并非依照被推入的次序排列，而是自动依照元素的权值排列（通常权值以实值表示）。权值最高者，排在最前面。缺省情况下priority_queue系利用一个max-heap完成，后者是一个以vector表现的 complete binary tree.max-heap可以满足priority_queue所需要的"依权值高低自动递减排序"的特性。
+priority_queue完全以底部容器作为根据，再加上heap处理规则，所以其实现非常简单。缺省情况下是以vector为底部容器。queue以底部容器完成其所有工作。具有这种"修改某物接口，形成另一种风貌"之性质者，称为adapter(配接器)，因此，STL priority_queue往往不被归类为container(容器)，而被归类为container adapter.
+
+##8、set multiset
+set的特性是，所有元素都会根据元素的键值自动被排序。set的元素不像map那样可以同时拥有实值(value)和键值(key), set 元素的键值就是实值，实值就是键值，set不允许两个元素有相同的值。set是通过红黑树来实现的，由于红黑树（RB-tree）是一种平衡二叉搜索树，自动排序的效果很不错，所以标准的STL的set即以RB-Tree为底层机制。又由于set所开放的各种操作接口，RB-tree也都提供了，所以几乎所有的set操作行为，都只有转调用RB-tree的操作行为而已。
+
+multiset的特性以及用法和set完全相同，唯一的差别在于它允许键值重复，因此它的插入操作采用的是底层机制RB-tree的insert_equal()而非insert_unique().
+
+##9、map multimap
+map的特性是，所有元素都会根据元素的键值自动被排序。map的所有元素都是pair,同时拥有实值（value）和键值（key）.  pair的第一元素被视为键值，第二元素被视为实值。map不允许两个元素拥有相同的键值.由于RB-tree是一种平衡二叉搜索树，自动排序的效果很不错，所以标准的STL map即以RB-tree为底层机制。又由于map所开放的各种操作接口，RB-tree也都提供了，所以几乎所有的map操作行为，都只是转调RB-tree的操作行为。
+multimap的特性以及用法与map完全相同，唯一的差别在于它允许键值重复，因此它的插入操作采用的是底层机制RB-tree的insert_equal()而非insert_unique。 
+
 
