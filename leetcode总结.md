@@ -18,6 +18,7 @@ public:
         return nMax;
     }
 };
+
 ##[摆动序列](https://leetcode-cn.com/problems/wiggle-subsequence)
 方向不同的才计数
 
@@ -139,7 +140,6 @@ public:
 
 #分治
 ##[单词拆分 II](https://leetcode-cn.com/problems/word-break-ii)    
-
 class Solution {
 public:
     unordered_map<string,vector<string>> m;//复杂度 K * n
@@ -152,17 +152,17 @@ public:
         {
             if (s.substr(0,w.size()) == w)
             {
-                vector<string> subv =
-wordBreak(s.substr(w.size()),wordDict);//分治
+                vector<string> subv = wordBreak(s.substr(w.size()),wordDict);//分治
                 for(auto& t:subv)
                 {
-                     res.push_back(t.size() ? w + string(" ") + t : w + t);
+                     res.push_back(t.size() ? w + string(" ") + t : w);
                 }
             }
         }
         return m[s] = res;//从后往前收敛，数组已是本子串的所有情况
     }
 };
+
 ##[扁平化嵌套列表迭代器](https://leetcode-cn.com/problems/flatten-nested-list-iterator)   
 class NestedIterator {
 public:
@@ -192,6 +192,7 @@ public:
         return cnt < nums.size();
     }
 };
+
 ##[为运算表达式设计优先级](https://leetcode-cn.com/problems/different-ways-to-add-parentheses) 
 class Solution {
 public:
@@ -624,9 +625,9 @@ public:
         return j_match && dp(s,p,i+1,j+1);
     }
 };
+
 #二分
 ##[有效的完全平方数](https://leetcode-cn.com/problems/valid-perfect-square) 
-
 二分尝试
 class Solution {
 public:
@@ -644,6 +645,7 @@ public:
         return false;
     }
 };
+
 ##[第一个错误的版本](https://leetcode-cn.com/problems/first-bad-version)    
 
 // Forward declaration of isBadVersion API.
@@ -654,8 +656,7 @@ public:
         if(n < 1)return -1;
         int low = 1,high = n;
         int mid;
-        while(low + 1< high)// +1
-条件是为了保证low比high至少小1，来确认第一个bad version
+        while(low + 1 < high)// +1 条件是为了保证low比high至少小1，来确认第一个bad version
         {
             mid = low + (high - low) / 2;
             if(isBadVersion(mid))
@@ -678,32 +679,34 @@ public:
         return -1;
     }
 };
+
 ##[搜索插入位置](https://leetcode-cn.com/problems/search-insert-position)    
 
 class Solution {
 public:
     int searchInsert(vector<int>& nums, int target) {
-        int low = 0, high = nums.size()-1;
+        int low = 0, high = nums.size() - 1;
         while(low <= high) {
-            int mid = (low+high)>>1;
+            int mid = low + (high - low) >> 1;
             if(nums[mid] == target) 
                 return mid;
             else if(nums[mid] > target) 
-                high = mid-1;
+                high = mid - 1;
             else
-                low = mid+1;
+                low = mid + 1;
         }
         return low;  
     }
 };
+
 ##[矩形区域不超过 K 的最大数值和](https://leetcode-cn.com/problems/max-sum-of-rectangle-no-larger-than-k)    
 
 class Solution {
 public:
     int maxSumSubmatrix(vector<vector<int>>& matrix, int k) {
-        if(matrix.size() ==0) return 0;  
+        if(matrix.size() == 0) return 0;  
         int row = matrix.size(), col = matrix[0].size();  
-        int res =INT_MIN;  
+        int res = INT_MIN;  
         for(int i = 0; i < col; i++)  
         {  
             vector<int> rowSum(row, 0); 
@@ -733,6 +736,7 @@ public:
     思路: 一种naive的算法就是枚举每个矩形块, 时间复杂度为O((mn)^2), 可以做少许优化时间复杂度可以降低到O(mnnlogm), 其中m为行数, n为列数. 
 先求出任意两列之间的所有数的和, 然后再枚举任意两行之间的和, 而我们优化的地方就在后者. 我们用s[x]来表示第x行从a列到b列的和. 遍历一遍从第0行到最后一行的求和数组, 并依次将其放到二叉搜索树中, 这样当我们知道了从第0行到当前行的和的值之后, 我们就可以用lower_bound在O(log n)的时间复杂度内找到能够使得从之前某行到当前行的矩阵值最接近k. 也就是说求在之前的求和数组中找到第一个位置使得大于(curSum - k), 这种做法的原理是在curSum之下规定了一个bottom-line, 在这上面的第一个和就是(curSum-val)差值与k最接近的数. 还需要注意的是预先为二叉搜索树加一个0值, 这种做法的原理是如果当前curSum小于k, 那么至少本身是一个潜在的解. 
     */
+    
 ##[Pow(x, n)](https://leetcode-cn.com/problems/powx-n)    
 
 class Solution {
@@ -748,23 +752,6 @@ public:
             x *= x;
         }
         return n < 0? 1/res:res;
-    }
-};
-
-#连续序列
-##[乘积最大子序列](https://leetcode-cn.com/problems/maximum-product-subarray)    
-class Solution {
-public:
-    int maxProduct(vector<int>& nums) {
-        int local_max = nums[0],local_min = nums[0],global_max = nums[0],tmp;
-        for(int i = 1;i < nums.size();++i)
-        {
-            tmp = max(max(local_max * nums[i],local_min * nums[i]),nums[i]);
-            local_min = min(min(local_max * nums[i],local_min * nums[i]),nums[i]);
-            local_max = tmp;
-            global_max = max(local_max,global_max);
-        }
-        return global_max;
     }
 };
 
@@ -878,12 +865,12 @@ public:
         for (int i = 0; i < nums.size() - 2; i++) {
             if (nums[i] > 0) return ret;
             if (i > 0 && nums[i] == nums[i-1]) continue;
-            for (int j = i+1; j < nums.size() - 1; j++) {
-                if (j >i +1 && nums[j]==nums[j-1]) continue;
-                int two = nums[i] + nums[j];
-                auto it = map.find(-two);
-                if (it!= map.end() && it->second > j) {
-                    vector<int> r = {nums[i],nums[j],-two};
+            for (int j = i + 1; j < nums.size() - 1; j++) {
+                if (j > i + 1 && nums[j]==nums[j-1]) continue;
+                int third = -(nums[i] + nums[j]);
+                auto it = map.find(third);
+                if (it != map.end() && it->second > j) {
+                    vector<int> r = {nums[i],nums[j],third};
                     ret.push_back(r);
                 }
             }
@@ -1311,10 +1298,8 @@ public:
         for (int j = 0; j <= size2; j++) dp[0][j] = j;
         for (int i = 1; i <= size1; i++) {
             for (int j = 1; j <= size2; j++) {
-                int replace = word1[i - 1] == word2[j - 1] ? dp[i - 1][j - 1] :
-dp[i - 1][j - 1] + 1;//替换或相同
-                int ins_del = min(dp[i][j - 1] + 1, dp[i - 1][j] +
-1);//插入或者删除
+                int replace = word1[i - 1] == word2[j - 1] ? dp[i - 1][j - 1] :dp[i - 1][j - 1] + 1;//替换或相同
+                int ins_del = min(dp[i][j - 1] + 1, dp[i - 1][j] + 1);//插入或者删除
                 dp[i][j] = min(replace, ins_del);
             }
         }
@@ -1615,6 +1600,22 @@ public:
         return m;
     }
 };
+
+##[乘积最大子序列](https://leetcode-cn.com/problems/maximum-product-subarray)    连续序列
+class Solution {
+public:
+    int maxProduct(vector<int>& nums) {
+        int local_max = nums[0],local_min = nums[0],global_max = nums[0],tmp;
+        for(int i = 1;i < nums.size();++i)
+        {
+            tmp = max(max(local_max * nums[i],local_min * nums[i]),nums[i]);
+            local_min = min(min(local_max * nums[i],local_min * nums[i]),nums[i]);
+            local_max = tmp;
+            global_max = max(local_max,global_max);
+        }
+        return global_max;
+    }
+};
  
 #集合
 ##[天际线问题](https://leetcode-cn.com/problems/the-skyline-problem)    
@@ -1914,7 +1915,6 @@ endWord.size() || wordList.size() == 0)return 0;
  
 #前缀树
 ##[实现 Trie (前缀树)](https://leetcode-cn.com/problems/implement-trie-prefix-tree) 
- 
 本质上是多叉树，利用了当前的访问的状态能够依赖之前访问的状态
 class Trie {
 public:
