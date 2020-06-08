@@ -1,4 +1,3 @@
-#mongodb
 ##mongodb语法
 mongodb查询的语法（大于，小于，大于或等于，小于或等于等等）  
 https://www.cnblogs.com/Logan626/articles/4858728.html
@@ -262,7 +261,7 @@ shard key 影响分片集群所使用的分片策略效率和性能
 
 一个唯一 shard key 任何时候只能在最多一个 chunk 中出现。如果 shard key 的基数是 4，那么集群中 chunks 的个数不能超过 4，各存储一个唯一 shard key 值。这将集群中有效分片的数量限制为4 - 添加其他分片不会提供任何好处。
 
-#【MongoDB】shard 片键选择
+##【MongoDB】shard 片键选择
 
 选择片键需要慎重，因为一旦选定就无法更改了。
 
@@ -280,4 +279,781 @@ shard key 影响分片集群所使用的分片策略效率和性能
 
 比如第一部分是{A,B,C}, 第二部分升序，那么片键可能是A1 B2 C3 A4 B5 C6 A10 B15 C20这样。
 
+##mongodb语法
+mongodb查询的语法（大于，小于，大于或等于，小于或等于等等）  https://www.cnblogs.com/Logan626/articles/4858728.html
 
+##MongoDB两阶段提交实现事务
+https://blog.csdn.net/after_you/article/details/68059774
+
+##Mongodb副本集容灾
+https://blog.csdn.net/sunbocong/article/details/78643457
+
+##Mongodb集群的三种搭建方式
+如上图所示，现假设我们有三台服务器，三台服务器上配置各配置一个分片，一个配置服务，一个Router服务。其中，每个分片，都是Replica Set，在第一节中介绍过，但是配置还是稍有不同。
+在所有服务器上运行如下Docker容器
+###1.数据容器Master
+docker run -d -p 27018:27018 --name mongodb_shard_master -v /share/disk0/mongodb_cluster/mongodb_node/shard_server_master/data:/data/db mongo:latest mongod --shardsvr --port 27018 --replSet rs1 --dbpath /data/db
+###2.数据容器Slaver
+docker run -d -p 27118:27118 --name mongodb_shard_slaver -v /share/disk0/mongodb_cluster/mongodb_node/shard_server_slaver/data:/data/db mongo:latest mongod --shardsvr --port 27118 --replSet rs1 --dbpath /data/db
+###3.数据容器Arbiter
+docker run -d -p 27118:27118 --name mongodb_shard_arbiter -v /share/disk0/mongodb_cluster/mongodb_node/shard_server_arbiter/data:/data/db mongo:latest mongod --shardsvr --port 27118 --replSet rs1 --dbpath /data/db
+###4.配置Sharding Replica Set
+docker exec -it mongo_master /bin/sh
+mongo --port 27018
+rs.initiate()
+rs.add("服务器IP: 27118")
+rs.addArb("服务器IP: 27218")
+rs.conf()
+rs.status()
+use admin
+db.createUser( {
+user: "admin",
+pwd: "P@ssw0rd",
+roles: [ { role: "root", db: "admin" } ]
+});
+###5.配置服务容器
+docker run -t -i -d -p 27019:27019 --name mongodb_configrs -v /share/disk0/mongodb_cluster/mongodb_node/config_server/data:/data/db mongo:latest mongod --configsvr --replSet csrs --dbpath /data/db
+这里--configsvr默认是27019端口
+假设在服务器1上运行如下命令
+docker exec -it mongodb_configrs /bin/sh
+mongo --port 27019
+rs.initiate()
+rs.add("服务器2IP: 27019")
+rs.addArb("服务器3IP: 27019")
+rs.conf()
+rs.status()
+###6.路由服务容器
+这里需要在服务器2、3上先运行配置服务容器
+docker run -t -i -d -p 27020:27020 --name mongodb_router -v /share/disk0/mongodb_cluster/mongodb_node1/router_server/data:/data/db mongo:latest mongos --configdb csrs/服务器1IP:27019,服务器2IP:27019,服务器3IP:27019 --port 27020
+这样，路由服务容器和配置服务容器建立了关系。然后通过路由服务添加分片到配置服务中
+docker exec -it mongodb_router /bin/sh
+mongo --port 27020
+use admin
+db.runCommand({addshard:"rs1/服务器1IP:27018"}) //会自动找到rs1中的备用和仲裁节点
+db.runCommand({addshard:"rs2/服务器2IP:27018"})
+db.runCommand({addshard:"rs3/服务器3IP:27018"})
+db.runCommand({listshards:1})
+use admin
+db.createUser( {
+user: "admin",
+pwd: "P@ssword",
+roles: [ { role: "root", db: "admin" } ]
+});
+###7.最后，通第一节中，删除分片容器和路由容器，在启动容器时，带上--auth。这样，连接Mongodb时，必须使用用户名密码登陆。
+3.Master-Slave
+这种模式比较简单，但是官方已经不推荐使用。只用于开发时调试可以使用。
+服务器1
+docker run -t -i -d -p 27018:27018 --name mongodb_master -v /share/disk0/mongodb_cluster/mongodb_node/master_server/data:/data/db mongo:latest mongod --port 27018 --master --dbpath /data/db
+docker exec -it mongodb_master /bin/sh
+use admin
+db.createUser( {
+user: "admin",
+pwd: "P@ssword",
+roles: [ { role: "root", db: "admin" } ]
+});
+docker stop mongodb_master
+docker rm mongodb_master
+docker run -t -i -d -p 27018:27018 --name mongodb_master -v /share/disk0/mongodb_cluster/mongodb_node/master_server/data:/data/db mongo:latest mongod --auth --port 27018 --master --dbpath /data/db
+服务器2
+docker run -t -i -d -p 27018:27018 --name mongodb_slave -v /share/disk0/mongodb_cluster/mongodb_node/slave_server/data:/data/db mongo:latest mongod --port 27018 --slave --source 服务器1IP: 27018 --dbpath /data/db
+这里，同服务器1一样设置密码即可。
+
+
+##高可用的MongoDB集群
+https://www.jianshu.com/p/2825a66d6aed
+大概介绍一下MongoDB集群的几种方式
+
+###Master-Slave、Relica Set、Sharding，并做简单的演示。
+使用集群的目的就是提高可用性。高可用性H.A.（High Availability）指的是通过尽量缩短因日常维护操作（计划）和突发的系统崩溃（非计划）所导致的停机时间，以提高系统和应用的可用性。它与被认为是不间断操作的容错技术有所不同。HA系统是目前企业防止核心计算机系统因故障停机的最有效手段。
+HA的三种工作方式：
+主从方式 （非对称方式）
+工作原理：主机工作，备机处于监控准备状况；当主机宕机时，备机接管主机的一切工作，待主机恢复正常后，按使用者的设定以自动或手动方式将服务切换到主机上运行，数据的一致性通过共享存储系统解决。
+双机双工方式（互备互援）
+工作原理：两台主机同时运行各自的服务工作且相互监测情况，当任一台主机宕机时，另一台主机立即接管它的一切工作，保证工作实时，应用服务系统的关键数据存放在共享存储系统中。
+集群工作方式（多服务器互备方式）
+工作原理：多台主机一起工作，各自运行一个或几个服务，各为服务定义一个或多个备用主机，当某个主机故障时，运行在其上的服务就可以被其它主机接管
+###主从架构（Master-Slave）
+
+Mater-Slaves
+主从架构一般用于备份或者做读写分离。由两种角色构成：
+主(Master)
+可读可写，当数据有修改的时候，会将oplog同步到所有连接的salve上去。
+从(Slave)
+只读不可写，自动从Master同步数据。
+特别的，对于Mongodb来说，并不推荐使用Master-Slave架构，因为Master-Slave其中Master宕机后不能自动恢复，推荐使用Replica Set，后面会有介绍，除非Replica的节点数超过50，才需要使用Master-Slave架构，正常情况是不可能用那么多节点的。
+还有一点，Master-Slave不支持链式结构，Slave只能直接连接Master。Redis的Master-Slave支持链式结构，Slave可以连接Slave，成为Slave的Slave。
+下面演示一下搭建过程：
+1>. 启动Master
+mongod --port 2000 --master --dbpath masterdb/
+
+2>. 启动Slave
+mongod --port 2001 --slave --source 127.0.0.1:2000 --dbpath slavedb/
+
+3>. 给Master里面导入数据，查看Master和Slave的数据。你会发现导入Master的数据同时也会在Slave中出现。
+mongoimport --port 2000 -d test -c dataset dataset.json
+
+mongo --port 2000 test
+db.dataset.count()
+
+> 25359
+
+mongo --port 2001 test
+db.dataset.count()
+
+> 25359
+
+4>. 试一下Master和Slave的写操作。你会发现，只有Master才可以对数据进行修改，Slave修改时候会报错。
+mongo --port 2001 test
+db.dataset.drop()
+>  Error: drop failed: { "note" : "from execCommand", "ok" : 0, "errmsg" : "not master" }
+mongoimport --port 2001 -d test -c dataset dataset.json
+> Failed: error checking connected node type: no reachable servers
+
+###副本集架构（Replica Set）
+为了防止单点故障就需要引副本（Replication），当发生硬件故障或者其它原因造成的宕机时，可以使用副本进行恢复，最好能够自动的故障转移（failover）。有时引入副本是为了读写分离，将读的请求分流到副本上，减轻主（Primary）的读压力。而Mongodb的Replica Set都能满足这些要求。
+Replica Set的一堆mongod的实例集合，它们有着同样的数据内容。包含三类角色：
+
+主节点（Primary）
+接收所有的写请求，然后把修改同步到所有Secondary。一个Replica Set只能有一个Primary节点，当Primar挂掉后，其他Secondary或者Arbiter节点会重新选举出来一个主节点。默认读请求也是发到Primary节点处理的，需要转发到Secondary需要客户端修改一下连接配置。
+
+副本节点（Secondary）
+与主节点保持同样的数据集。当主节点挂掉的时候，参与选主。
+
+仲裁者（Arbiter）
+不保有数据，不参与选主，只进行选主投票。使用Arbiter可以减轻数据存储的硬件需求，Arbiter跑起来几乎没什么大的硬件资源需求，但重要的一点是，在生产环境下它和其他数据节点不要部署在同一台机器上。
+注意，一个自动failover的Replica Set节点数必须为奇数，目的是选主投票的时候要有一个大多数才能进行选主决策。
+
+应用客户端
+客户端连接单个mongod和副本集的操作是相同，只需要配置好连接选项即可，比如下面是node.js连接Replica Set的方式：
+mongoose.connect('mongodb://[username:password@]host1[:port1][,host2[:port2],...[,hostN[:portN]]][/[database][?options]]' [, options]);
+
+Primary和Secondary搭建的Replica Set
+
+Primary和Secondary搭建的Replica Set
+奇数个数据节点构成的Replica Set，下面演示精典的3个数据节点的搭建过程。
+1> 启动3个数据节点，--relSet指定同一个副本集的名字
+mongod --port 2001 --dbpath rs0-1 --replSet rs0
+mongod --port 2002 --dbpath rs0-2 --replSet rs0
+mongod --port 2003 --dbpath rs0-3 --replSet rs0
+
+2> 连接到其中一个，配置Replica Set，同时正在执行rs.add的节点被选为Primary。开发环境中<hostname>指的是机器名，生产环境下就是机器的IP。
+mongo --port 2001
+
+rs.initiate()
+rs.add("<hostname>:2002")
+rs.add("<hostname>:2003")
+rs.conf()
+
+3> 连接Primary节点，导入数据成功。
+mongoimport --port 2001 -d test -c dataset dataset.json
+mongo --port 2001 test
+db.dataset.count()
+> 25359
+
+4> 默认情况下，Secondary不能读和写。
+mongo --port 2003 test
+db.dataset.count()
+> Error: count failed: { "note" : "from execCommand", "ok" : 0, "errmsg" : "not master" }
+
+注意，其中Secondary宕机，不受影响，若Primary宕机，会进行重新选主：
+
+自动Failover
+使用Arbiter搭建Replica Set
+偶数个数据节点，加一个Arbiter构成的Replica Set，下面演示精典的2个数据节点加一个仲裁者的搭建过程。
+特别的，生产环境中的Arbiter节点，需要修改一下配置：
+journal.enabled = false
+smallFiles = true
+
+使用Arbiter搭建Replica Set
+1> 启动两个数据节点和一个Arbiter节点
+mongod --port 2001 --dbpath rs0-1 --replSet rs0
+mongod --port 2002 --dbpath rs0-2 --replSet rs0
+
+mongod --port 2003 --dbpath arb --replSet rs0
+
+2> 连接到其中一个，添加Secondary和Arbiter。当仅需要添加Aribiter的时候，只需连接当前Replica Set的Primary，然后执行rs.addArb。
+mongo --port 2001
+
+rs.initiate()
+rs.add("<hostname>:2002")
+rs.addArb("<hostname>:2003")
+rs.conf()
+
+###数据分片架构（Sharding）
+当数据量比较大的时候，我们需要把数据分片运行在不同的机器中，以降低CPU、内存和IO的压力，Sharding就是这样的技术。数据库主要由两种方式做Sharding：纵向，横向，纵向的方式就是添加更多的CPU，内存，磁盘空间等。横向就是上面说的方式，如图所示：
+
+MongoDB的Sharding架构：
+
+MongoDB的Sharding架构
+MongoDB分片架构中的角色：
+数据分片（Shards）
+保存数据，保证数据的高可用性和一致性。可以是一个单独的mongod实例，也可以是一个副本集。在生产环境下Shard是一个Replica Set，以防止该数据片的单点故障。所有Shard中有一个PrimaryShard，里面包含未进行划分的数据集合：
+
+查询路由（Query Routers）
+mongos的实例，客户端直接连接mongos，由mongos把读写请求路由到指定的Shard上去。一个Sharding集群，可以有一个mongos，也可以有多mongos以减轻客户端请求的压力。
+配置服务器（Config servers）
+保存集群的元数据（metadata），包含各个Shard的路由规则。
+搭建一个有2个shard的集群
+1> 启动两个数据分片节点。在此仅演示单个mongod的方式，Replica Set类似。
+mongod --port 2001 --shardsvr --dbpath shard1/
+mongod --port 2002 --shardsvr --dbpath shard2/
+
+
+2> 启动配置服务器
+mongod --port 3001 --dbpath cfg1/
+mongod --port 3002 --dbpath cfg2/
+mongod --port 3003 --dbpath cfg3/
+
+3> 启动查询路由mongos服务器
+mongos --port 5000 --configdb 127.0.0.1:3001,127.0.0.1:3002,127.0.0.1:3003
+
+4> 连接mongos，为集群添加数据分片节点。
+mongo --port 5000 amdmin
+
+sh.addShard("127.0.0.1:2001")
+sh.addShard("127.0.0.1:2002")
+
+如果Shard是Replica Set，添加Shard的命令：
+sh.addShard("rsname/host1:port,host2:port,...")
+
+rsname - 副本集的名字
+
+5> 可以连接mongos进行数据操作了。
+mongo --port 5000 test
+
+mongoimport.exe --port 5000 -d test dataset.json
+> 25359
+
+数据的备份和恢复
+MongodDB的备份有多种方式，这里只简单介绍一下mongodump和mongorestore的用法。
+1> 备份和恢复所有db
+mongodump -h IP --port PORT -o BACKUPPATH
+
+mongorestore -h IP --port PORT BACKUPPATH
+
+2> 备份和恢复指定db
+mongodump -h IP --port PORT -d DBNAME -o BACKUPPATH
+
+mongorestore -h IP --port PORT  -d DBNAME BACKUPPATH
+mongorestore -h IP --port PORT --drop -d DBNAME BACKUPPATH
+
+3> 备份和恢复指定collection
+mongodump -h IP --port PORT -d DBNAME -c COLLECTION -o xxx.bson
+
+mongorestore -h IP --port PORT  -d DBNAME -c COLLECTION xxx.bson
+mongorestore -h IP --port PORT --drop -d DBNAME -c COLLECTION xxx.bson
+
+小结
+MongoDB的集群能力还是很强的，搭建还算是简单。最关键的是要明白上面提到的3种架构的原理，才能用的得心应手。当然不限于MongoDB，或许其他数据库也多多少少支持类似的架构。
+参考资料
+百度百科： http://baike.baidu.com/view/2850255.htm 
+MongodDB官网文档：http://docs.mongodb.org/
+
+##MongoDB在58同城百亿量级数据下的应用实践
+https://www.jianshu.com/p/ea35f248cc68
+
+58同城作为中国最大的生活服务平台，涵盖了房产、招聘、二手、二手车、黄页等核心业务。58同城发展之初，大规模使用关系型数据库（SQL Server、MySQL等），随着业务扩展速度增加，数据量和并发量演变的越来越有挑战，此阶段58的数据存储架构也需要相应的调整以更好的满足业务快速发展的需求。
+MongoDB经过几个版本的迭代，到2.0.0以后，变的越来越稳定，它具备的高性能、高扩展性、Auto-Sharding、Free-Schema、类SQL的丰富查询和索引等特性，非常诱惑，同时58同城在一些典型业务场景下使用MongoDB也较合适，2011年，我们开始使用MongoDB，逐步扩大了使用的业务线，覆盖了58帮帮、58交友、58招聘、信息质量等等多条业务线。
+随着58每天处理的海量数据越来越大，并呈现不断增多的趋势，这为MongoDB在存储与处理方面带来了诸多的挑战。面对百亿量级的数据，我们该如何存储与处理，本文将详细介绍MongoDB遇到的问题以及最终如何“完美”解决。
+
+本文详细讲述MongoDB在58同城的应用实践：MongoDB在58同城的使用情况；为什么要使用MongoDB；MongoDB在58同城的架构设计与实践；针对业务场景我们在MongoDB中如何设计库和表；数据量增大和业务并发，我们遇到典型问题及其解决方案；MongoDB如何监控。
+
+MongoDB在58同城的使用情况
+MongoDB在58同城的众多业务线都有大规模使用：58转转、58帮帮、58交友、58招聘、58信息质量、58测试应用等，如[图1]所示。
+
+
+相关厂商内容
+华为软件开发云专区全新上线！
+
+Airbnb 的通用数据产品平台架构开发设计思路
+Apache Beam 大规模乱序流数据处理
+Apache Kafka：大数据的实时处理分析实战
+阿里新一代实时计算引擎 Blink 典型的场景应用
+图1 MongoDB典型的使用场景：转转
+为什么要使用MongoDB？
+MongoDB这个来源英文单词“humongous”，homongous这个单词的意思是“巨大的”、“奇大无比的”，从MongoDB单词本身可以看出它的目标是提供海量数据的存储以及管理能力。MongoDB是一款面向文档的NoSQL数据库，MongoDB具备较好的扩展性以及高可用性，在数据复制方面，支持Master-Slaver（主从）和Replica-Set（副本集）等两种方式。通过这两种方式可以使得我们非常方便的扩展数据。
+MongoDB较高的性能也是它强有力的卖点之一，存储引擎使用的内存映射文件（MMAP的方式），将内存管理工作交给操作系统去处理。MMAP的机制，数据的操作写内存即是写磁盘，在保证数据一致性的前提下，提供了较高的性能。
+除此之外，MongoDB还具备了丰富的查询支持、较多类型的索引支持以及Auto-Sharding的功能。在所有的NoSQL产品中，MongoDB对查询的支持是最类似于传统的RDBMS，这也使得应用方可以较快的从RDBMS转换到MonogoDB。
+在58同城，我们的业务特点是具有较高的访问量，并可以按照业务进行垂直的拆分，在每个业务线内部通过MongoDB提供两种扩展机制，当业务存储量和访问量变大，我们可以较易扩展。同时我们的业务类型对事务性要求低，综合业务这几点特性，在58同城使用MongoDB是较合适的。
+如何使用MongoDB？
+MongoDB作为一款NoSQL数据库产品，Free Schema是它的特性之一，在设计我们的数据存储时，不需要我们固定Schema，提供给业务应用方较高的自由度。那么问题来了，Free Schema真的Free吗？
+第一：Free Schema意味着重复Schema。在MongoDB数据存储的时候，不但要存储数据本身，Schema（字段key）本身也要重复的存储（例如：{“name”:”zhuanzhuan”, “infoid”:1,“infocontent”:”这个是转转商品”}），必然会造成存储空间的增大。
+第二：Free Schema意味着All Schema，任何一个需要调用MongoDB数据存储的地方都需要记录数据存储的Schema，这样才能较好的解析和处理，必然会造成业务应用方的复杂度。
+那么我们如何应对呢？在字段名Key选取方面，我们尽可能减少字段名Key的长度，比如：name字段名使用n来代替，infoid字段名使用i来代替，infocontent字段名使用c来代替（例如：{“n”:”zhuanzhuan”, “i”:1, “c”:”这个是转转商品”}）。使用较短的字段名会带来较差的可读性，我们通过在使用做字段名映射的方式（ #defineZZ_NAME ("n")），解决了这个问题；同时在数据存储方面我们启用了数据存储的压缩，尽可能减少数据存储的量。
+MongoDB提供了自动分片（Auto-Sharding）的功能，经过我们的实际测试和线上验证，并没有使用这个功能。我们启用了MongoDB的库级Sharding；在CollectionSharding方面，我们使用手动Sharding的方式，水平切分数据量较大的文档。
+MongoDB的存储文档必须要有一个“_id”字段，可以认为是“主键”。这个字段值可以是任何类型，默认一个ObjectId对象，这个对象使用了12个字节的存储空间，每个字节存储两位16进制数字，是一个24位的字符串。这个存储空间消耗较大，我们实际使用情况是在应用程序端，使用其他的类型（比如int）替换掉到，一方面可以减少存储空间，另外一方面可以较少MongoDB服务端生成“_id”字段的开销。
+在每一个集合中，每个文档都有唯一的“_id”标示，来确保集中每个文档的唯一性。而在不同集合中，不同集合中的文档“_id”是可以相同的。比如有2个集合Collection_A和Collection_B，Collection_A中有一个文档的“_id”为1024，在Collection_B中的一个文档的“_id”也可以为1024。
+###MongoDB集群部署
+MongoDB集群部署我们采用了Sharding+Replica-Set的部署方式。整个集群有Shard Server节点（存储节点，采用了Replica-Set的复制方式）、Config Server节点（配置节点）、Router Server（路由节点、Arbiter Server（投票节点）组成。每一类节点都有多个冗余构成。满足58业务场景的一个典型MongoDB集群部署架构如下所示[图2]：
+
+
+
+
+图2 58同城典型业务MongoDB集群部署架构
+在部署架构中，当数据存储量变大后，我们较易增加Shard Server分片。Replica-Set的复制方式，分片内部可以自由增减数据存储节点。在节点故障发生时候，可以自动切换。同时我们采用了读写分离的方式，为整个集群提供更好的数据读写服务。
+
+
+
+
+图3 Auto-Sharding MAY is not that Reliable
+针对业务场景我们在MongoDB中如何设计库和表
+MongoDB本身提供了Auto-Sharding的功能，这个智能的功能作为MongoDB的最具卖点的特性之一，真的非常靠谱吗（图3）？也许理想是丰满的，现实是骨干滴。
+首先是在Sharding Key选择上，如果选择了单一的Sharding Key，会造成分片不均衡，一些分片数据比较多，一些分片数据较少，无法充分利用每个分片集群的能力。为了弥补单一Sharding Key的缺点，引入复合Sharing Key，然而复合Sharding Key会造成性能的消耗；
+第二count值计算不准确的问题，数据Chunk在分片之间迁移时，特定数据可能会被计算2次，造成count值计算偏大的问题；
+第三Balancer的稳定性&智能性问题，Sharing的迁移发生时间不确定，一旦发生数据迁移会造成整个系统的吞吐量急剧下降。为了应对Sharding迁移的不确定性，我们可以强制指定Sharding迁移的时间点，具体迁移时间点依据业务访问的低峰期。比如IM系统，我们的流量低峰期是在凌晨1点到6点，那么我们可以在这段时间内开启Sharding迁移功能，允许数据的迁移，其他的时间不进行数据的迁移，从而做到对Sharding迁移的完全掌控，避免掉未知时间Sharding迁移带来的一些风险。
+
+###如何设计库（DataBase）？
+我们的MongoDB集群线上环境全部禁用了Auto-Sharding功能。如上节所示，仅仅提供了指定时间段的数据迁移功能。线上的数据我们开启了库级的分片，通过db.runCommand({“enablesharding”: “im”});命令指定。并且我们通过db.runCommand({movePrimary:“im”, to: “sharding1”});命令指定特定库到某一固定分片上。通过这样的方式，我们保证了数据的无迁移性，避免了Auto-Sharding带来的一系列问题，数据完全可控，从实际使用情况来看，效果也较好。
+既然我们关闭了Auto-Sharding的功能，就要求对业务的数据增加情况提前做好预估，详细了解业务半年甚至一年后的数据增长情况，在设计MongoDB库时需要做好规划：确定数据规模、确定数据库分片数量等，避免数据库频繁的重构和迁移情况发生。
+
+那么问题来了，针对MongoDB，我们如何做好容量规划？
+
+MongoDB集群高性能本质是MMAP机制，对机器内存的依赖较重，因此我们要求业务热点数据和索引的总量要能全部放入内存中，即：Memory > Index + Hot Data。一旦数据频繁地Swap，必然会造成MongoDB集群性能的下降。当内存成为瓶颈时，我们可以通过Scale Up或者Scale Out的方式进行扩展。
+
+第二：我们知道MongoDB的数据库是按文件来存储的：例如：db1下的所有collection都放在一组文件内db1.0,db1.1,db1.2,db1.3……db1.n。数据的回收也是以库为单位进行的，数据的删除将会造成数据的空洞或者碎片，碎片太多，会造成数据库空间占用较大，加载到内存时也会存在碎片的问题，内存使用率不高，会造成数据频繁地在内存和磁盘之间Swap，影响MongoDB集群性能。因此将频繁更新删除的表放在一个独立的数据库下，将会减少碎片，从而提高性能。
+
+第三：单库单表绝对不是最好的选择。原因有三：表越多，映射文件越多，从MongoDB的内存管理方式来看，浪费越多；同理，表越多，回写和读取的时候，无法合并IO资源，大量的随机IO对传统硬盘是致命的；单表数据量大，索引占用高，更新和读取速度慢。
+
+第四：Local库容量设置。我们知道Local库主要存放oplog，oplog用于数据的同步和复制，oplog同样要消耗内存的，因此选择一个合适的oplog值很重要，如果是高插入高更
+新，并带有延时从库的副本集需要一个较大的oplog值（比如50G）；如果没有延时从库，并且数据更新速度不频繁，则可以适当调小oplog值（比如5G）。总之，oplog值大小的设置取决于具体业务应用场景，一切脱离业务使用场景来设置oplog的值大小都是耍流氓。
+
+###如何设计表（Collection）？
+MongoDB在数据逻辑结构上和RDBMS比较类似，如图4所示：MongoDB三要素：数据库（DataBase）、集合（Collection）、文档（Document）分别对应RDBMS（比如MySQL）三要素：数据库（DataBase）、表（Table）、行（Row）。
+
+
+图4 MongoDB和RDBMS数据逻辑结构对比
+MongoDB作为一支文档型的数据库允许文档的嵌套结构，和RDBMS的三范式结构不同，我们以“人”描述为例，说明两者之间设计上的区别。“人”有以下的属性：姓名、性别、年龄和住址；住址是一个复合结构，包括：国家、城市、街道等。针对“人”的结构，传统的RDBMS的设计我们需要2张表：一张为People表[图5]，另外一张为Address表[图6]。这两张表通过住址ID关联起来（即Addess ID是People表的外键）。在MongoDB表设计中，由于MongoDB支持文档嵌套结构，我可以把住址复合结构嵌套起来，从而实现一个Collection结构[图7]，可读性会更强。
+
+图 5 RDBMSPeople表设计
+
+图 6 RDBMS Address表设计
+
+图7 MongoDB表设计
+MongoDB作为一支NoSQL数据库产品，除了可以支持嵌套结构外，它又是最像RDBMS的产品，因此也可以支持“关系”的存储。接下来会详细讲述下对应RDBMS中的一对一、一对多、多对多关系在MongoDB中我们设计和实现。
+IM用户信息表，包含用户uid、用户登录名、用户昵称、用户签名等，是一个典型的一对一关系，在MongoDB可以采用类RDBMS的设计，我们设计一张IM用户信息表user：{_id:88, loginname:musicml, nickname:musicml,sign:love}，其中_id为主键，_id实际为uid。IM用户消息表，一个用户可以收到来自他人的多条消息，一个典型的一对多关系。
+我们如何设计？
+一种方案，采用RDBMS的“多行”式设计，msg表结构为：{uid，msgid，msg_content}，具体的记录为：123, 1, 你好；123，2，在吗。
+另外一种设计方案，我们可以使用MongoDB的嵌套结构：{uid:123, msg:{[{msgid:1,msg_content:你好}，{msgid:2, msg_content:在吗}]}}。
+采用MongoDB嵌套结构，会更加直观，但也存在一定的问题：更新复杂、MongoDB单文档16MB的限制问题。采用RDBMS的“多行”设计，它遵循了范式，一方面查询条件更灵活，另外通过“多行式”扩展性也较高。
+在这个一对多的场景下，由于MongoDB单条文档大小的限制，我们并没采用MongoDB的嵌套结构，而是采用了更加灵活的类RDBMS的设计。
+在User和Team业务场景下，一个Team中有多个User，一个User也可能属于多个Team，这种是典型的多对多关系。
+在MongoDB中我们如何设计？一种方案我们可以采用类RDBMS的设计。一共三张表：Team表{teamid,teamname, ……}，User表{userid,username,……}，Relation表{refid, userid, teamid}。其中Team表存储Team本身的元信息，User表存储User本身的元信息，Relation表存储Team和User的所属关系。
+在MongoDB中我们可以采用嵌套的设计方案：一种2张表：Team表{teamid,teamname,teammates:{[userid, userid, ……]}，存储了Team所有的User成员和User表{useid,usename,teams:{[teamid, teamid,……]}}，存储了User所有参加的Team。
+在MongoDB Collection上我们并没有开启Auto-Shariding的功能，那么当单Collection数据量变大后，我们如何Sharding？对Collection Sharding 我们采用手动水平Sharding的方式，单表我们保持在千万级别文档数量。当Collection数据变大，我们进行水平拆分。比如IM用户信息表：{uid, loginname, sign, ……}，可用采用uid取模的方式水平扩展，比如：uid%64，根据uid查询可以直接定位特定的Collection，不用跨表查询。
+通过手动Sharding的方式，一方面根据业务的特点，我们可以很好满足业务发展的情况，另外一方面我们可以做到可控、数据的可靠，从而避免了Auto-Sharding带来的不稳定因素。对于Collection上只有一个查询维度（uid），通过水平切分可以很好满足。
+但是对于Collection上有2个查询维度，我们如何处理？比如商品表：{uid, infoid, info,……}，存储了商品发布者，商品ID，商品信息等。我们需要即按照infoid查询，又能支持按照uid查询。为了支持这样的查询需求，就要求infoid的设计上要特殊处理：infoid包含uid的信息（infoid最后8个bit是uid的最后8个bit），那么继续采用infoid取模的方式，比如：infoid%64，这样我们既可以按照infoid查询，又可以按照uid查询，都不需要跨Collection查询。
+数据量、并发量增大，遇到问题及其解决方案
+大量删除数据问题及其解决方案
+我们在IM离线消息中使用了MongoDB，IM离线消息是为了当接收方不在线时，需要把发给接收者的消息存储下来，当接收者登录IM后，读取存储的离线消息后，这些离线消息不再需要。已读取离线消息的删除，设计之初我们考虑物理删除带来的性能损耗，选择了逻辑标识删除。IM离线消息Collection包含如下字段：msgid, fromuid, touid, msgcontent, timestamp, flag。其中touid为索引，flag表示离线消息是否已读取，0未读，1读取。
+当IM离线消息已读条数积累到一定数量后，我们需要进行物理删除，以节省存储空间，减少Collection文档条数，提升集群性能。既然我们通过flag==1做了已读取消息的标示，第一时间想到了通过flag标示位来删除：db.collection.remove({“flag” :1}};一条简单的命令就可以搞定。表面上看很容易就搞定了？！实际情况是IM离线消息表5kw条记录，近200GB的数据大小。
+悲剧发生了：晚上10点后部署删除直到早上7点还没删除完毕；MongoDB集群和业务监控断续有报警；从库延迟大；QPS/TPS很低；业务无法响应。事后分析原因：虽然删除命令db.collection.remove({“flag” : 1}};很简单，但是flag字段并不是索引字段，删除操作等价于全部扫描后进行，删除速度很慢，需要删除的消息基本都是冷数据，大量的冷数据进入内存中，由于内存容量的限制，会把内存中的热数据swap到磁盘上，造成内存中全是冷数据，服务能力急剧下降。
+遇到问题不可怕，我们如何解决呢？首先我们要保证线上提供稳定的服务，采取紧急方案，找到还在执行的opid，先把此命令杀掉（kill opid），恢复服务。长期方案，我们首先优化了离线删除程序[图8]，把已读IM离线消息的删除操作，每晚定时从库导出要删除的数据，通过脚本按照objectid主键（_id）的方式进行删除，并且删除速度通过程序控制，从避免对线上服务影响。其次，我们通过用户的离线消息的读取行为来分析，用户读取离线消息时间分布相对比较均衡，不会出现比较密度读取的情形，也就不会对MongoDB的更新带来太大的影响，基于此我们把用户IM离线消息的删除由逻辑删除优化成物理删除，从而从根本上解决了历史数据的删除问题。
+
+
+
+
+图8 离线删除优化脚本
+大量数据空洞问题及其解决方案
+MongoDB集群大量删除数据后（比如上节中的IM用户离线消息删除）会存在大量的空洞，这些空洞一方面会造成MongoDB数据存储空间较大，另外一方面这些空洞数据也会随之加载到内存中，导致内存的有效利用率较低，在机器内存容量有限的前提下，会造成热点数据频繁的Swap，频繁Swap数据，最终使得MongoDB集群服务能力下降，无法提供较高的性能。
+通过上文的描述，大家已经了解MongoDB数据空间的分配是以DB为单位，而不是以Collection为单位的，存在大量空洞造成MongoDB性能低下的原因，问题的关键是大量碎片无法利用，因此通过碎片整理、空洞合并收缩等方案，我们可以提高MongoDB集群的服务能力。
+那么我们如何落地呢？
+方案一：我们可以使用MongoDB提供的在线数据收缩的功能，通过Compact命令（db.yourCollection.runCommand(“compact”);）进行Collection级别的数据收缩，去除Collectoin所在文件碎片。此命令是以Online的方式提供收缩，收缩的同时会影响到线上的服务，其次从我们实际收缩的效果来看，数据空洞收缩的效果不够显著。因此我们在实际数据碎片收缩时没有采用这种方案，也不推荐大家使用这种空洞数据的收缩方案。
+既然这种数据方案不够好，我们可以采用Offline收缩的方案二：此方案收缩的原理是：把已有的空洞数据，remove掉，重新生成一份无空洞数据。那么具体如何落地？先预热从库；把预热的从库提升为主库；把之前主库的数据全部删除；重新同步；同步完成后，预热此库；把此库提升为主库。
+具体的操作步骤如下：检查服务器各节点是否正常运行 (ps -ef |grep mongod)；登入要处理的主节点 /mongodb/bin/mongo--port 88888；做降权处理rs.stepDown()，并通过命令 rs.status()来查看是否降权；切换成功之后，停掉该节点；检查是否已经降权，可以通过web页面查看status，我们建议最好登录进去保证有数据进入，或者是mongostat 查看； kill 掉对应mongo的进程： kill 进程号；删除数据，进入对应的分片删除数据文件，比如： rm -fr /mongodb/shard11/；重新启动该节点，执行重启命令，比如：如:/mongodb/bin/mongod --config /mongodb/shard11.conf；通过日志查看进程；数据同步完成后，在修改后的主节点上执行命令 rs.stepDown() ，做降权处理。
+通过这种Offline的收缩方式，我们可以做到收缩率是100%，数据完全无碎片。当然做离线的数据收缩会带来运维成本的增加，并且在Replic-Set集群只有2个副本的情况下，还会存在一段时间内的单点风险。通过Offline的数据收缩后，收缩前后效果非常明显，如[图9,图10]所示：收缩前85G存储文件，收缩后34G存储文件，节省了51G存储空间，大大提升了性能。
+
+
+
+
+图9 收缩MongoDB数据库前存储数据大小
+
+
+
+
+图10 收缩MongoDB数据库后存储数据大小
+MongoDB集群监控
+MongoDB集群有多种方式可以监控：mongosniff、mongostat、mongotop、db.xxoostatus、web控制台监控、MMS、第三方监控。我们使用了多种监控相结合的方式*，从而做到对MongoDB整个集群完全Hold住。
+第一是mongostat[图11]，mongostat是对MongoDB集群负载情况的一个快照，可以查看每秒更新量、加锁时间占操作时间百分比、缺页中断数量、索引miss的数量、客户端查询排队长度（读|写)、当前连接数、活跃客户端数量(读|写)等。
+
+
+
+
+图11 MongoDB mongostat监控
+mongstat可以查看的字段较多，我们重点关注Locked、faults、miss、qr|qw等，这些值越小越好，最好都为0；locked最好不要超过10%；造成faults、miss原因主要是内存不够或者内冷数据频繁Swap，索引设置不合理；qr|qw堆积较多，反应了数据库处理慢，这时候我们需要针对性的优化。
+第二是web控制台，和MongoDB服务一同开启，它的监听端口是MongoDB服务监听端口加上1000，如果MongoDB的监听端口33333，则Web控制台端口为34333。我们可以通过http://ip:port（http://8.8.8.8:34333）访问监控了什么[图12]：当前MongoDB所有的连接数、各个数据库和Collection的访问统计包括：Reads, Writes, Queries等、写锁的状态、最新的几百行日志文件。
+
+
+
+
+图12 MongoDB Web控制台监控
+第三是MMS（MongoDBMonitoring Service），它是2011年官方发布的云监控服务，提供可视化图形监控。工作原理如下：在MMS服务器上配置需要监控的MongoDB信息（ip/port/user/passwd等）；在一台能够访问你MongoDB服务的内网机器上运行其提供的Agent脚本；Agent脚本从MMS服务器获取到你配置的MongoDB信息；Agent脚本连接到相应的MongoDB获取必要的监控数据；Agent脚本将监控数据上传到MMS的服务器；登录MMS网站查看整理过后的监控数据图表。具体的安装部署，可以参考：http://mms.10gen.com。
+
+
+
+
+图13 MongoDB MMS监控
+第四是第三方监控，MongoDB开源爱好者和团队支持者较多，可以在常用监控框架上扩展，比如：zabbix，可以监控CPU负荷、内存使用、磁盘使用、网络状况、端口监视、日志监视等；nagios，可以监控监控网络服务（HTTP等）、监控主机资源（处理器负荷、磁盘利用率等）、插件扩展、报警发送给联系人（EMail、短信、用户定义方式）、手机查看方式；cacti，可以基于PHP,MySQL,SNMP及RRDTool开发的网络流量监测图形分析工具。
+最后我要感谢公司和团队，在MongoDB集群的大规模实战中积累了宝贵的经验，才能让我有机会撰写了此文，由于MongoDB社区不断发展，特别是MongoDB 3.0，对性能、数据压缩、运维成本、锁级别、Sharding以及支持可插拔的存储引擎等的改进，MongoDB越来越强大。文中可能会存在一些不妥的地方，欢迎大家交流指正。
+讲师介绍
+孙玄，极客邦培训专家讲师，58同城系统架构师、技术委员会架构组主任、产品技术学院优秀讲师，58同城即时通讯、C2C技术负责人，负责58核心系统的架构以及优化工作。分布式系统存储专家，2007年开始从事大规模高性能分布式存储系统架构设计实现工作。涉及自主研发分布式存储系统、MongoDB、MySQL、Memcached、Redis等。前百度高级工程师，参与社区搜索部多个基础系统的设计与实现。
+
+
+##MongoDB的水平扩展，你做对了吗？
+https://www.jianshu.com/p/f33570f0cd30
+
+配置 Shard 数据库
+环境搭建好并且数据已经准备完毕以后，接下来的事情就是配置数据库并切分数据。方便起见，我们把用户分为三组，20 岁以下（junior)，20 到 40 岁（middle）和 40 岁以上（senior），为了节省篇幅，我在这里不过多的介绍如何使用 MongoDB 命令，按照下面的几条命令执行以后，我们的数据会按照用户年龄段拆分成若干个 chunk，并分发到不同的 shard cluster 中。如果对下面的命令不熟悉，可以查看 MongoDB 官方文档关于 Shard Zone/Chunk 的解释。
+db.getSiblingDB('test').getCollection('users').createIndex({'user.age':1})
+sh.setBalancerState(false)
+sh.addShardTag('shard01', 'junior')
+sh.addShardTag('shard02', 'middle')
+sh.addShardTag('shard03', 'senior')
+sh.addTagRange('test.users', {'user.age': MinKey}, {'user.age':20}, 'junior') sh.addTagRange('test.users', {'user.age': 21}, {'user.age':40}, 'middle') sh.addTagRange('test.users', {'user.age': 41}, {'user.age': MaxKey}, 'senior')
+sh.enableSharding('test')
+sh.shardCollection('test.users', {'user.age':1})
+sh.setBalancerState(true)
+从上面的命令中可以看出，我们首先要为 Shard Key 创建索引，之后禁止 Balancer 的运行，这么做的原因是不希望在 Shard Collection 的过程中还运行 Balancer。之后将数据按照年龄分成三组，分别标记为junior,middle，senior并把这三组分别分配到三个 Shard 集群中。 之后对 test 库中的 users collection 进行按用户年龄字段的切分操作，如果 Shard collection 成功返回，你会得到下面的输出结果：{ "collectionsharded" : "test.users", "ok" : 1 }。
+
+关于 Shard 需要注意的几点
+一旦你对一个 Colleciton 进行了 Shard 操作，你选择的 Shard Key 和它对应的值将成为不可变对象，所以：
+你无法在为这个 collection 重新选择 Shard Key
+你不能更新 Shard key 的取值
+随后不要忘记，我们还需要将 Balancer 打开：sh.setBalancerState(true)。刚打开以后运行sh.isBalancerRunning()应当返回true，说明 Balancer 服务正在运行，他会调整 Chunk 在不同 Shards 服务器中的分配。一般 Balancer 会运行一段时间，因为他要对分组的数据重新分配到指定的 shard 服务器上，你可以通过sh.isBalancerRunning()命令查看 Balancer 是否正在运行。现在可以稍事休息一下喝杯咖啡或看看窗外的风景。
+为了理解数据如何分布在 3 个 shard 集群中，我们有必要分析一下 chunk 和 zone 的划分，下图是在 dbKoda 上显示 Shard Cluster 统计数据，可以看到数据总共被分成 6 个 chunks，每个 shard 集群存储 2 个 chunk。
+
+Chunk
+我们已经知道 MongoDB 是通过 shard key 来对数据进行切分，被切分出来的数据被分配到若干个 chunks 中。一个 chunk 可以被认为是一台 shard 服务器中数据的子集，根据 shard key，每个 chunk 都有上下边界，在我们的例子中，边界值就是用户年龄。chunk 有自己的大小，数据不断插入到 mongos 的过程中，chunk 的大小会发生变化，chunk 的默认大小是 64M。当然 MongoDB 允许你对 chunk 的大小进行设置，你也可以把一个 chunk 切分成若干个小 chunk，或者合并多个 chunk。一般我不建议大家手动操作 chunk 的大小，或者在 mongos 层面切分或合并 chunk，除非真有合适的原因才去这么做。原因是，在数据不断插入到我们的集群中时，mongodb 中的 chunk 大小会发生很大的变化，当一个 chunk 的大小超过了最大值，mongo 会根据 shard key 对 chunk 进行切分，在必要的时候，一个 chunk 可能会被切分成多个小 chunk，大多数情况下这种自动行为已经满足了我们日常的业务需求，无需进行手动操作，另一点原因是当进行 chunk 切分后，直接的结果会导致数据分配的不均匀，此时 balancer 会被调用来进行数据重新分配，很多时候这个操作会运行很长时间，无形中导致了内部结构的负载平衡，因此不建议大家手动拆分。当然，理解 chunk 的分配原理还是有助于大家分析数据库性能的必要条件。我在这里不过多的将如何进行这些操作，有兴趣的读者可以参考 MongoDB 官方文档，上面有比较全面的解释。这里我只强调在进行 chunk 操作的时候，要注意一下几个方面，这些都是影响你 MongoDB 性能的关键因素。
+如果存在大量体积很小的 chunk，他可以保证你的数据均匀的分布在 shard 集群中但是可能会导致频繁的数据迁移。这将加重 mongos 层面上的操作。
+大的 chunk 会减少数据迁移，减轻网络负担，降低在 mongos 路由层面上的负载，但弊端是有可能导致数据在 shard 集群中分布的不均匀。
+Balancer 会在数据分配不均匀的时候自动运行，那么 Balancer 是如何决定什么情况下需要进行数据迁移呢？答案是 Migration Thresholds，当 chunk 的数量在不同 shard replica 之间超过一个定值时，balancer 会自动运行，这个定值根据你的 shard 数量不同而不同。
+
+
+Zones
+可以说 chunk 是 MongoDB 在多个 shard 集群中迁移数据的最小单元，有时候数据的分配不会按照我们臆想的方向进行，就拿上面的例子来说，虽然我们选择了用户年龄作为 shard key，但是 MongoDB 并不会按照我们设想的那样来分配数据，如何进行数据分配就是通过 Zones 来实现。Zones 解决了 shard 集群与 shard key 之间的关系，我们可以按照 shard key 对数据进行分组，每一组称之为一个 Zone，之后把 Zone 在分配给不同的 Shard 服务器。一个 Shard 可以存储一个或多个 Zone，前提是 Zone 之间没有数据冲突。Balancer 在运行的时候会把在 Zone 里的 chunk 迁移到关联这个 Zone 的 shard 上。
+理解了这些概念以后，我们对数据的分配就有了更清楚的认识。我们对前面提到的问题就有了充分的解释。表面上看，数据的分布貌似均匀，我们执行几个查询语句看看性能怎样。这里再次用到 dbKoda 中的 explain 视图。
+
+你选择的 Shard Key 合适吗？
+了解了数据是如何分布的以后，咱们再回过头来看看我们选择的 shard key 是否合理。细心的读者已经发现，上面运行的 explain 结果中存在一个问题，就是 shard3 存储了大量的数据，如果我们看一下每个年龄组的纪录个数，会发现 shard1、shard2、shard3 分别包括 198554, 187975, 593673，显然年龄大于 40 岁的用户占了大多数。这并不是我们希望的结果，因为 shard3 成为了集群中的一个瓶颈，数据库操作语句在 shard3 上运行的速度会大大超过另外两个 shard，这点从上面的 explain 结果中也可以看到，查询语句在 shard3 上的运行时间是另外两个 shard 的两倍以上。更重要的是，随着用户数量的不断增加，数据的分布也会出现显著变化，在系统运行一段时间以后，可能 shard2 的用户数超过 shard3，也有可能 shard1 称为存储数据量最多的服务器。这种数据不平衡是我们不希望看到的。原因在哪里呢？是不是觉得我们选择的用户年龄作为分组条件是一个不太理想的 key。那么什么样的 key 能够保证数据的均匀分布呢？接下来我们分析一下 shard key 的种类。
+Ranged Shard Key
+我们上面选择的年龄分组就是用的这种 shard key。根据 shard key 的取值，它把数据切分成连续的几个区间。取值相近的纪录会放进同一个 shard 服务器。好处是查询连续取值纪录时，查询效率可以得到保证。当数据库查询语句发送到 mongos 中时，mongos 会很快的找到目标 shard，而且不需要将语句发送到所有的 shard 上，一般只需要少量的 shard 就可以完成查询操作。缺点是不能保证数据的平均分配，在数据插入和修改时会产生比较严重的性能瓶颈。
+Hashed Shard Key
+于 Ranged Shard Key 对应的一种被称之为 Hashed Shard Key，它采用字段的索引哈希值作为 shard key 的取值，这样做可以保证数据的均匀分布。在 mongos 和各个 shard 集群之间存在一个哈希值计算方法，所有的数据在迁移时都是根据这个方法来计算数据应当被迁移到什么地方。当 mongos 接收到一条语句时，通常他会把这条语句广播到所有的 shard 上去执行。
+有了上面的认识，我们如何在 Ranged 和 Shard 之间进行选择呢？下面两个属性是我们选择 shard key 的关键。
+Shard Key Cardinality （集）
+Cardinality指的是 shard key 可以取到的不同值的个数。他会影响到 Balancer 的运行，这个值也可以被看做是 Balancer 可以创建的最大 chunk 个数。以我们年龄字段为例，假如一个人的年龄在 100 岁以下，那么这个字段的 cardinality 可以取 100 个不同的值。对于一个唯一的年龄数据，不会出现在不同的 chunk 中。如果你选择的 Shard Key 的 cardinality 很小，比如只有 4 个，那么数据最多会被分发到 4 个不同的 shard 中，这样的结构也不适合服务器的水平扩展，因为不会有数据被分割到第五个 shard 服务器上。
+Shard Key Frequency（频率）
+Frequency指的是 shard key 的重复度，也就是对于一个字段，有多少取值相同的纪录。如果大部分数据的 shard key 取值相同，那么存储他们的 chunk 会成为数据库的一个瓶颈。而且，这些 chunk 也变成了不可再切分的 chunk，严重影响了数据库的水平扩展。在这种情况下应当考虑使用组合索引的方式来创建 shard key。所以，尽量选择低频率的字段作为 shard key。
+Shard Key Increasing Monotonically （单调增长）
+单调增长在这里的意思是在数据被切分以后，新增加的数据会按照其 shard key 取值向 shard 中插入，如果新增的数据的 key 值都是向最大值方向增加，那么这些新的数据会被插入到同一个 shard 服务器上。例如我们前面的用户年龄分组字段，如果系统的新增用户都是年龄大于 40 岁的，那么 shard3 将会存储所有的新增用户，shard3 会成为系统的性能瓶颈。在这种情况下，应当考虑使用 Hashed Shard Key。
+重新设计 Shard Key
+通过上面的分析我们可以得出结论，前面例子中的用户年龄字段是一个很糟糕的方案。有几个原因：
+用户的年龄不是固定不变的，由于 shard key 是不可变字段，一旦确定下来以后不能进行修改，所以年龄字段显然不是很合适，毕竟没有年龄永远不增长的用户。
+一个系统的用户在不同年龄阶段的分布是不一样的，对于像游戏、娱乐方面的应用可能会吸引年轻人多一些。而对于医疗、养生方面也许会有更多老年人关注。从这一点上说，这样的切分也是不恰当的。
+选择年龄字段并没有考虑到未来用户增长方面带来的问题，有可能在数据切分的时候年龄是均匀分布的，但是系统运行一段时间以后有可能出现不平等的数据分布，这点会给数据维护带来很大的困扰。
+那么我们应当如何进行选择呢？看一下用户表的所有属性可以发现，其中有一个created_at字段，它指的是纪录创建的时间戳。如果采用 Ranged Key 那么在数据增长方向上会出现单调增长问题，在分析一下发现这个字段重复的纪录不多，他有很高的cardinality和非常低的频率，这样 Harded key 就成为了很好的备选方案。
+分析完理论以后咱们实践一下看看效果，不幸的是我们并不能修改 shard key，最好的方法就是备份数据，重新创建 shard 集群。创建和数据准备的过程我就不在重复了，你们可以根据前面的例子自己作一遍。
+下图中是我新建的一个userscollection，并以created_at为索引创建了 Hashed Shard Key，注意
+created_at必须是一个 hash index 才能成为 hashed shard key。下面是针对用户表的一次查询结果。
+
+​从图中可以看到，explain 的结果表示了三个 shard 服务器基本上均匀分布了所有的数据，三个 shard 上执行时间也都基本均匀，在 500 到 700 多毫秒以内。还记得上面的几次查询结果吗？在数据比较多的 shard 上的运行时间在 1 到 2 毫秒。可以看到总的性能得到了显著提高。
+选择完美的 Shard Key
+在 shard key 的选择方面，我们需要考虑很多因素，有些是技术的，有些是业务层面的。通常来讲应当注意下面几点：
+所有增删改查语句都可以发送到集群中所有的 shard 服务器中
+任何操作只需要发送到与其相关的 shard 服务器中，例如一次删除操作不应当发送到没有包括要删除的数据的 shard 服务器上
+权衡利弊，实际上没有完美的 shard key，只有选择 shard key 时应当注意和考虑的要素。不会出现一种 shard key 可以满足所有的增删改查操作。你需要从给你的应用场景中抽象出用来选择 shard key 的元素，考量这些要素并作出最后选择，例如：你的应用是处理读操作多还是写操作多？最常用的写操作场景是什么样子的？
+
+
+##mongodb分布式集群搭建手记 
+https://www.cnblogs.com/wangshuyang/p/11728067.html
+
+二、配置说明
+端口通讯
+当前集群中存在shard、config、mongos共12个进程节点，端口矩阵编排如下：
+编号  实例类型
+1   mongos
+2   mongos
+3   mongos
+4   config
+5   config
+6   config
+7   shard1
+8   shard1
+9   shard1
+10  shard2
+11  shard2
+12  shard2
+内部鉴权
+节点间鉴权采用keyfile方式实现鉴权，mongos与分片之间、副本集节点之间共享同一套keyfile文件。 官方说明
+账户设置
+管理员账户：admin/Admin@01，具有集群及所有库的管理权限
+应用账号：appuser/AppUser@01，具有appdb的owner权限
+关于初始化权限
+keyfile方式默认会开启鉴权，而针对初始化安装的场景，Mongodb提供了localhost-exception机制，
+可以在首次安装时通过本机创建用户、角色，以及副本集初始操作。
+
+三、准备工作
+1. 下载安装包
+官方地址：https://www.mongodb.com/download-center
+wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-rhel70-3.6.3.tgz
+2. 部署目录
+解压压缩文件，将bin目录拷贝到目标路径/opt/local/mongo-cluster，参考以下命令：
+tar -xzvf mongodb-linux-x86_64-rhel70-3.6.3.tgz
+mkdir -p  /opt/local/mongo-cluster
+cp -r mongodb-linux-x86_64-rhel70-3.6.3/bin  /opt/local/mongo-cluster
+3. 创建配置文件
+cd /opt/local/mongo-cluster
+mkdir conf 
+A. mongod 配置文件 mongo_node.conf
+mongo_node.conf 作为mongod实例共享的配置文件，内容如下：
+storage:
+    engine: wiredTiger
+    directoryPerDB: true
+    journal:
+        enabled: true
+systemLog:
+    destination: file
+    logAppend: true
+operationProfiling:
+  slowOpThresholdMs: 10000
+replication:
+    oplogSizeMB: 10240
+processManagement:
+    fork: true
+net:
+    http:
+      enabled: false
+security:
+    authorization: "enabled"
+选项说明可参考这里
+B. mongos 配置文件 mongos.conf
+systemLog:
+    destination: file
+    logAppend: true
+processManagement:
+    fork: true
+net:
+    http:
+      enabled: false
+4. 创建keyfile文件
+cd /opt/local/mongo-cluster
+mkdir keyfile
+openssl rand -base64 756 > mongo.key
+chmod 400 mongo.key
+mv mongo.key keyfile
+mongo.key 采用随机算法生成，用作节点内部通讯的密钥文件
+
+5. 创建节点目录
+WORK_DIR=/opt/local/mongo-cluster
+mkdir -p $WORK_DIR/nodes/config/n1/data
+mkdir -p $WORK_DIR/nodes/config/n2/data
+mkdir -p $WORK_DIR/nodes/config/n3/data
+
+mkdir -p $WORK_DIR/nodes/shard1/n1/data
+mkdir -p $WORK_DIR/nodes/shard1/n2/data
+mkdir -p $WORK_DIR/nodes/shard1/n3/data
+
+mkdir -p $WORK_DIR/nodes/shard2/n1/data
+mkdir -p $WORK_DIR/nodes/shard2/n2/data
+mkdir -p $WORK_DIR/nodes/shard2/n3/data
+
+mkdir -p $WORK_DIR/nodes/mongos/n1
+mkdir -p $WORK_DIR/nodes/mongos/n2
+mkdir -p $WORK_DIR/nodes/mongos/n3
+以config 节点1 为例，nodes/config/n1/data是数据目录，而pid文件、日志文件都存放于n1目录
+以mongos 节点1 为例，nodes/mongos/n1 存放了pid文件和日志文件
+
+四、搭建集群
+1. Config副本集
+按以下脚本启动3个Config实例
+WORK_DIR=/opt/local/mongo-cluster
+KEYFILE=$WORK_DIR/keyfile/mongo.key
+CONFFILE=$WORK_DIR/conf/mongo_node.conf
+MONGOD=$WORK_DIR/bin/mongod
+
+$MONGOD --port 26001 --configsvr --replSet configReplSet --keyFile $KEYFILE --dbpath $WORK_DIR/nodes/config/n1/data --pidfilepath $WORK_DIR/nodes/config/n1/db.pid --logpath $WORK_DIR/nodes/config/n1/db.log --config $CONFFILE
+
+$MONGOD --port 26002 --configsvr --replSet configReplSet --keyFile $KEYFILE --dbpath $WORK_DIR/nodes/config/n2/data --pidfilepath $WORK_DIR/nodes/config/n2/db.pid --logpath $WORK_DIR/nodes/config/n2/db.log --config $CONFFILE
+
+$MONGOD --port 26003 --configsvr --replSet configReplSet --keyFile $KEYFILE --dbpath $WORK_DIR/nodes/config/n3/data --pidfilepath $WORK_DIR/nodes/config/n3/db.pid --logpath $WORK_DIR/nodes/config/n3/db.log --config $CONFFILE
+待成功启动后，输出日志如下：
+about to fork child process, waiting until server is ready for connections.
+forked process: 4976
+child process started successfully, parent exiting
+此时通过ps 命令也可以看到3个启动的进程实例。
+连接其中一个Config进程，执行副本集初始化
+./bin/mongo --port 26001 --host 127.0.0.1
+> MongoDB server version: 3.4.7
+> cfg={
+    _id:"configReplSet", 
+    configsvr: true,
+    members:[
+        {_id:0, host:'127.0.0.1:26001'},
+        {_id:1, host:'127.0.0.1:26002'}, 
+        {_id:2, host:'127.0.0.1:26003'}
+    ]};
+rs.initiate(cfg);
+其中configsvr:true指明这是一个用于分片集群的Config副本集。
+关于副本集配置可参考这里
+
+2. 创建分片
+按以下脚本启动Shard1的3个实例
+WORK_DIR=/opt/local/mongo-cluster
+KEYFILE=$WORK_DIR/keyfile/mongo.key
+CONFFILE=$WORK_DIR/conf/mongo_node.conf
+MONGOD=$WORK_DIR/bin/mongod
+
+echo "start shard1 replicaset"
+
+$MONGOD --port 27001 --shardsvr --replSet shard1 --keyFile $KEYFILE --dbpath $WORK_DIR/nodes/shard1/n1/data --pidfilepath $WORK_DIR/nodes/shard1/n1/db.pid --logpath $WORK_DIR/nodes/shard1/n1/db.log --config $CONFFILE
+$MONGOD --port 27002 --shardsvr --replSet shard1 --keyFile $KEYFILE --dbpath $WORK_DIR/nodes/shard1/n2/data --pidfilepath $WORK_DIR/nodes/shard1/n2/db.pid --logpath $WORK_DIR/nodes/shard1/n2/db.log --config $CONFFILE
+$MONGOD --port 27003 --shardsvr --replSet shard1 --keyFile $KEYFILE --dbpath $WORK_DIR/nodes/shard1/n3/data --pidfilepath $WORK_DIR/nodes/shard1/n3/db.pid --logpath $WORK_DIR/nodes/shard1/n3/db.log --config $CONFFILE
+待成功启动后，输出日志如下：
+about to fork child process, waiting until server is ready for connections.
+forked process: 5976
+child process started successfully, parent exiting
+此时通过ps 命令也可以看到3个启动的Shard进程实例。
+连接其中一个Shard进程，执行副本集初始化
+./bin/mongo --port 27001 --host 127.0.0.1
+> MongoDB server version: 3.4.7
+> cfg={
+    _id:"shard1", 
+    members:[
+        {_id:0, host:'127.0.0.1:27001'},
+        {_id:1, host:'127.0.0.1:27002'}, 
+        {_id:2, host:'127.0.0.1:27003'}
+    ]};
+rs.initiate(cfg);
+参考以上步骤，启动Shard2的3个实例进程，并初始化副本集。
+
+3. 启动mongos路由
+执行以下脚本启动3个mongos进程
+WORK_DIR=/opt/local/mongo-cluster
+KEYFILE=$WORK_DIR/keyfile/mongo.key
+CONFFILE=$WORK_DIR/conf/mongos.conf
+MONGOS=$WORK_DIR/bin/mongos
+
+echo "start mongos instances"
+$MONGOS --port=25001 --configdb configReplSet/127.0.0.1:26001,127.0.0.1:26002,127.0.0.1:26003 --keyFile $KEYFILE --pidfilepath $WORK_DIR/nodes/mongos/n1/db.pid --logpath $WORK_DIR/nodes/mongos/n1/db.log --config $CONFFILE
+$MONGOS --port 25002 --configdb configReplSet/127.0.0.1:26001,127.0.0.1:26002,127.0.0.1:26003 --keyFile $KEYFILE --pidfilepath $WORK_DIR/nodes/mongos/n2/db.pid --logpath $WORK_DIR/nodes/mongos/n2/db.log --config $CONFFILE
+$MONGOS --port 25003 --configdb configReplSet/127.0.0.1:26001,127.0.0.1:26002,127.0.0.1:26003 --keyFile $KEYFILE --pidfilepath $WORK_DIR/nodes/mongos/n3/db.pid --logpath $WORK_DIR/nodes/mongos/n3/db.log --config $CONFFILE
+待成功启动后，通过ps命令看到mongos进程：
+dbuser      7903    1  0 17:49 ?        00:00:00 /opt/local/mongo-cluster/bin/mongos --port=25001 --configdb configReplSet/127.0.0.1:26001,127.0.0.1:26002,127.0.0.1:26003 --keyFile /opt/local/mongo-cluster/keyfile/mongo.key --pidfilepath /opt/local/mongo-cluster/nodes/mongos/n1/db.pid --logpath /opt/local/mongo-cluster/nodes/mongos/n1/db.log --config /opt/local/mongo-cluster/conf/mongos.conf
+dbuser      7928    1  0 17:49 ?        00:00:00 /opt/local/mongo-cluster/bin/mongos --port 25002 --configdb configReplSet/127.0.0.1:26001,127.0.0.1:26002,127.0.0.1:26003 --keyFile /opt/local/mongo-cluster/keyfile/mongo.key --pidfilepath /opt/local/mongo-cluster/nodes/mongos/n2/db.pid --logpath /opt/local/mongo-cluster/nodes/mongos/n2/db.log --config /opt/local/mongo-cluster/conf/mongos.conf
+dbuser      7954    1  0 17:49 ?        00:00:00 /opt/local/mongo-cluster/bin/mongos --port 25003 --configdb configReplSet/127.0.0.1:26001,127.0.0.1:26002,127.0.0.1:26003 --keyFile /opt/local/mongo-cluster/keyfile/mongo.key --pidfilepath /opt/local/mongo-cluster/nodes/mongos/n3/db.pid --logpath /opt/local/mongo-cluster/nodes/mongos/n3/db.log --config /opt/local/mongo-cluster/conf/mongos.conf
+接入其中一个mongos实例，执行添加分片操作：
+./bin/mongo --port 25001 --host 127.0.0.1
+mongos> MongoDB server version: 3.4.7
+mongos> sh.addShard("shard1/127.0.0.1:27001")
+{ "shardAdded" : "shard1", "ok" : 1 }
+mongos> sh.addShard("shard2/127.0.0.1:27004")
+{ "shardAdded" : "shard2", "ok" : 1 }
+至此，分布式集群架构启动完毕，但进一步操作需要先添加用户。
+
+4. 初始化用户
+接入其中一个mongos实例，添加管理员用户
+use admin
+db.createUser({
+    user:'admin',pwd:'Admin@01',
+    roles:[
+        {role:'clusterAdmin',db:'admin'},
+        {role:'userAdminAnyDatabase',db:'admin'},
+        {role:'dbAdminAnyDatabase',db:'admin'},
+        {role:'readWriteAnyDatabase',db:'admin'}
+]})
+当前admin用户具有集群管理权限、所有数据库的操作权限。
+需要注意的是，在第一次创建用户之后，localexception不再有效，接下来的所有操作要求先通过鉴权。
+use admin
+db.auth('admin','Admin@01')
+
+检查集群状态
+mongos> sh.status()
+--- Sharding Status --- 
+  sharding version: {
+    "_id" : 1,
+    "minCompatibleVersion" : 5,
+    "currentVersion" : 6,
+    "clusterId" : ObjectId("5aa39c3e915210dc501a1dc8")
+}
+  shards:
+    {  "_id" : "shard1",  "host" : "shard1/127.0.0.1:27001,127.0.0.1:27002,127.0.0.1:27003",  "state" : 1 }
+    {  "_id" : "shard2",  "host" : "shard2/127.0.0.1:27004,127.0.0.1:27005,127.0.0.1:27006",  "state" : 1 }
+  active mongoses:
+    "3.4.7" : 3
+autosplit:
+    Currently enabled: yes
+    
+集群用户
+分片集群中的访问都会通过mongos入口，而鉴权数据是存储在config副本集中的，即config实例中system.users数据库存储了集群用户及角色权限配置。mongos与shard实例则通过内部鉴权(keyfile机制)完成，因此shard实例上可以通过添加本地用户以方便操作管理。在一个副本集上，只需要在Primary节点上添加用户及权限，相关数据会自动同步到Secondary节点。
+关于集群鉴权https://docs.mongodb.com/manual/core/security-users/?spm=a2c4e.11153940.blogcont617224.15.77552d7eSApnpI#sharded-cluster-users
+在本案例中，我们为两个分片副本集都添加了本地admin用户。
+通过mongostat工具可以显示集群所有角色：
+          host insert query update delete getmore command dirty used flushes mapped vsize  res faults qrw arw net_in net_out conn    set repl                time
+127.0.0.1:27001    *0    *0    *0    *0      0    6|0  0.1% 0.1%      0        1.49G 44.0M    n/a 0|0 0|0  429b  56.1k  25 shard1  PRI Mar 10 19:05:13.928
+127.0.0.1:27002    *0    *0    *0    *0      0    7|0  0.1% 0.1%      0        1.43G 43.0M    n/a 0|0 0|0  605b  55.9k  15 shard1  SEC Mar 10 19:05:13.942
+127.0.0.1:27003    *0    *0    *0    *0      0    7|0  0.1% 0.1%      0        1.43G 43.0M    n/a 0|0 0|0  605b  55.9k  15 shard1  SEC Mar 10 19:05:13.946
+127.0.0.1:27004    *0    *0    *0    *0      0    6|0  0.1% 0.1%      0        1.48G 43.0M    n/a 0|0 0|0  546b  55.8k  18 shard2  PRI Mar 10 19:05:13.939
+127.0.0.1:27005    *0    *0    *0    *0      0    6|0  0.1% 0.1%      0        1.43G 42.0M    n/a 0|0 0|0  540b  54.9k  15 shard2  SEC Mar 10 19:05:13.944
+127.0.0.1:27006    *0    *0    *0    *0      0    6|0  0.1% 0.1%      0        1.46G 44.0M    n/a 0|0 0|0  540b  54.9k  17 shard2  SEC Mar 10 19:05:13.936    
+
+五、数据操作
+在案例中，创建appuser用户、为数据库实例appdb启动分片。
+use appdb
+db.createUser({user:'appuser',pwd:'AppUser@01',roles:[{role:'dbOwner',db:'appdb'}]})
+sh.enableSharding("appdb")
+创建集合book，为其执行分片初始化。
+use appdb
+db.createCollection("book")
+db.device.ensureIndex({createTime:1})
+sh.shardCollection("appdb.book", {bookId:"hashed"}, false, { numInitialChunks: 4} )
+继续往device集合写入1000W条记录，观察chunks的分布情况
+
+use appdb
+var cnt = 0;
+for(var i=0; i<1000; i++){
+    var dl = [];
+    for(var j=0; j<100; j++){
+        dl.push({
+                "bookId" : "BBK-" + i + "-" + j,
+                "type" : "Revision",
+                "version" : "IricSoneVB0001",
+                "title" : "Jackson's Life",
+                "subCount" : 10,
+                "location" : "China CN Shenzhen Futian District",
+                "author" : {
+                      "name" : 50,
+                      "email" : "RichardFoo@yahoo.com",
+                      "gender" : "female"
+                },
+                "createTime" : new Date()
+            });
+      }
+      cnt += dl.length;
+      db.book.insertMany(dl);
+      print("insert ", cnt);
+}
+执行db.book.getShardDistribution(),输出如下：
+Shard shard1 at shard1/127.0.0.1:27001,127.0.0.1:27002,127.0.0.1:27003
+data : 13.41MiB docs : 49905 chunks : 2
+estimated data per chunk : 6.7MiB
+estimated docs per chunk : 24952
+
+Shard shard2 at shard2/127.0.0.1:27004,127.0.0.1:27005,127.0.0.1:27006
+data : 13.46MiB docs : 50095 chunks : 2
+estimated data per chunk : 6.73MiB
+estimated docs per chunk : 25047
+
+Totals
+data : 26.87MiB docs : 100000 chunks : 4
+Shard shard1 contains 49.9% data, 49.9% docs in cluster, avg obj size on shard : 281B
+Shard shard2 contains 50.09% data, 50.09% docs in cluster, avg obj size on shard : 281B
+
+##MongoDB的容量规划及硬件配置 
+https://www.cnblogs.com/williamjie/p/9298031.html
+
+##MongoDB分片（Sharding）技术
+http://www.cecdns.com/post/45616.html
+
+##使用哈希片键对集合分片
+https://mongoing.com/docs/tutorial/shard-collection-with-a-hashed-shard-key.html
+https://mongoing.com/docs/reference/glossary.html#term-chunk
+>>>>>>> branch 'master' of https://github.com/doerjiayi/algorithm.git
