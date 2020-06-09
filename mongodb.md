@@ -1057,3 +1057,271 @@ http://www.cecdns.com/post/45616.html
 https://mongoing.com/docs/tutorial/shard-collection-with-a-hashed-shard-key.html
 https://mongoing.com/docs/reference/glossary.html#term-chunk
 >>>>>>> branch 'master' of https://github.com/doerjiayi/algorithm.git
+
+##mongodb分片介绍—— 基于范围（数值型）的分片 或者 基于哈希的分片 
+https://www.cnblogs.com/bonelee/p/6282142.html
+
+mongodb分片介绍—— 基于范围（数值型）的分片 或者 基于哈希的分片 
+数据分区
+MongoDB中数据的分片是以集合为基本单位的,集合中的数据通过 片键 被分成多部分.
+片键
+对集合进行分片时,你需要选择一个 片键 , shard key 是每条记录都必须包含的,且建立了索引的单个字段或复合字段,MongoDB按照片键将数据划分到不同的 数据块 中,并将 数据块 均衡地分布到所有分片中.为了按照片键划分数据块,MongoDB使用 基于范围的分片方式 或者 基于哈希的分片方式。
+以范围为基础的分片
+对于 基于范围的分片 ,MongoDB按照片键的范围把数据分成不同部分.假设有一个数字的片键:想象一个从负无穷到正无穷的直线,每一个片键的值都在直线上画了一个点.MongoDB把这条直线划分为更短的不重叠的片段,并称之为 数据块 ,每个数据块包含了片键在一定范围内的数据.
+在使用片键做范围划分的系统中,拥有”相近”片键的文档很可能存储在同一个数据块中,因此也会存储在同一个分片中.
+
+基于哈希的分片
+对于 基于哈希的分片 ,MongoDB计算一个字段的哈希值,并用这个哈希值来创建数据块.
+在使用基于哈希分片的系统中,拥有”相近”片键的文档 很可能不会 存储在同一个数据块中,因此数据的分离性更好一些.
+
+基于范围的分片方式与基于哈希的分片方式性能对比
+基于范围的分片方式提供了更高效的范围查询,给定一个片键的范围,分发路由可以很简单地确定哪个数据块存储了请求需要的数据,并将请求转发到相应的分片中.
+不过,基于范围的分片会导致数据在不同分片上的不均衡,有时候,带来的消极作用会大于查询性能的积极作用.比如,如果片键所在的字段是线性增长的,一定时间内的所有请求都会落到某个固定的数据块中,最终导致分布在同一个分片中.在这种情况下,一小部分分片承载了集群大部分的数据,系统并不能很好地进行扩展.
+与此相比,基于哈希的分片方式以范围查询性能的损失为代价,保证了集群中数据的均衡.哈希值的随机性使数据随机分布在每个数据块中,因此也随机分布在不同分片中.但是也正由于随机性,一个范围查询很难确定应该请求哪些分片,通常为了返回需要的结果,需要请求所有分片.
+均衡
+The balancer is a background process that manages chunk migrations. The balancer can run from any of themongos instances in a cluster.
+当集群中数据的不均衡发生时,均衡器会将数据块从数据块数目最多的分片迁移到数据块最少的分片上,举例来讲:如果集合 users 在 分片1 上有100个数据块,在 分片2 上有50个数据块,均衡器会将数据块从 分片1一直向 分片2 迁移,一直到数据均衡为止.
+The shards manage chunk migrations as a background operation between an origin shard and a destination shard. During a chunk migration, the destination shard is sent all the current documents in the chunk from theorigin shard. Next, the destination shard captures and applies all changes made to the data during the migration process. Finally, the metadata regarding the location of the chunk on config server is updated.
+If there’s an error during the migration, the balancer aborts the process leaving the chunk unchanged on the origin shard. MongoDB removes the chunk’s data from the origin shard after the migration completes successfully.
+
+##MongoDB 分片集群技术
+
+https://www.jianshu.com/p/8d9d3adb289d?from=timeline&isappinstalled=0
+
+分片集群的构造
+    （1）mongos ：数据路由，和客户端打交道的模块。mongos本身没有任何数据，他也不知道该怎么处理这数据，去找config server
+（2）config server：所有存、取数据的方式，所有shard节点的信息，分片功能的一些配置信息。可以理解为真实数据的元数据。
+（3）shard：真正的数据存储位置，以chunk为单位存数据。
+Mongos本身并不持久化数据，Sharded cluster所有的元数据都会存储到Config Server，而用户的数据会议分散存储到各个shard。Mongos启动后，会从配置服务器加载元数据，开始提供服务，将用户的请求正确路由到对应的碎片。
+Mongos的路由功能
+　　当数据写入时，MongoDB Cluster根据分片键设计写入数据。
+　　当外部语句发起数据查询时，MongoDB根据数据分布自动路由至指定节点返回数据。
+2.2 集群中数据分布
+2.2.1 Chunk是什么
+　　在一个shard server内部，MongoDB还是会把数据分为chunks，每个chunk代表这个shard server内部一部分数据。chunk的产生，会有以下两个用途：
+Splitting：当一个chunk的大小超过配置中的chunk size时，MongoDB的后台进程会把这个chunk切分成更小的chunk，从而避免chunk过大的情况
+Balancing：在MongoDB中，balancer是一个后台进程，负责chunk的迁移，从而均衡各个shard server的负载，系统初始1个chunk，chunk size默认值64M,生产库上选择适合业务的chunk size是最好的。ongoDB会自动拆分和迁移chunks。
+分片集群的数据分布（shard节点）
+（1）使用chunk来存储数据
+（2）进群搭建完成之后，默认开启一个chunk，大小是64M，
+（3）存储需求超过64M，chunk会进行分裂，如果单位时间存储需求很大，设置更大的chunk
+（4）chunk会被自动均衡迁移。
+2.2.2 chunksize的选择
+　　适合业务的chunksize是最好的。
+　　chunk的分裂和迁移非常消耗IO资源；chunk分裂的时机：在插入和更新，读数据不会分裂。
+chunksize的选择：
+　　小的chunksize：数据均衡是迁移速度快，数据分布更均匀。数据分裂频繁，路由节点消耗更多资源。大的chunksize：数据分裂少。数据块移动集中消耗IO资源。通常100-200M
+2.2.3 chunk分裂及迁移
+
+
+随着数据的增长，其中的数据大小超过了配置的chunk size，默认是64M，则这个chunk就会分裂成两个。数据的增长会让chunk分裂得越来越多
+
+
+这时候，各个shard 上的chunk数量就会不平衡。这时候，mongos中的一个组件balancer  就会执行自动平衡。把chunk从chunk数量最多的shard节点挪动到数量最少的节点。
+chunkSize 对分裂及迁移的影响
+　　MongoDB 默认的 chunkSize 为64MB，如无特殊需求，建议保持默认值；chunkSize 会直接影响到 chunk 分裂、迁移的行为。
+　　chunkSize 越小，chunk 分裂及迁移越多，数据分布越均衡；反之，chunkSize 越大，chunk 分裂及迁移会更少，但可能导致数据分布不均。
+　　chunkSize 太小，容易出现 jumbo chunk（即shardKey 的某个取值出现频率很高，这些文档只能放到一个 chunk 里，无法再分裂）而无法迁移；chunkSize 越大，则可能出现 chunk 内文档数太多（chunk 内文档数不能超过 250000 ）而无法迁移。
+　　chunk 自动分裂只会在数据写入时触发，所以如果将 chunkSize 改小，系统需要一定的时间来将 chunk 分裂到指定的大小。
+　　chunk 只会分裂，不会合并，所以即使将 chunkSize 改大，现有的 chunk 数量不会减少，但 chunk 大小会随着写入不断增长，直到达到目标大小。
+2.3 数据区分
+2.3.1 分片键shard key
+　　MongoDB中数据的分片是、以集合为基本单位的，集合中的数据通过片键（Shard key）被分成多部分。其实片键就是在集合中选一个键，用该键的值作为数据拆分的依据。
+　　所以一个好的片键对分片至关重要。片键必须是一个索引，通过sh.shardCollection加会自动创建索引（前提是此集合不存在的情况下）。一个自增的片键对写入和数据均匀分布就不是很好，因为自增的片键总会在一个分片上写入，后续达到某个阀值可能会写到别的分片。但是按照片键查询会非常高效。
+　　随机片键对数据的均匀分布效果很好。注意尽量避免在多个分片上进行查询。在所有分片上查询，mongos会对结果进行归并排序。
+　　对集合进行分片时，你需要选择一个片键，片键是每条记录都必须包含的，且建立了索引的单个字段或复合字段，MongoDB按照片键将数据划分到不同的数据块中，并将数据块均衡地分布到所有分片中。
+　　为了按照片键划分数据块，MongoDB使用基于范围的分片方式或者 基于哈希的分片方式。
+注意：
+        分片键是不可变。
+        分片键必须有索引。
+        分片键大小限制512bytes。
+        分片键用于路由查询。
+        MongoDB不接受已进行collection级分片的collection上插入无分片
+        键的文档（也不支持空值插入）
+
+
+##
+https://www.cnblogs.com/btgyoyo/p/7156589.html
+MongoDB 中我们经常会接触到一个自动生成的字段："_id"，类型为ObjectId。
+之前我们使用MySQL等关系型数据库时，主键都是设置成自增的。但在分布式环境下，这种方法就不可行了，会产生冲突。为此，mongodb采用了一个称之为ObjectId的类型来做主键。ObjectId是一个12字节的 BSON 类型字符串。按照字节顺序，一次代表：
+4字节：UNIX时间戳 
+3字节：表示运行MongoDB的机器 
+2字节：表示生成此_id的进程 
+3字节：由一个随机数开始的计数器生成的值 
+从ObjectId的构造上来看，内部就嵌入了时间类型。我们肯定可以从中获取时间信息：即插入此文档时的时间
+a = new ObjectId() 
+ObjectId(“53102b43bf1044ed8b0ba36b”) 
+a.getTimestamp() 
+ISODate(“2014-02-28T06:22:59Z”) 
+根据时间构造ObjectId
+ 
+上例是直接使用MongoDB提供的新建方法来构造ObjectId的，我们自己可不可以通过字符串来构造呢？看下例：
+// 使用Date的字符串构造方法生成日期 
+// 然后使用Date对象的getTime获取毫秒数，再除以1000得到标准时间戳
+a = new Date(“2012-12-12 00:00:00”).getTime()/1000 
+1355241600 
+// 获取时间戳的标准十六进制表示 
+a = a.toString(16) 
+50c75880
+ MongoDB默认在ObjectId上建立索引，是按照插入时间排序的。我们可以使用此索引进行查询和排序。
+
+db.col.insert({“num”:1}) 
+db.col.insert({“num”:2}) 
+db.col.insert({“num”:3}) 
+db.col.find().pretty() 
+{ “_id” : ObjectId(“53102fb4bf1044ed8b0ba36c”), “num” : 1 } 
+{ “_id” : ObjectId(“53102fb9bf1044ed8b0ba36d”), “num” : 2 } 
+{ “_id” : ObjectId(“53102fbabf1044ed8b0ba36e”), “num” : 3 }
+
+ 
+// 按照_id升序，即按照插入时间升序
+db.col.find().sort({“_id”:1}).pretty() 
+{ “_id” : ObjectId(“53102fb4bf1044ed8b0ba36c”), “num” : 1 } 
+{ “_id” : ObjectId(“53102fb9bf1044ed8b0ba36d”), “num” : 2 } 
+{ “_id” : ObjectId(“53102fbabf1044ed8b0ba36e”), “num” : 3 }
+ 
+// 按照_id降序，即按照插入时间降序
+db.col.find().sort({“_id”:-1}).pretty() 
+{ “_id” : ObjectId(“53102fbabf1044ed8b0ba36e”), “num” : 3 } 
+{ “_id” : ObjectId(“53102fb9bf1044ed8b0ba36d”), “num” : 2 } 
+{ “_id” : ObjectId(“53102fb4bf1044ed8b0ba36c”), “num” : 1 }
+ 
+// 抽取num = 2的ObjectId用来过滤
+num2 = ObjectId(“53102fb9bf1044ed8b0ba36d”) 
+ObjectId(“53102fb9bf1044ed8b0ba36d”)
+ 
+// 找出插入时间在num2之后的数据
+db.col.find({ “_id”:{$gt:num2}}).pretty() 
+{ “_id” : ObjectId(“53102fbabf1044ed8b0ba36e”), “num” : 3 }
+
+##Mongodb 与 MySQL对比 
+https://www.cnblogs.com/web-fusheng/p/6884759.html
+无论是MongoDB还是MySQL，都存在着主键的定义。
+对于MongoDB来说，其主键名叫”_id”，在生成数据的时候，如果用户不主动为其分配一个主键的话，MongoDB会自动为其生成一个随机分配的值。
+在MySQL中，主键的指定是在MySQL插入数据时指明PRIMARY KEY来定义的。当没有指定主键的时候，另一种工具 —— 索引，相当于替代了主键的功能。索引可以为空，也可以有重复，另外有一种不允许重复的索引叫惟一索引。如果既没有指定主键也没有指定索引的话，MySQL会自动为数据创建一个。
+ 
+1.       数据库的平均插入速率：MongoDB不指定_id插入 > MySQL不指定主键插入 > MySQL指定主键插入 > MongoDB指定_id插入。
+2.       MongoDB在指定_id与不指定_id插入时速度相差很大，而MySQL的差别却小很多。
+ 
+分析：
+1.         在指定_id或主键时，两种数据库在插入时要对索引值进行处理，并查找数据库中是否存在相同的键值，这会减慢插入的速率。
+2.         在MongoDB中，指定索引插入比不指定慢很多，这是因为，MongoDB里每一条数据的_id值都是唯一的。当在不指定_id插入数据的时候，其_id是系统自动计算生成的。MongoDB通过计算机特征值、时间、进程ID与随机数来确保生成的_id是唯一的。而在指定_id插入时，MongoDB每插一条数据，都需要检查此_id可不可用，当数据库中数据条数太多的时候，这一步的查询开销会拖慢整个数据库的插入速度。
+3.         MongoDB会充分使用系统内存作为缓存，这是一种非常优秀的特性。我们的测试机的内存有64G，在插入时，MongoDB会尽可能地在内存快写不进去数据之后，再将数据持久化保存到硬盘上。这也是在不指定_id插入的时候，MongoDB的效率遥遥领先的原因。但在指定_id插入时，当数据量一大内存装不下时，MongoDB就需要将磁盘中的信息读取到内存中来查重，这样一来其插入效率反而慢了。
+4.         MySQL不愧是一种非常稳定的数据库，无论在指定主键还是在不指定主键插入的情况下，其效率都差不了太多。
+ 
+插入稳定性分析
+插入稳定性是指，随着数据量的增大，每插入一定量数据时的插入速率情况。
+在本次测试中，我们把这个指标的规模定在10w，即显示的数据是在每插入10w条数据时，在这段时间内每秒钟能插入多少条数据。
+先呈现四张图上来：
+ 
+1.       MongoDB指定_id插入：
+ 
+ 
+2.       MongoDB不指定_id插入：
+
+ 
+3.       MySQL指定PRIMARY KEY插入：
+
+ 
+4.       MySQL不指定PRIMARY KEY插入：
+
+ 
+总结：
+1.       整体上的插入速度还是和上一回的统计数据类似：MongoDB不指定_id插入 > MySQL不指定主键插入 > MySQL指定主键插入 > MongoDB指定_id插入。
+2.       从图中可以看出，在指定主键插入数据的时候，MySQL与MongoDB在不同数据数量级时，每秒插入的数据每隔一段时间就会有一个波动，在图表中显示成为规律的毛刺现象。而在不指定插入数据时，在大多数情况下插入速率都比较平均，但随着数据库中数据的增多，插入的效率在某一时段有瞬间下降，随即又会变稳定。
+3.       整体上来看，MongoDB的速率波动比MySQL的严重，方差变化较大。
+4.       MongoDB在指定_id插入时，当插入的数据变多之后，插入效率有明显地下降。在其他三种的插入测试中，从开始到结束，其插入的速率在大多数的时候都固定在一个标准上。
+ 
+分析：
+1.       毛刺现象是因为，当插入的数据太多的时候，MongoDB需要将内存中的数据写进硬盘，MySQL需要重新分表。这些操作每当数据库中的数据达到一定量级后就会自动进行，因此每隔一段时间就会有一个明显的毛刺。
+2.       MongoDB毕竟还是新生事物，其稳定性没有已应用多年的MySQL优秀。
+3.       MongoDB在指定_id插入的时候，其性能的下降还是很厉害的。
+1.       在读取的数据规模不大时，MongoDB的查询速度真是一骑绝尘，甩开MySQL好远好远。
+2.       在查询的数据量逐渐增多的时候，MySQL的查询速度是稳步下降的，而MongoDB的查询速度却有些起伏。
+ 
+分析：
+1.       如果MySQL没有经过查询优化的话，其查询速度就不要跟MongoDB比了。MongoDB可以充分利用系统的内存资源，我们的测试机器内存是64GB的，内存越大MongoDB的查询速度就越快，毕竟磁盘与内存的I/O效率不是一个量级的。
+2.       本次实验的查询的数据也是随机生成的，因此所有待查询的数据都存在MongoDB的内存缓存中的概率是很小的。在查询时，MongoDB需要多次将内存中的数据与磁盘进行交互以便查找，因此其查询速率取决于其交互的次数。这样就存在这样一种可能性，尽管待查询的数据数目较多，但这段随机生成的数据被MongoDB以较少的次数从磁盘中取出。因此，其查询的平均速度反而更快一些。这样看来，MongoDB的查询速度波动也处在一个合理的范围内。
+3.       MySQL的稳定性还是毋庸置疑的。
+ 
+结论
+1. 相比较MySQL，MongoDB数据库更适合那些读作业较重的任务模型。MongoDB能充分利用机器的内存资源。如果机器的内存资源丰富的话，MongoDB的查询效率会快很多。
+2. 在带”_id”插入数据的时候，MongoDB的插入效率其实并不高。如果想充分利用MongoDB性能的话，推荐采取不带”_id”的插入方式，然后对相关字段作索引来查询。
+1. MongoDB适合那些对数据库具体数据格式不明确或者数据库数据格式经常变化的需求模型，而且对开发者十分友好。
+2. MongoDB官方就自带一个分布式文件系统，可以很方便地部署到服务器机群上。MongoDB里有一个Shard的概念，就是方便为了服务器分片使用的。每增加一台Shard，MongoDB的插入性能也会以接近倍数的方式增长，磁盘容量也很可以很方便地扩充。
+3. MongoDB还自带了对map-reduce运算框架的支持，这也很方便进行数据的统计。
+ 
+MongoDB的缺陷
+1. 事务关系支持薄弱。这也是所有NoSQL数据库共同的缺陷，不过NoSQL并不是为了事务关系而设计的，具体应用还是很需求。
+2. 稳定性有些欠缺，这点从上面的测试便可以看出。
+3. MongoDB一方面在方便开发者的同时，另一方面对运维人员却提出了相当多的要求。业界并没有成熟的MongoDB运维经验，MongoDB中数据的存放格式也很随意，等等问题都对运维人员的考验。
+
+##详解mongodb——架构模式、持久化原理和数据文件存储原理 值得收藏
+
+https://www.cnblogs.com/web-fusheng/p/6884759.html
+
+
+架构模式
+Replica set：复制集，mongodb的架构方式之一 ，通常是三个对等的节点构成一个“复制集”集群，有“primary”和secondary等多中角色（稍后详细介绍），其中primary负责读写请求，secondary可以负责读请求，这有配置决定，其中secondary紧跟primary并应用write操作；如果primay失效，则集群进行“多数派”选举，选举出新的primary，即failover机制，即HA架构。复制集解决了单点故障问题，也是mongodb垂直扩展的最小部署单位，当然sharding cluster中每个shard节点也可以使用Replica set提高数据可用性。
+
+打开今日头条，查看更多精彩图片
+Sharding cluster：分片集群，数据水平扩展的手段之一；replica set这种架构的缺点就是“集群数据容量”受限于单个节点的磁盘大小，如果数据量不断增加，对它进行扩容将时非常苦难的事情，所以我们需要采用Sharding模式来解决这个问题。将整个collection的数据将根据sharding key被sharding到多个mongod节点上，即每个节点持有collection的一部分数据，这个集群持有全部数据，原则上sharding可以支撑数TB的数据。
+
+系统配置：
+1）建议mongodb部署在linux系统上，较高版本，选择合适的底层文件系统（ext4），开启合适的swap空间
+2）无论是MMAPV1或者wiredTiger引擎，较大的内存总能带来直接收益。
+3）对数据存储文件关闭“atime”（文件每次access都会更改这个时间值，表示文件最近被访问的时间），可以提升文件访问效率。
+4）ulimit参数调整，这个在基于网络IO或者磁盘IO操作的应用中，通常都会调整，上调系统允许打开的文件个数（ulimit -n 65535）。
+
+持久化原理
+持久化为了保证数据永久保存不丢失。MongoDB具有高度可配置的持久化设置，从完全没有任何保证到完全持久化。
+mongodb与mysql不同，mysql的每一次更新操作都会直接写入硬盘，但是mongo不会，做为内存型数据库，数据操作会先写入内存，然后再会持久化到硬盘中去，那么mongo是如何持久化的呢
+mongodb在启动时，专门初始化一个线程不断循环（除非应用crash掉），用于在一定时间周期内来从defer队列中获取要持久化的数据并写入到磁盘的journal(日志)和mongofile(数据)处，当然因为它不是在用户添加记录时就写到磁盘上，所以按mongodb开发者说，它不会造成性能上的损耗，因为看过代码发现，当进行CUD操作时，记录(Record类型)都被放入到defer队列中以供延时批量（groupcommit）提交写入，但相信其中时间周期参数是个要认真考量的参数，系统为90毫秒，如果该值更低的话，可能会造成频繁磁盘操作，过高又会造成系统宕机时数据丢失过。
+数据文件存储原理（Data Files storage，MMAPV1引擎）
+1、Data Files
+mongodb的数据将会保存在底层文件系统中，比如我们dbpath设定为“/data/db”目录，我们创建一个database为“test”，collection为“sample”，然后在此collection中插入数条documents。我们查看dbpath下生成的文件列表
+
+可以看到test这个数据库目前已经有6个数据文件（data files），每个文件以“database”的名字 + 序列数字组成，序列号从0开始，逐个递增，数据文件从16M开始，每次扩张一倍（16M、32M、64M、128M...），在默认情况下单个data file的最大尺寸为2G，如果设置了smallFiles属性（配置文件中）则最大限定为512M；mongodb中每个database最多支持16000个数据文件，即约32T，如果设置了smallFiles则单个database的最大数据量为8T。
+2、Namespace文件
+对于namespace文件，比如“test.ns”文件，默认大小为16M，此文件中主要用于保存“collection”、index的命名信息，比如collection的“属性”信息、每个索引的属性类型等，如果你的database中需要存储大量的collection（比如每一小时生成一个collection，在数据分析应用中），那么我们可以通过配置文件“nsSize”选项来指定
+3、journal文件
+journal日志为mongodb提供了数据保障能力，它本质上与mysql binlog没有太大区别，用于当mongodb异常crash后，重启时进行数据恢复；这归结于mongodb的数据持久写入磁盘是滞后的。默认情况下，“journal”特性是开启的，特别在production环境中，我们没有理由来关闭它。（除非，数据丢失对应用而言，是无关紧要的）
+一个mongodb实例中所有的databases共享journal文件。
+对于write操作而言，首先写入journal日志，然后将数据在内存中修改（mmap），此后后台线程间歇性的将内存中变更的数据flush到底层的data files中，时间间隔为60秒（参见配置项“syncPeriodSecs”）；write操作在journal文件中是有序的，为了提升性能，write将会首先写入journal日志的内存buffer中，当buffer数据达到100M或者每隔100毫秒，buffer中的数据将会flush到磁盘中的journal文件中；如果mongodb异常退出，将可能导致最多100M数据或者最近100ms内的数据丢失，flush磁盘的时间间隔有配置项“commitIntervalMs”决定，默认为100毫秒。mongodb之所以不能对每个write都将journal同步磁盘，这也是对性能的考虑，mysql的binlog也采用了类似的权衡方式。开启journal日志功能，将会导致write性能有所降低，可能降低5~30%，因为它直接加剧了磁盘的写入负载，我们可以将journal日志单独放置在其他磁盘驱动器中来提高写入并发能力（与data files分别使用不同的磁盘驱动器）。
+如果你希望数据尽可能的不丢失，可以考虑：
+1）减小commitIntervalMs的值
+2）每个write指定“write concern”中指定“j”参数为true
+3）最佳手段就是采用“replica set”架构模式，通过数据备份方式解决，同时还需要在“write concern”中指定“w”选项，且保障级别不低于“majority”。
+
+mongodb现在应用很广，还是很有用的，例如我们生产环境就是用5台服务器专门去做mongodb分片集群，对mongodb有兴趣的朋友可以多了解下这方面。
+
+
+##mongodb系列之-解读journal
+https://blog.csdn.net/t594362122/article/details/52813272
+
+   mongodb的journal，简单来说就是用于数据故障恢复和持久化数据的，它以日志方式来记录。从1.8版本开始有此功能，2.0开始默认打开此功能，但32位的系统是默认关闭的。
+    journal除了故障恢复的作用之外，还可以提高写入的性能，批量提交（batch-commit），journal一般默认100ms刷新一次，在这个过程中，所有的写入都可以一次提交，是单事务的，全部成功或者全部失败，刷新时间，可以更改，范围是2-300ms。
+       当系统非正常情况下突然挂掉，再次启动时候mongodb就会从journal日志中恢复数据，而确保数据不丢失，最多丢失ms级别的数据（个人臆想）
+
+  使用db.serverStatus（）可以查看状态：
+dur:{
+		commits:30,
+		journaledMB:0.270336,
+		writeToDataFilesMB:0.329578,
+		compression:0.7986268873651776,
+		commotsInWriteLock:0,
+		earlyCommits:0,
+		timeMs:{
+			dt:3077,
+			prepLogBuffer:0,
+			writeToJournal:4,
+			writeToDataFiles:3,
+			remapPrivateView:3
+		}
+}
+ 
+dur.timeMS.prepLogBuffer：从privateView映射到Logbuffer的时间。
+dur.timeMS.writeToJournal：从logbuffer刷新到journalfile 的时间。
+dur.timeMS.writeToDataFiles：从journalbuffer映射到MMF，然后从MMF刷新到磁盘的时间，文件系统和磁盘会影响写入性能。 
+dur.timeMS.remapPrivateView：重新映射数据到PrivateView的时间，越小性能越好。
+所以说开启journal后会使用更多内存，因为journal会另外使用一块内存区域（即：PrivateView）

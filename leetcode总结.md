@@ -3,6 +3,10 @@ leetcode总结：leetcode的资料在网上已较多，这里对各个算法进�
 
 #贪心
 ##[盛最多水的容器](https://leetcode-cn.com/problems/container-with-most-water)
+给你 n 个非负整数 a1，a2，...，an，每个数代表坐标中的一个点 (i, ai) 。在坐标内画 n 条垂直线，垂直线 i 的两个端点分别为 (i, ai) 和 (i, 0)。找出其中的两条线，使得它们与 x 轴共同构成的容器可以容纳最多的水。
+
+说明：你不能倾斜容器，且 n 的值至少为 2。
+
 矮边是乘积的成员，而宽度是一直减少的，贪心移动矮边
 
 class Solution {
@@ -12,7 +16,7 @@ public:
         int nMax = 0;
         while(left<right){
             nMax = max(nMax, min(height[left], height[right])*(right-left));
-            if(height[left]<height[right])left++;
+            if(height[left] < height[right])left++;
             else right--;
         }
         return nMax;
@@ -44,7 +48,21 @@ public:
     }
 };
 
-##[最接近的三数之和](https://leetcode-cn.com/problems/3sum-closest)    
+##[最接近的三数之和](https://leetcode-cn.com/problems/3sum-closest)   
+
+给定一个包括 n 个整数的数组 nums 和 一个目标值 target。找出 nums 中的三个整数，使得它们的和与 target 最接近。返回这三个数的和。假定每组输入只存在唯一答案。
+
+示例：
+输入：nums = [-1,2,1,-4], target = 1
+输出：2
+解释：与 target 最接近的和是 2 (-1 + 2 + 1 = 2) 。
+
+提示：
+	3 <= nums.length <= 10^3
+	-10^3 <= nums[i] <= 10^3
+	-10^4 <= target <= 10^4
+
+ 
 class Solution {
 public:
     int threeSumClosest(vector<int>& nums, int target)
@@ -72,6 +90,46 @@ public:
         return res;
     }
 };
+
+class Solution {
+public:
+    int threeSumClosest(vector<int>& nums, int target) 
+    {
+        if (nums.size() < 3)return 0;
+        sort(nums.begin(),nums.end());
+        int res(0),diff(INT_MAX);
+        for(int i = 0;i < nums.size()-2;++i)
+        {
+            int left = i + 1,right = nums.size()-1;
+            while(left < right)
+            {
+                int s = nums[i] + nums[left] + nums[right];
+                if (s == target)return s;
+                int d = abs(target - s);
+                if (d < diff)
+                {
+                    res = s;
+                    diff = d;
+                }
+                if (s < target)
+                {
+                    ++left;
+                    while (left < right && nums[left] == nums[left - 1])++left; 
+                }
+                else 
+                {
+                    --right;
+                    while (left < right && nums[right] == nums[right + 1])--right; 
+                }
+            }
+        }
+        return res;
+    }
+};
+
+第二种性能要优化一些
+第一种 24 ms9.4 MB Cpp
+第二种 12 ms10.2 MBCpp
 
 ##[搜索二维矩阵 II](https://leetcode-cn.com/problems/search-a-2d-matrix-ii)
 class Solution {
@@ -852,23 +910,33 @@ public:
 
 ##[三数之和](https://leetcode-cn.com/problems/3sum)    
 
+给你一个包含 n 个整数的数组 nums，判断 nums 中是否存在三个元素 a，b，c ，使得 a + b + c = 0 ？请你找出所有满足条件且不重复的三元组。
+注意：答案中不可以包含重复的三元组。
+
+示例：
+给定数组 nums = [-1, 0, 1, 2, -1, -4]，
+满足要求的三元组集合为：
+[
+  [-1, 0, 1],
+  [-1, -1, 2]
+]
+
 class Solution {
 public:
     vector<vector<int>> threeSum(vector<int>& nums) {
-        if (nums.size() == 0) return {};
+        if (nums.size() < 3) return {};
         sort(nums.begin(), nums.end());
         unordered_map<int,int> map;
         for (int i = 0; i < nums.size(); i++) {
             map[nums[i]] = i;
         }
         vector<vector<int> > ret;
-        for (int i = 0; i < nums.size() - 2; i++) {
-            if (nums[i] > 0) return ret;
-            if (i > 0 && nums[i] == nums[i-1]) continue;
-            for (int j = i + 1; j < nums.size() - 1; j++) {
-                if (j > i + 1 && nums[j]==nums[j-1]) continue;
+        for (int i = 0; i < nums.size() - 2 && nums[i] <= 0; i++) {//第一个数
+            if (i > 0 && nums[i] == nums[i-1]) continue;//去重
+            for (int j = i + 1; j < nums.size() - 1; j++) {//第二个数
+                if (j > i + 1 && nums[j] == nums[j-1]) continue;//去重
                 int third = -(nums[i] + nums[j]);
-                auto it = map.find(third);
+                auto it = map.find(third);//有第三个数，且在后面
                 if (it != map.end() && it->second > j) {
                     vector<int> r = {nums[i],nums[j],third};
                     ret.push_back(r);
@@ -878,6 +946,52 @@ public:
         return ret;
     }
 };
+
+class Solution {
+public:
+    vector<vector<int>> threeSum(vector<int>& nums) {
+            if (nums.size() < 3) return {};
+            sort(nums.begin(), nums.end());
+            vector<vector<int> > ret;
+            int n = nums.size();
+            for (int i = 0; i < n - 2 && nums[i] <= 0; i++) {//第一个数
+                if (i > 0 && nums[i] == nums[i-1]) continue;//去重，第一个不跟上次相同
+                int L = i + 1;
+                int R = n - 1;
+                while(L < R)
+                {
+                    if(nums[i]+nums[L]+nums[R]==0)
+                    {
+                        ret.push_back({nums[i],nums[L],nums[R]});
+                        ++L;
+                        while(L<R && nums[L]==nums[L-1])//去重，第二个不跟上次相同
+                        {
+                        	++L;
+                        }
+                        --R;
+                        while(L<R && nums[R]==nums[R+1])//去重，第三个不跟上次相同
+                        {
+                        	--R;
+                        }
+                    }
+                    else if(nums[i]+nums[L]+nums[R]>0)
+                    {
+                        --R;
+                    }
+                    else
+                    {
+                        ++L;
+                    }
+                }
+            }
+            return ret;
+        }
+};
+
+第二种方案要优于第一种，减少了构造哈希map和查询哈希map的过程。
+第一种 468 ms 21.4 MB Cpp
+第二种 156 ms 19.6 MB Cpp
+
 
 ##[四数之和](https://leetcode-cn.com/problems/4sum)  
 
@@ -3101,7 +3215,18 @@ public:
 };
 
 ##[两数相加](https://leetcode-cn.com/problems/add-two-numbers)    
- 
+给出两个 非空 的链表用来表示两个非负的整数。其中，它们各自的位数是按照 逆序 的方式存储的，并且它们的每个节点只能存储 一位 数字。
+
+如果，我们将这两个数相加起来，则会返回一个新的链表来表示它们的和。
+
+您可以假设除了数字 0 之外，这两个数都不会以 0 开头。
+
+示例：
+
+输入：(2 -> 4 -> 3) + (5 -> 6 -> 4)
+输出：7 -> 0 -> 8
+原因：342 + 465 = 807
+
 class Solution {
 public:
     ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) 
@@ -4089,6 +4214,22 @@ public:
 };
 
 ##[整数反转](https://leetcode-cn.com/problems/reverse-integer)    
+给出一个 32 位的有符号整数，你需要将这个整数中每位上的数字进行反转。
+示例 1:
+输入: 123
+输出: 321
+
+ 示例 2:
+输入: -123
+输出: -321
+
+示例 3:
+输入: 120
+输出: 21
+
+注意:
+假设我们的环境只能存储得下 32 位的有符号整数，则其数值范围为 [−231,  231 − 1]。请根据这个假设，如果反转后整数溢出那么就返回 0。
+
 class Solution {
 public:
     int reverse(int x) {
@@ -4103,6 +4244,49 @@ public:
 };
 
 ##[字符串转换整数 (atoi)](https://leetcode-cn.com/problems/string-to-integer-atoi)    
+请你来实现一个 atoi 函数，使其能将字符串转换成整数。
+首先，该函数会根据需要丢弃无用的开头空格字符，直到寻找到第一个非空格的字符为止。接下来的转化规则如下：
+	如果第一个非空字符为正或者负号时，则将该符号与之后面尽可能多的连续数字字符组合起来，形成一个有符号整数。
+	假如第一个非空字符是数字，则直接将其与之后连续的数字字符组合起来，形成一个整数。
+	该字符串在有效的整数部分之后也可能会存在多余的字符，那么这些字符可以被忽略，它们对函数不应该造成影响。
+
+注意：假如该字符串中的第一个非空格字符不是一个有效整数字符、字符串为空或字符串仅包含空白字符时，则你的函数不需要进行转换，即无法进行有效转换。
+在任何情况下，若函数不能进行有效的转换时，请返回 0 。
+提示：
+	本题中的空白字符只包括空格字符 ' ' 。
+	假设我们的环境只能存储 32 位大小的有符号整数，那么其数值范围为 [−231,  231 − 1]。如果数值超过这个范围，请返回  INT_MAX (231 − 1) 或 INT_MIN (−231) 。
+
+示例 1:
+输入: "42"
+输出: 42
+
+
+示例 2:
+输入: "   -42"
+输出: -42
+解释: 第一个非空白字符为 '-', 它是一个负号。
+     我们尽可能将负号与后面所有连续出现的数字组合起来，最后得到 -42 。
+
+
+示例 3:
+输入: "4193 with words"
+输出: 4193
+解释: 转换截止于数字 '3' ，因为它的下一个字符不为数字。
+
+
+示例 4:
+输入: "words and 987"
+输出: 0
+解释: 第一个非空字符是 'w', 但它不是数字或正、负号。
+     因此无法执行有效的转换。
+
+示例 5:
+
+输入: "-91283472332"
+输出: -2147483648
+解释: 数字 "-91283472332" 超过 32 位有符号整数范围。 
+     因此返回 INT_MIN (−231) 。
+
 class Solution {
 public:
     int myAtoi(string str) 
@@ -4157,6 +4341,28 @@ public:
 };
 
 ##[回文数](https://leetcode-cn.com/problems/palindrome-number)    
+判断一个整数是否是回文数。回文数是指正序（从左向右）和倒序（从右向左）读都是一样的整数。
+
+示例 1:
+输入: 121
+输出: true
+
+
+示例 2:
+输入: -121
+输出: false
+解释: 从左向右读, 为 -121 。 从右向左读, 为 121- 。因此它不是一个回文数。
+
+
+示例 3:
+输入: 10
+输出: false
+解释: 从右向左读, 为 01 。因此它不是一个回文数。
+
+
+进阶:
+你能不将整数转为字符串来解决这个问题吗？
+
 class Solution {
 public:
     bool isPalindrome(int x) 
@@ -4280,7 +4486,75 @@ public:
 ##[猜数字大小 II](https://leetcode-cn.com/problems/guess-number-higher-or-lower-ii)    
  
 ##[寻找两个有序数组的中位数](https://leetcode-cn.com/problems/median-of-two-sorted-arrays)    
- 
+给定两个大小为 m 和 n 的正序（从小到大）数组 nums1 和 nums2。
+请你找出这两个正序数组的中位数，并且要求算法的时间复杂度为 O(log(m + n))。
+你可以假设 nums1 和 nums2 不会同时为空。
+
+示例 1:
+nums1 = [1, 3]
+nums2 = [2]
+则中位数是 2.0
+
+
+示例 2:
+nums1 = [1, 2]
+nums2 = [3, 4]
+则中位数是 (2 + 3)/2 = 2.5
+
+class Solution {
+public:
+    double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) 
+    {
+        if (nums1.size() == 0 && nums2.size() == 0)return 0.0;
+        vector<int> total;
+        int i = 0,j = 0;
+        while (i < nums1.size() && j < nums2.size())//遍历了一边nums1和nums2，复杂度为m + n
+        {
+            if (nums1[i] < nums2[j])total.emplace_back(nums1[i++]);
+            else total.emplace_back(nums2[j++]);
+        }
+        for(;j < nums2.size();++j)total.emplace_back(nums2[j]);
+        for(;i < nums1.size();++i)total.emplace_back(nums1[i]);
+        if (total.size() % 2 == 1)//奇数个
+        {
+            return total[total.size() / 2];
+        }
+        //偶数个
+        return (double)((double) total[total.size() / 2] + (double)total[(total.size() / 2) -1])/2;
+    }
+};
+
+class Solution {
+public:
+	double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {
+		int n = nums1.size();
+		int m = nums2.size();
+		if (n > m)  //保证数组1一定最短
+		{
+			return findMedianSortedArrays(nums2, nums1);
+		}
+		// Ci 为第i个数组的割,比如C1为2时表示第1个数组只有2个元素。LMaxi为第i个数组割后的左元素。RMini为第i个数组割后的右元素。
+		int LMax1, LMax2, RMin1, RMin2, c1, c2, lo = 0, hi = 2 * n;  //我们目前是虚拟加了'#'所以数组1是2*n长度
+		while (lo <= hi)   //二分
+		{
+			c1 = (lo + hi) / 2;  //c1是二分的结果
+			c2 = m + n - c1;
+			LMax1 = (c1 == 0) ? INT_MIN : nums1[(c1 - 1) / 2];
+			RMin1 = (c1 == 2 * n) ? INT_MAX : nums1[c1 / 2];
+			LMax2 = (c2 == 0) ? INT_MIN : nums2[(c2 - 1) / 2];
+			RMin2 = (c2 == 2 * m) ? INT_MAX : nums2[c2 / 2];
+			if (LMax1 > RMin2)
+				hi = c1 - 1;
+			else if (LMax2 > RMin1)
+				lo = c1 + 1;
+			else
+				break;
+		}
+		return (max(LMax1, LMax2) + min(RMin1, RMin2)) / 2.0;
+	}
+};
+
+
 ##[汉明距离](https://leetcode-cn.com/problems/hamming-distance)    
  
 ##[第三大的数](https://leetcode-cn.com/problems/third-maximum-number)    
@@ -4634,7 +4908,24 @@ public:
 ##[汇总区间](https://leetcode-cn.com/problems/summary-ranges)    
  
 ##[最长公共前缀](https://leetcode-cn.com/problems/longest-common-prefix)    
- 
+编写一个函数来查找字符串数组中的最长公共前缀。
+
+如果不存在公共前缀，返回空字符串 ""。
+
+示例 1:
+输入: ["flower","flow","flight"]
+输出: "fl"
+
+
+示例 2:
+输入: ["dog","racecar","car"]
+输出: ""
+解释: 输入不存在公共前缀。
+
+
+说明:
+所有输入只包含小写字母 a-z 。
+
 跟第一个比较
 class Solution {
 public:
@@ -5789,7 +6080,16 @@ continue;//同样的字符前面访问过的就不再访问，因为没意义
 };
  
 ##[最长回文子串](https://leetcode-cn.com/problems/longest-palindromic-substring)    
- 
+给定一个字符串 s，找到 s 中最长的回文子串。你可以假设 s 的最大长度为 1000。
+示例 1：
+输入: "babad"
+输出: "bab"
+注意: "aba" 也是一个有效答案。
+
+示例 2：
+输入: "cbbd"
+输出: "bb"
+
 class Solution {
 public:
     int begin = 0;int maxLen = 0;
@@ -5813,7 +6113,44 @@ public:
         }
     }
 };
- 
+
+复杂度 O(N * N)
+
+拓展一下：
+https://leetcode-cn.com/problems/longest-palindromic-substring/solution/zhong-xin-kuo-san-dong-tai-gui-hua-by-liweiwei1419/
+
+dp的做法，但是性能不很好
+class Solution {
+public:
+    string longestPalindrome(string s) {        //动态规划
+        int n = s.size();
+	    if (n < 2)  return s;         //字符串只有一个字符，直接返回
+	    int maxL = 1, begin = 0, l, r,i;//maxL记录LPS的长度，begin记录LPS在字符串中的起始位置,l,r分别为左右指针
+	    vector<vector<bool>> dp(n,vector<bool>(n,true));    //构造bool型二维向量,dp表
+	    for (r = 1; r < n; r++) {       
+		    for (l = 0; l < r; l++)
+		    {
+			    if (s[l] != s[r])//子串首尾字符不相同，直接为false
+			    	dp[l][r] = false;
+			    else if (r - l < 3)//字串首尾相同，若长度小于3，直接为true，否则利用状态转移方程
+				    dp[l][r] = true;
+			    else
+			    	dp[l][r] =  dp[l + 1][r - 1];
+			    if (dp[l][r] && (r - l + 1 > maxL)) {//如果是回文字符串且长度大于已知回文子串长度，那么进行更新
+			    	maxL = r - l + 1;
+			    	begin = l;
+			    }              
+		    }
+	    }
+	    return s.substr(begin, maxL);
+    }
+};
+
+第一种做法
+通过  56 ms   6.8 MB  Cpp
+第二种做法
+通过  1200 ms 16.8 MB  Cpp
+
 ##[反转字符串](https://leetcode-cn.com/problems/reverse-string)    
  
 class Solution {
@@ -7760,3 +8097,6 @@ awk '{for (i = 1;i <= NF;++i) { if (NR == 1) s[i] = $i; else s[i] = s[i] " " $i;
 ##[第十行](https://leetcode-cn.com/problems/tenth-line/)  
 
 awk 'NR == 10' file.txt
+
+#腾讯
+https://leetcode-cn.com/problemset/50/

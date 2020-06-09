@@ -1,8 +1,54 @@
-#隔离级别
+##隔离级别
 事务的四种隔离级别
 https://www.cnblogs.com/catmelo/p/8878961.html
 
-#mysql
+在数据库操作中，为了有效保证并发读取数据的正确性，提出的事务隔离级别。我们的数据库锁，也是为了构建这些隔离级别存在的。
+隔离级别
+ 
+ 
+隔离级别 脏读（Dirty Read）不可重复读（NonRepeatable Read）幻读（Phantom Read）
+未提交读（Read uncommitted）可能 可能 可能
+已提交读（Read committed）不可能 可能 可能
+可重复读（Repeatable read）不可能 不可能 可能
+可串行化（Serializable ）不可能 不可能 不可能
+
+未提交读(Read Uncommitted)：允许脏读，也就是可能读取到其他会话中未提交事务修改的数据
+提交读(Read Committed)：只能读取到已经提交的数据。Oracle等多数数据库默认都是该级别 (不重复读)
+可重复读(Repeated Read)：可重复读。在同一个事务内的查询都是事务开始时刻一致的，InnoDB默认级别。在SQL标准中，该隔离级别消除了不可重复读，但是还存在幻象读
+串行读(Serializable)：完全串行化的读，每次读都需要获得表级共享锁，读写相互都会阻塞
+
+可重复读和幻读
+在可重复读中，该sql第一次读取到数据后，就将这些数据加锁（悲观锁），其它事务无法修改这些数据，就可以实现可重复读了。但这种方法却无法锁住insert的数据，所以当事务A先前读取了数据，或者修改了全部数据，事务B还是可以insert数据提交，这时事务A就会发现莫名其妙多了一条之前没有的数据，这就是幻读，不能通过行锁来避免。需要Serializable隔离级别 ，读用读锁，写用写锁，读锁和写锁互斥，这么做可以有效的避免幻读、不可重复读、脏读等问题，但会极大的降低数据库的并发能力。
+但是MySQL、ORACLE、PostgreSQL等成熟的数据库，出于性能考虑，都是使用了以乐观锁为理论基础的MVCC（多版本并发控制）来实现。
+
+##MySQL日志系统：redo log、binlog、undo log 区别与作用
+https://blog.csdn.net/u010002184/article/details/88526708
+
+一、重做日志（redo log）
+作用：
+确保事务的持久性。防止在发生故障的时间点，尚有脏页未写入磁盘，在重启mysql服务的时候，根据redo log进行重做，从而达到事务的持久性这一特性。
+二、回滚日志（undo log）
+作用：
+保存了事务发生之前的数据的一个版本，可以用于回滚，同时可以提供多版本并发控制下的读（MVCC），也即非锁定读
+三、二进制日志（binlog）：
+作用：
+用于复制，在主从复制中，从库利用主库上的binlog进行重播，实现主从同步。 
+用于数据库的基于时间点的还原。
+
+梳理下事务执行的各个阶段：
+（1）写undo日志到log buffer；
+（2）执行事务，并写redo日志到log buffer；
+（3）如果innodb_flush_log_at_trx_commit=1，则将redo日志写到log file，并刷新落盘。
+（4）提交事务。
+可能有同学会问，为什么没有写data file，事务就提交了？
+在数据库的世界里，数据从来都不重要，日志才是最重要的，有了日志就有了一切。
+因为data buffer中的数据会在合适的时间 由存储引擎写入到data file，如果在写入之前，数据库宕机了，根据落盘的redo日志，完全可以将事务更改的数据恢复。好了，看出日志的重要性了吧。先持久化日志的策略叫做Write Ahead Log，即预写日志。
+分析几种异常情况：
+innodb_flush_log_at_trx_commit=2（innodb_flush_log_at_trx_commit和sync_binlog参数详解）时，将redo日志写入logfile后，为提升事务执行的性能，存储引擎并没有调用文件系统的sync操作，将日志落盘。如果此时宕机了，那么未落盘redo日志事务的数据是无法保证一致性的。
+undo日志同样存在未落盘的情况，可能出现无法回滚的情况。
+checkpoint：
+checkpoint是为了定期将db buffer的内容刷新到data file。当遇到内存不足、db buffer已满等情况时，需要将db buffer中的内容/部分内容（特别是脏数据）转储到data file中。在转储时，会记录checkpoint发生的”时刻“。在故障回复时候，只需要redo/undo最近的一次checkpoint之后的操作。
+
 ##Mysql乐观锁实现
 https://blog.csdn.net/lp2388163/article/details/80683383
 Mysql锁机制--乐观锁 & 悲观锁
@@ -114,9 +160,7 @@ Redo介绍:
 
 4. 聚簇索引/二级索引/Undo页面修改，均需要记录Redo日志;
 
-为了管理脏页，在 Buffer Pool 的每个instance上都维持了一个flush list，flush list 上的 page 按照修改这些page 的LSN号进行排序。因此定期做redo checkpoint点时，选择的 LSN 总是所有 bp instance 的 flush list 上最老的那个page（拥有最小的LSN）。由于采用WAL的
-
-策略，每次事务提交时需要持久化 redo log 才能保证事务不丢。而延迟刷脏页则起到了合并多次修改的效果，避免频繁写数据文件造成的性能问题。
+为了管理脏页，在 Buffer Pool 的每个instance上都维持了一个flush list，flush list 上的 page 按照修改这些page 的LSN号进行排序。因此定期做redo checkpoint点时，选择的 LSN 总是所有 bp instance 的 flush list 上最老的那个page（拥有最小的LSN）。由于采用WAL的策略，每次事务提交时需要持久化 redo log 才能保证事务不丢。而延迟刷脏页则起到了合并多次修改的效果，避免频繁写数据文件造成的性能问题。
 
 REDO的作用:提高性能和做crash recovery
 
