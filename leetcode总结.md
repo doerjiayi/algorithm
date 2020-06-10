@@ -179,7 +179,21 @@ public:
         return res;
     }
 };
-##[最大子序和](https://leetcode-cn.com/problems/maximum-subarray)    
+##[最大子序和](https://leetcode-cn.com/problems/maximum-subarray)  
+
+给定一个整数数组 nums ，找到一个具有最大和的连续子数组（子数组最少包含一个元素），返回其最大和。
+
+示例:
+输入: [-2,1,-3,4,-1,2,1,-5,4],
+输出: 6
+解释: 连续子数组 [4,-1,2,1] 的和最大，为 6。
+
+
+进阶:
+如果你已经实现复杂度为 O(n) 的解法，尝试使用更为精妙的分治法求解。
+
+贪心算法
+
 class Solution {
 public:
     int maxSubArray(vector<int>& nums)
@@ -190,11 +204,35 @@ public:
         {
             sum += n;
             res = max(res,sum);//贪心
-            if (sum < 0)sum = 0;//断开不需要的
+            if (sum < 0)sum = 0;//小于0的就不需要了，可以去掉
         }
         return res;
     }
 };
+通过 4 ms 7.1 MB Cpp
+
+dp算法
+class Solution
+{
+public:
+    int maxSubArray(vector<int> &nums)
+    {
+        int numsSize = int(nums.size());
+        if (numsSize == 0)return 0;
+        //因为只需要知道dp的前一项，可以用int代替一维数组
+        int dp(nums[0]),result = dp;
+        for (int i = 1; i < numsSize; i++)
+        {
+            dp = max(dp + nums[i], nums[i]);
+            result = max(result, dp);
+        }
+        return result;
+    }
+};
+
+通过 4 ms 6.9 MB Cpp
+
+贪心算法看上去更简洁一点
 
 #分治
 ##[单词拆分 II](https://leetcode-cn.com/problems/word-break-ii)    
@@ -283,6 +321,22 @@ public:
 #dfs
 （排列）结束的条件为遍历的长度
 ##[全排列](https://leetcode-cn.com/problems/permutations)  
+
+给定一个 没有重复 数字的序列，返回其所有可能的全排列。
+
+示例:
+
+输入: [1,2,3]
+输出:
+[
+  [1,2,3],
+  [1,3,2],
+  [2,1,3],
+  [2,3,1],
+  [3,1,2],
+  [3,2,1]
+]
+
 选择一个，递归，恢复原来，不需要检查去重
 class Solution {
 public:
@@ -358,7 +412,27 @@ public:
         }
     }
 };
-##[子集](https://leetcode-cn.com/problems/subsets)    
+##[子集](https://leetcode-cn.com/problems/subsets)   
+
+给定一组不含重复元素的整数数组 nums，返回该数组所有可能的子集（幂集）。
+
+说明：解集不能包含重复的子集。
+
+示例:
+
+输入: nums = [1,2,3]
+输出:
+[
+  [3],
+  [1],
+  [2],
+  [1,2,3],
+  [1,3],
+  [2,3],
+  [1,2],
+  []
+]
+
 dfs，选择或者不选择，没去重
 class Solution {
 public:
@@ -1227,14 +1301,36 @@ public:
 
 ##[爬楼梯](https://leetcode-cn.com/problems/climbing-stairs)    
 
+假设你正在爬楼梯。需要 n 阶你才能到达楼顶。
+
+每次你可以爬 1 或 2 个台阶。你有多少种不同的方法可以爬到楼顶呢？
+
+注意：给定 n 是一个正整数。
+
+示例 1：
+
+输入： 2
+输出： 2
+解释： 有两种方法可以爬到楼顶。
+1.  1 阶 + 1 阶
+2.  2 阶
+
+示例 2：
+
+输入： 3
+输出： 3
+解释： 有三种方法可以爬到楼顶。
+1.  1 阶 + 1 阶 + 1 阶
+2.  1 阶 + 2 阶
+3.  2 阶 + 1 阶
+
 class Solution {
 public:
     int climbStairs(int n) {
         if (n <= 2)return n;
-        int vec[3];
-        vec[0] = 1;vec[1] = 2;//初始化值（n 为1和2 ）
+        int vec[3] = {1,2,0};//初始化值（n 为1和2 ）
         for(int i=3; i<=n; i++)//计算 n -2 次
-        {//地推公式为： vec[n] = vec[n-1] + vec[n-2]
+        {//递推公式为： vec[n] = vec[n-1] + vec[n-2]
             vec[2] = vec[0]+vec[1];
             vec[0] = vec[1];//移动变量
             vec[1] = vec[2];
@@ -1307,6 +1403,46 @@ public:
 };
 
 ##[格雷编码](https://leetcode-cn.com/problems/gray-code)
+
+格雷编码是一个二进制数字系统，在该系统中，两个连续的数值仅有一个位数的差异。
+
+给定一个代表编码总位数的非负整数 n，打印其格雷编码序列。即使有多个不同答案，你也只需要返回其中一种。
+
+格雷编码序列必须以 0 开头。
+
+ 
+
+示例 1:
+
+输入: 2
+输出: [0,1,3,2]
+解释:
+00 - 0
+01 - 1
+11 - 3
+10 - 2
+
+对于给定的 n，其格雷编码序列并不唯一。
+例如，[0,2,3,1] 也是一个有效的格雷编码序列。
+
+00 - 0
+10 - 2
+11 - 3
+01 - 1
+
+示例 2:
+
+输入: 0
+输出: [0]
+解释: 我们定义格雷编码序列必须以 0 开头。
+     给定编码总位数为 n 的格雷编码序列，其长度为 2n。当 n = 0 时，长度为 20 = 1。
+     因此，当 n = 0 时，其格雷编码序列为 [0]。
+
+初始为一个0，在之前数字的基础上，从后往前遍历，在高位加1位处理，则每次跟之前只会相差一位，例如
+00 - 0
+01 - 1
+11 - 3
+10 - 2
 
 class Solution {
 public:
@@ -1421,20 +1557,43 @@ public:
     }
 };
 ##[不同路径](https://leetcode-cn.com/problems/unique-paths)    
+一个机器人位于一个 m x n 网格的左上角 （起始点在下图中标记为“Start” ）。
+机器人每次只能向下或者向右移动一步。机器人试图达到网格的右下角（在下图中标记为“Finish”）。
+
+问总共有多少条不同的路径？
+例如，上图是一个7 x 3 的网格。有多少可能的路径？
+
+示例 1:
+
+输入: m = 3, n = 2
+输出: 3
+解释:
+从左上角开始，总共有 3 条路径可以到达右下角。
+1. 向右 -> 向右 -> 向下
+2. 向右 -> 向下 -> 向右
+3. 向下 -> 向右 -> 向右
+
+示例 2:
+输入: m = 7, n = 3
+输出: 28
+
+提示：
+	1 <= m, n <= 100
+	题目数据保证答案小于等于 2 * 10 ^ 9
 
 class Solution {
 public:
-    int uniquePaths(int m, int n) {
-        vector<vector<int>> array(m,vector<int>(n,1));  
-        for(int i=1; i<m;i++)//直接从第二行、第二列开始计算
-        {  
-            for(int j=1;j<n;j++)
-            {  
-                array[i][j]=array[i-1][j]+array[i][j-1];  //dp,每个格子来源于左边和上边的格子之和
-            }  
-        }  
-        return array[m-1][n-1];  
-    }
+    int uniquePaths(int m, int n) {
+        vector<vector<int>> dp(m,vector<int>(n,1));  
+        for(int i=1; i<m;i++)//直接从第二行、第二列开始计算
+        {  
+            for(int j=1;j<n;j++)
+            {  
+                dp[i][j]=dp[i-1][j]+dp[i][j-1];  //dp,每个格子来源于左边和上边的格子之和
+            }  
+        }  
+        return dp[m-1][n-1];  
+    }
 };
 
 ##[不同路径 II](https://leetcode-cn.com/problems/unique-paths-ii)    
@@ -2853,7 +3012,29 @@ public:
 };
  
 ##[旋转链表](https://leetcode-cn.com/problems/rotate-list)    
- 
+
+给定一个链表，旋转链表，将链表每个节点向右移动 k 个位置，其中 k 是非负数。
+
+示例 1:
+
+输入: 1->2->3->4->5->NULL, k = 2
+输出: 4->5->1->2->3->NULL
+解释:
+向右旋转 1 步: 5->1->2->3->4->NULL
+向右旋转 2 步: 4->5->1->2->3->NULL
+
+
+示例 2:
+
+输入: 0->1->2->NULL, k = 4
+输出: 2->0->1->NULL
+解释:
+向右旋转 1 步: 2->0->1->NULL
+向右旋转 2 步: 1->2->0->NULL
+向右旋转 3 步: 0->1->2->NULL
+向右旋转 4 步: 2->0->1->NULL
+
+
 连成一圈再断开，注意计算断开位置
 class Solution {
 public:
@@ -2862,7 +3043,7 @@ public:
 		// 获取长度和末尾节点tail
 		int len = 1;
 		ListNode* tail = head;
-		while (tail->next && len++) tail = tail->next;
+		while (tail->next) {tail = tail->next;len++;}
 		if (k % len == 0) return head;
 		// 找到倒数第k%len(也是断开节点的)的前一个节点
 		int pos = len - k % len;
@@ -5273,6 +5454,18 @@ public:
 };
  
 ##[合并两个有序数组](https://leetcode-cn.com/problems/merge-sorted-array)    
+给你两个有序整数数组 nums1 和 nums2，请你将 nums2 合并到 nums1 中，使 nums1 成为一个有序数组。
+
+说明:
+	初始化 nums1 和 nums2 的元素数量分别为 m 和 n 。
+	你可以假设 nums1 有足够的空间（空间大小大于或等于 m + n）来保存 nums2 中的元素。
+
+示例:
+输入:
+nums1 = [1,2,3,0,0,0], m = 3
+nums2 = [2,5,6],       n = 3
+
+输出: [1,2,2,3,5,6]
  
 class Solution {
 public:
@@ -5291,7 +5484,6 @@ public:
                 nums1[k--] = nums2[j--];
             }
         }
-        while(i >= 0)nums1[k--] = nums1[i--];
         while(j >= 0)nums1[k--] = nums2[j--];
     }
 };
@@ -5319,41 +5511,75 @@ public:
 };
  
 ##[螺旋矩阵](https://leetcode-cn.com/problems/spiral-matrix)    
- 
-注意边界条件
+
+给定一个包含 m x n 个元素的矩阵（m 行, n 列），请按照顺时针螺旋顺序，返回矩阵中的所有元素。
+
+示例 1:
+
+输入:
+[
+ [ 1, 2, 3 ],
+ [ 4, 5, 6 ],
+ [ 7, 8, 9 ]
+]
+输出: [1,2,3,6,9,8,7,4,5]
+
+
+示例 2:
+
+输入:
+[
+  [1, 2, 3, 4],
+  [5, 6, 7, 8],
+  [9,10,11,12]
+]
+输出: [1,2,3,4,8,12,11,10,9,5,6,7]
+
+考察理解行和列的边界条件
+
 class Solution {
 public:
-    vector<int> spiralOrder(vector<vector<int>>& matrix) {
-       if (matrix.size() == 0)return {};
-        vector<int> ret;
-        int row = matrix.size() - 1;
-        int col = matrix[0].size() - 1;
-        for (int x = 0, y = 0; x <= row && y <= col; x++, y++,row--,col--)
-        {
-            for(int j=y ; j<=col ; ++j)//首行
-            {
-                ret.push_back(matrix[x][j]);
-            }
-            for (int i = x + 1; i <= row; ++i)//最右列(上到下，需要跳过第一个)
-            {
-                ret.push_back(matrix[i][col]);
-            }
-            for (int j = col - 1; j >= y && x != row;
---j)//最底行(右到左，需要跳过第一个，判断重复行)
-            {
-                ret.push_back(matrix[row][j]);
-            }
-            for (int i = row - 1; i > x && y != col;
---i)//最左列(下到上，需要跳过第一个，判断重复列)
-            {
-                ret.push_back(matrix[i][y]);
-            }
-        }
-        return ret;
-    }
+    vector<int> spiralOrder(vector<vector<int>>& matrix) {
+       if (matrix.size() == 0 || matrix[0].size() == 0)return {};
+        vector<int> ret;
+        int row(matrix.size() - 1),col(matrix[0].size() - 1),x(0),y(0),i(0);
+        for (; x <= row && y <= col; x++, y++,row--,col--)
+        {
+            for(i=y ; i<=col ; ++i)//首行
+            {
+                ret.push_back(matrix[x][i]);
+            }
+            for (i = x + 1; i <= row; ++i)//最右列(上到下，需要跳过第一个)
+            {
+                ret.push_back(matrix[i][col]);
+            }
+            for (i = col - 1; i >= y && x != row; --i)//最底行(右到左，需要跳过第一个，判断重复行)
+            {
+                ret.push_back(matrix[row][i]);
+            }
+            for (i = row - 1; i > x && y != col; --i)//最左列(下到上，需要跳过第一个，判断重复列)
+            {
+                ret.push_back(matrix[i][y]);
+            }
+        }
+        return ret;
+    }
 };
  
 ##[螺旋矩阵 II](https://leetcode-cn.com/problems/spiral-matrix-ii)    
+ 
+给定一个正整数 n，生成一个包含 1 到 n2 所有元素，且元素按顺时针顺序螺旋排列的正方形矩阵。
+
+示例:
+
+输入: 3
+输出:
+[
+ [ 1, 2, 3 ],
+ [ 8, 9, 4 ],
+ [ 7, 6, 5 ]
+]
+
  
 class Solution {
 public:
@@ -5361,22 +5587,22 @@ public:
     {
         if (n <= 0)return {};
         vector<vector<int>> res(n,vector<int>(n,0));
-        int row(n-1),col(n-1),x(0),y(0),cnt(0);
+        int row(n-1),col(n-1),x(0),y(0),cnt(0),i(0);
         for(;x <= row && y <= col;++x,++y,--row,--col)
         {
-            for(int i = y;i <= col;++i)
+            for(i = y;i <= col;++i)
             {
                 res[x][i] = ++cnt;//printf("1)%d %d %d\n",x,i,cnt);
             }
-            for(int i = x+1;i <= row;++i)
+            for(i = x+1;i <= row;++i)
             {
                 res[i][col] = ++cnt;//printf("2)%d %d %d\n",i,col,cnt);
             }
-            for(int i = col-1;i >= y && x != row;--i)
+            for(i = col-1;i >= y && x != row;--i)
             {
                 res[row][i] = ++cnt;//printf("3)%d %d %d\n",row,i,cnt);
             }
-            for(int i = row-1;i >= x + 1&& y != col;--i)
+            for(i = row-1;i >= x + 1&& y != col;--i)
             {
                 res[i][y] = ++cnt;//printf("4)%d %d %d\n",i,y,cnt);
             }
@@ -6046,13 +6272,28 @@ public:
 ##[报数](https://leetcode-cn.com/problems/count-and-say)    
  
 ##[字符串相乘](https://leetcode-cn.com/problems/multiply-strings)    
+给定两个以字符串形式表示的非负整数 num1 和 num2，返回 num1 和 num2 的乘积，它们的乘积也表示为字符串形式。
+
+示例 1:
+输入: num1 = "2", num2 = "3"
+输出: "6"
+
+示例 2:
+输入: num1 = "123", num2 = "456"
+输出: "56088"
+
+说明：
+	num1 和 num2 的长度小于110。
+	num1 和 num2 只包含数字 0-9。
+	num1 和 num2 均不以零开头，除非是数字 0 本身。
+	不能使用任何标准库的大数类型（比如 BigInteger）或直接将输入转换为整数来处理。
 
 class Solution {
 public:
     string multiply(string num1, string num2) 
     {
         string res;
-        vector<int> mul(num1.size() + num2.size(),0);
+        vector<int> mul(num1.size() + num2.size(),0);// 从低位到高位
         for(int i = 0;i < num1.size();++i)
         {
             for(int j = 0;j < num2.size();++j)
@@ -6072,11 +6313,12 @@ public:
         for(;i >= 0;--i)
         {
             //printf("2)%d\n",mul[i]);
-            res.push_back('0' + mul[i]);
+            res.push_back('0' + mul[i]);// 从高位到低位
         }
         return res;
     }
 };
+
 
 ##[找不同](https://leetcode-cn.com/problems/find-the-difference)    
  
