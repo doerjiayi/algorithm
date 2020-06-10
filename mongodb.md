@@ -1325,3 +1325,31 @@ dur.timeMS.writeToJournal：从logbuffer刷新到journalfile 的时间。
 dur.timeMS.writeToDataFiles：从journalbuffer映射到MMF，然后从MMF刷新到磁盘的时间，文件系统和磁盘会影响写入性能。 
 dur.timeMS.remapPrivateView：重新映射数据到PrivateView的时间，越小性能越好。
 所以说开启journal后会使用更多内存，因为journal会另外使用一块内存区域（即：PrivateView）
+
+## mongodb复杂条件查询 (or与and)
+https://blog.csdn.net/tjbsl/article/details/80620303 
+
+要实现管理数据的如下SQL形式：
+关系数据库：select * from  where（state1=11 and state2=22） or  value >300
+首先使用MongoDB的方式查询：
+分为以下几个步骤实现：
+步骤一：实现 （state1=11 and state2=22）
+db.getCollection('testOrAnd').find(
+    {$and:[{"state1":11},{"state2":22}]}
+    )
+步骤二：使用or形式实现 value >300
+db.getCollection('testOrAnd').  find(
+    { $or:[{"value":{$gte:300}}] }
+    )
+步骤三：将步骤一参数拼接到步骤二or条件
+db.getCollection('testOrAnd').
+    find({$or:
+           [
+            {$and:[{"state1":11},{"state2":22}]},{"value":{$gte:300}}
+           ]
+         })
+
+最终实现结果
+
+
+
