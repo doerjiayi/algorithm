@@ -192,16 +192,633 @@ int main()
     return 0;
 }
 
+##c++11 类默认函数的控制："=default" 和 "=delete"函数
+https://www.cnblogs.com/lsgxeva/p/7787438.html
+//c++11 类默认函数的控制："=default" 和 "=delete"函数
+
+/*
+C++ 的类有四类特殊成员函数，它们分别是：默认构造函数、析构函数、拷贝构造函数以及拷贝赋值运算符。
+这些类的特殊成员函数负责创建、初始化、销毁，或者拷贝类的对象。
+如果程序员没有显式地为一个类定义某个特殊成员函数，而又需要用到该特殊成员函数时，则编译器会隐式的为这个类生成一个默认的特殊成员函数。
+*/
+
+// C++11 标准引入了一个新特性："=default"函数。程序员只需在函数声明后加上“=default;”，就可将该函数声明为 "=default"函数，编译器将为显式声明的 "=default"函数自动生成函数体。
+class X
+{ 
+public: 
+    X() = default; //该函数比用户自己定义的默认构造函数获得更高的代码效率
+    X(int i)
+    { 
+        a = i; 
+    }
+
+private: 
+    int a; 
+}; 
+
+X obj;
+
+// "=default"函数特性仅适用于类的特殊成员函数，且该特殊成员函数没有默认参数。
+class X1
+{
+public:
+    int f() = default;      // err , 函数 f() 非类 X 的特殊成员函数
+    X1(int, int) = default;  // err , 构造函数 X1(int, int) 非 X 的特殊成员函数
+    X1(int = 1) = default;   // err , 默认构造函数 X1(int=1) 含有默认参数
+};
+
+// "=default"函数既可以在类体里（inline）定义，也可以在类体外（out-of-line）定义。
+class X2
+{
+public:
+    X2() = default; //Inline defaulted 默认构造函数
+    X2(const X&);
+    X2& operator = (const X&);
+    ~X2() = default;  //Inline defaulted 析构函数
+};
+
+X2::X2(const X&) = default;  //Out-of-line defaulted 拷贝构造函数
+X2& X2::operator= (const X2&) = default;   //Out-of-line defaulted  拷贝赋值操作符
+
+
+// 为了能够让程序员显式的禁用某个函数，C++11 标准引入了一个新特性："=delete"函数。程序员只需在函数声明后上“=delete;”，就可将该函数禁用。
+class X3
+{
+public:
+    X3();
+    X3(const X3&) = delete;  // 声明拷贝构造函数为 deleted 函数
+    X3& operator = (const X3 &) = delete; // 声明拷贝赋值操作符为 deleted 函数
+};
+
+// "=delete"函数特性还可用于禁用类的某些转换构造函数，从而避免不期望的类型转换
+class X4
+{
+public:
+    X4(double)
+    {
+
+    }
+    X4(int) = delete;
+};
+
+// "=delete"函数特性还可以用来禁用某些用户自定义的类的 new 操作符，从而避免在自由存储区创建类的对象
+class X5
+{
+public:
+    void *operator new(size_t) = delete;
+    void *operator new[](size_t) = delete;
+};
+
+
+void mytest()
+{
+    X4 obj1;
+    X4 obj2=obj1;   // 错误，拷贝构造函数被禁用
+    X4 obj3;
+    obj3=obj1;     // 错误，拷贝赋值操作符被禁用
+    X5 *pa = new X5;      // 错误，new 操作符被禁用
+    X5 *pb = new X5[10];  // 错误，new[] 操作符被禁用
+    return;
+}
+
+
+int main()
+{
+    mytest();
+    system("pause");
+    return 0;
+}
 
 
 ##c++11 move 
+###左值、左值引用、右值、右值引用
 https://www.cnblogs.com/SZxiaochun/p/8017475.html
+
+1、左值和右值的概念
+         左值是可以放在赋值号左边可以被赋值的值；左值必须要在内存中有实体；
+         右值当在赋值号右边取出值赋给其他变量的值；右值可以在内存也可以在CPU寄存器。
+         一个对象被用作右值时，使用的是它的内容(值)，被当作左值时，使用的是它的地址。
+
+2、引用
+        引用是C++语法做的优化，引用的本质还是靠指针来实现的。引用相当于变量的别名。
+        引用可以改变指针的指向，还可以改变指针所指向的值。
+        引用的基本规则：
+
+声明引用的时候必须初始化，且一旦绑定，不可把引用绑定到其他对象；即引用必须初始化，不能对引用重定义；
+对引用的一切操作，就相当于对原对象的操作。
+3、左值引用和右值引用
+    3.1 左值引用
+         左值引用的基本语法：type &引用名 = 左值表达式；
+    3.2 右值引用
+        右值引用的基本语法type &&引用名 = 右值表达式；
+        右值引用在企业开发人员在代码优化方面会经常用到。
+        右值引用的“&&”中间不可以有空格。
+
+
+###C++ move构造函数和move赋值
 https://www.jianshu.com/p/f027aaf95fcf
+
+看一下下面这个例子
+
+template<class T>
+class Auto_ptr3
+{
+    T* m_ptr;
+public:
+    Auto_ptr3(T* ptr = nullptr)
+        :m_ptr(ptr)
+    {
+    }
+ 
+    ~Auto_ptr3()
+    {
+        delete m_ptr;
+    }
+ 
+    // Copy constructor
+    // Do deep copy of a.m_ptr to m_ptr
+    Auto_ptr3(const Auto_ptr3& a)
+    {
+        m_ptr = new T;
+        *m_ptr = *a.m_ptr;
+    }
+ 
+    // Copy assignment
+    // Do deep copy of a.m_ptr to m_ptr
+    Auto_ptr3& operator=(const Auto_ptr3& a)
+    {
+        // Self-assignment detection
+        if (&a == this)
+            return *this;
+ 
+        // Release any resource we're holding
+        delete m_ptr;
+ 
+        // Copy the resource
+        m_ptr = new T;
+        *m_ptr = *a.m_ptr;
+ 
+        return *this;
+    }
+ 
+    T& operator*() const { return *m_ptr; }
+    T* operator->() const { return m_ptr; }
+    bool isNull() const { return m_ptr == nullptr; }
+};
+ 
+class Resource
+{
+public:
+    Resource() { std::cout << "Resource acquired\n"; }
+    ~Resource() { std::cout << "Resource destroyed\n"; }
+};
+ 
+Auto_ptr3<Resource> generateResource()
+{
+    Auto_ptr3<Resource> res(new Resource);
+    return res; // this return value will invoke the copy constructor
+}
+ 
+int main()
+{
+    Auto_ptr3<Resource> mainres;
+    mainres = generateResource(); // this assignment will invoke the copy assignment
+ 
+    return 0;
+}
+输出：
+
+Resource acquired
+Resource acquired
+Resource destroyed
+Resource acquired
+Resource destroyed
+Resource destroyed
+好多构造函数和析构函数执行，下面分析一下每个打印代表的步骤
+1)nside generateResource() new Resource构造函数调用
+2)generateResource 返回main,res调用copy构造函数给一个临时变量
+
+res在generateResource退出后调用析构函数
+4)临时变量调用copy构造函数给mainres
+临时变量调用析构函数
+main退出，mainres 调用析构函数
+优化如下：
+ 
+template<class T>
+class Auto_ptr4
+{
+    T* m_ptr;
+public:
+    Auto_ptr4(T* ptr = nullptr)
+        :m_ptr(ptr)
+    {
+    }
+    ~Auto_ptr4()
+    {
+        delete m_ptr;
+    }
+    // Copy constructor
+    // Do deep copy of a.m_ptr to m_ptr
+    Auto_ptr4(const Auto_ptr4& a)
+    {
+        m_ptr = new T;
+        *m_ptr = *a.m_ptr;
+    }
+    // Move constructor
+    // Transfer ownership of a.m_ptr to m_ptr
+    Auto_ptr4(Auto_ptr4&& a)
+        : m_ptr(a.m_ptr)
+    {
+        a.m_ptr = nullptr; // we'll talk more about this line below
+    }
+    // Copy assignment
+    // Do deep copy of a.m_ptr to m_ptr
+    Auto_ptr4& operator=(const Auto_ptr4& a)
+    {
+        // Self-assignment detection
+        if (&a == this)
+            return *this;
+        // Release any resource we're holding
+        delete m_ptr;
+        // Copy the resource
+        m_ptr = new T;
+        *m_ptr = *a.m_ptr;
+        return *this;
+    }
+    // Move assignment
+    // Transfer ownership of a.m_ptr to m_ptr
+    Auto_ptr4& operator=(Auto_ptr4&& a)
+    {
+        // Self-assignment detection
+        if (&a == this)
+            return *this;
+        // Release any resource we're holding
+        delete m_ptr;
+        // Transfer ownership of a.m_ptr to m_ptr
+        m_ptr = a.m_ptr;
+        a.m_ptr = nullptr; // we'll talk more about this line below
+        return *this;
+    }
+    T& operator*() const { return *m_ptr; }
+    T* operator->() const { return m_ptr; }
+    bool isNull() const { return m_ptr == nullptr; }
+};
+ 
+class Resource
+{
+public:
+    Resource() { std::cout << "Resource acquired\n"; }
+    ~Resource() { std::cout << "Resource destroyed\n"; }
+};
+ 
+Auto_ptr4<Resource> generateResource()
+{
+    Auto_ptr4<Resource> res(new Resource);
+    return res; // this return value will invoke the move constructor
+}
+ 
+int main()
+{
+    Auto_ptr4<Resource> mainres;
+    mainres = generateResource(); // this assignment will invoke the move assignment
+    return 0;
+}
+输出:
+
+Resource acquired
+Resource destroyed
+1)第一步同上
+2）函数返回，保存返回值给临时变量，调用move constructed函数，只进行指针copy
+3）函数返回,res回收，由于res不指向任何值，因此没操作
+4）临时变量赋值给mainres，同第2不
+5）main退出，临时变量不指向任何值，无操作
+6）main退出，mainres 调用析构函数"Resource destroyed"执行
+
+那么什么条件下执行copy构造函数，什么情况下调用Move构造函数
+1） 如果我们给一个l-value赋值的时候，调用copy构造函数
+2）如果给一个r-value赋值的时候，调用Move构造函数，因为r-value都是临时的，将要被销毁的
+在上面的例子中，generateResource（）函数返回值调用的是move构造函数，而不是copy构造函数，跟第一条不符？C++定义函数返回值是调用move即使是给l-value复制。
+
+
 https://www.cnblogs.com/xiaoshiwang/p/9582325.html
 https://www.cnblogs.com/LearningTheLoad/p/7690052.html
 
-##c++11 forward
+##c/c++ 右值引用，forward关键字
 https://www.cnblogs.com/xiaoshiwang/p/9589008.html
+
+c++ forward关键字
+forward的由来：模板函数中的推导类型，作为另一函数的参数时，不管实参是什么类型，作为另一个参数的实参时，都变成了左值。因为C++里规定函数的形参就是左值，不过调用侧的实参是否是右值。所以，调用的另一个函数的形参即使用T&& arg来声明，传过去的也是左值，编译不过，因为不能自动把左值转化成右值，除非使用std::move。forward就是为了解决这个问题的。
+forward() 函数的作用：保持住实参的类型。
+include <iostream>
+using namespace std;
+
+void rvalue_call(int& v){
+  cout << "& call" << endl;
+}
+void rvalue_call(int&& v){
+  cout << "&& call" << endl;
+}
+void rvalue_call(const int& v){
+  cout << "const & call" << endl;
+}
+void rvalue_call(const int&& v){
+  cout << "const && call" << endl;
+}
+
+template<typename T>
+void func(T&& a){
+  rvalue_call(a);
+}
+
+int main(void){
+  int x = 1;
+  func(x);//实参为左值                                           
+  int& y = x;
+  func(y);//实参为左值引用                                       
+  func(std::move(y));//实参为右值引用                            
+  func(100);//实参为右值引用          
+  const int a = 11;
+  func(a);//实参为左值常引用   
+  func(std::move(a));//实参为右值常引用   
+}
+执行结果：
+
+& call
+& call
+& call
+& call
+const & call
+const & call
+上面的例子即使传递的是右值，但也不能够调用到
+
+void rvalue_call(int&& v)
+void rvalue_call(const int&& v)
+解决办法：加std::forward
+
+using namespace std;
+
+void rvalue_call(int& v){
+  cout << "& call" << endl;
+}
+void rvalue_call(int&& v){
+  cout << "&& call" << endl;
+}
+void rvalue_call(const int& v){
+  cout << "const & call" << endl;
+}
+void rvalue_call(const int&& v){
+  cout << "const && call" << endl;
+}
+
+template<typename T>
+void func(T&& a){
+  rvalue_call(std::forward<T> (a));
+}
+
+int main(void){
+  int x = 1;
+  func(x);//实参为左值                                           
+  int& y = x;
+  func(y);//实参为左值引用                                       
+  func(std::move(y));//实参为右值引用                            
+  func(100);
+    
+  const int a = 11;
+  func(a);
+  func(std::move(a));
+}
+执行结果：发现可以调用到右值的两个函数。这就是std::forward函数在模板里的作用
+
+& call
+& call
+&& call
+&& call
+const & call
+const && call
+另一个例子：
+
+template<typename F, typename T1, typename T2>
+void fcn2(F f, T1&& t1, T2&& t2){
+  f(std::forward<T2>(t2), std::forward<T1>(t1));//OK
+  //f(std::move(t2), std::forward<T1>(t1));//OK
+  //f(t2, t1);//ERROR
+}
+
+void f1(int&& i1, int& i2){
+  i1 = 10;
+  i2 = 20;
+}
+
+int main(){
+  int i1 = 1, i2 = 2;
+  int& a = i1;
+  int& b = i2;
+  int&& c = 111;
+
+  fcn2(f1, i1, 42);//因为42为右值，所以fcn2的T2为右值，如果不加forward，把T2的形参传给另一个函数时，它就变成了左值，但是函数f1的参数时右值，这时，编译就不过了。
+  std::cout << i1 << ", " << i2 << std::endl;
+
+}
+
+
+##c++ 类的默认八种函数
+https://www.cnblogs.com/lsgxeva/p/7668200.html
+
+class MyClass
+{
+public:
+    MyClass(const char * str = nullptr);  // 默认带参构造函数 // 默认构造函数指不带参数或者所有参数都有缺省值的构造函数
+    ~MyClass(void);  // 默认析构函数
+    MyClass(const MyClass &);  // 默认拷贝构造函数
+    MyClass & operator =(const MyClass &);  // 默认重载赋值运算符函数
+    MyClass * operator &();  // 默认重载取址运算符函数
+    MyClass const * operator &() const;  // 默认重载取址运算符const函数
+    MyClass(MyClass &&);  // 默认移动构造函数
+    MyClass & operator =(MyClass &&);  // 默认重载移动赋值操作符函数
+
+private:
+    char *m_pData;
+};
+
+// 默认带参构造函数
+MyClass::MyClass(const char * str)
+{
+    if (!str)
+    {
+        m_pData = nullptr;
+    } 
+    else
+    {
+        this->m_pData = new char[strlen(str) + 1];
+        strcpy(this->m_pData, str);
+    }
+    std::cout << "默认带参构造函数" << " this addr: " << this << std::endl;
+}
+
+ // 默认析构函数
+MyClass::~MyClass(void)
+{
+    if (this->m_pData)
+    {
+        delete[] this->m_pData;
+        this->m_pData = nullptr;
+    }
+    std::cout << "默认析构函数" << " this addr: " << this << std::endl;
+}
+
+// 默认拷贝构造函数
+MyClass::MyClass(const MyClass &m)
+{
+    if (!m.m_pData)
+    {
+        this->m_pData = nullptr;
+    } 
+    else
+    {
+        this->m_pData = new char[strlen(m.m_pData) + 1];
+        strcpy(this->m_pData, m.m_pData);
+    }
+    std::cout << "默认拷贝构造函数" << " this addr: " << this << std::endl;
+}
+
+// 默认重载赋值运算符函数
+MyClass & MyClass::operator =(const MyClass &m)
+{
+    if ( this == &m ) {
+        return *this;
+    }
+    delete[] this->m_pData;
+    if (!m.m_pData)
+    {
+        this->m_pData = nullptr;
+    } 
+    else
+    {
+        this->m_pData = new char[strlen(m.m_pData) + 1];
+        strcpy(this->m_pData, m.m_pData);
+    }
+    std::cout << "默认重载赋值运算符函数" << " this addr: " << this << std::endl;
+    return *this;
+}
+
+// 默认重载取址运算符函数
+MyClass * MyClass::operator &()
+{
+    std::cout << "默认重载取址运算符函数" << " this addr: " << this << std::endl;
+    return this;
+}
+
+// 默认重载取址运算符const函数
+MyClass const * MyClass::operator &() const
+{
+    std::cout << "默认重载取址运算符const函数" << " this addr: " << this << std::endl;
+    return this;
+}
+
+// 默认移动构造函数
+MyClass::MyClass(MyClass && m):
+    m_pData(std::move(m.m_pData))
+{
+    std::cout << "默认移动构造函数" << std::endl;
+    m.m_pData = nullptr;
+}
+
+// 默认重载移动赋值操作符函数
+MyClass & MyClass::operator =(MyClass && m)
+{
+    if ( this == &m ) {
+        return *this;
+    }
+    this->m_pData = nullptr;
+    this->m_pData = std::move(m.m_pData);
+    m.m_pData = nullptr;
+    std::cout << "默认重载移动赋值操作符函数" << " this addr: " << this << std::endl;
+    return *this;
+}
+
+void funA(MyClass a)
+{
+    std::cout << "调用funA函数" << " param addr: " << &a << std::endl;
+}
+
+void mytest1(void)
+{
+    std::cout << "mytest1 >>>>" << std::endl;
+    MyClass myclass1; // 等价于 MyClass myclass1 = MyClass(); // 调用默认带参构造函数
+    myclass1 = MyClass(); // MyClass()为右值，需要右值引用 // 先调用默认带参构造函数，然后调用默认重载取址运算符函数，最后调用默认重载移动赋值操作符函数
+    std::cout << "<<<<< mytest1" << std::endl;
+    // 析构两次 1: myclass1 = MyClass()中的MyClass() 2: MyClass myclass1
+}
+
+void mytest2(void)
+{
+    std::cout << "mytest2 >>>>" << std::endl;
+    MyClass myclass1; // 等价于 MyClass myclass1 = MyClass(); // 调用默认带参构造函数
+    MyClass myclass2(myclass1);  // 调用默认拷贝构造函数
+    myclass2 = myclass1; // myclass2为左值，所以此操作为赋值操作，会调用默认重载取址运算符const函数，然后调用默认重载赋值运算符函数
+    funA(myclass1); // 参数传值会导致赋值操作，会调用默认拷贝构造函数，然后funA函数调用默认重载取址运算符函数取得参数
+    funA(std::move(myclass1)); // funA函数的参数现为右值，会调用默认移动构造函数，然后funA函数调用默认重载取址运算符函数取得参数
+    // 在移动构造函数中对于基本类型所谓移动只是把其值拷贝，对于如string这类类成员来说才会真正的所谓资源移动
+    std::cout << "<<<<< mytest2" << std::endl;
+}
+
+void mytest3(void)
+{
+    std::cout << "mytest3 >>>>" << std::endl;
+    funA(MyClass()); // 会调用默认带参构造函数，生成该类的对象，然后funA函数调用默认重载取址运算符函数取得参数
+    std::cout << "<<<<< mytest3" << std::endl;
+    // 析构一次 1: funA(MyClass())中的MyClass()形成的对象，是在funA函数结束调用的时候，调用默认析构函数
+}
+
+void mytest(void)
+{
+    std::cout << "<<<<<<<<<<<<<<<<<<<<<<<<<" << std::endl;
+    mytest1();
+    mytest2();
+    mytest3();
+    std::cout << "<<<<<<<<<<<<<<<<<<<<<<<<<" << std::endl;
+}
+
+int main(int argc, char * argv[], char * envp[])
+{
+    mytest();
+    system("pause");
+    return 0;
+}
+
+<<<<<<<<<<<<<<<<<<<<<<<<<
+mytest1 >>>>
+默认带参构造函数 this addr: 0x7ffca6b2eed8
+默认带参构造函数 this addr: 0x7ffca6b2eed0
+默认重载取址运算符函数 this addr: 0x7ffca6b2eed0
+默认重载移动赋值操作符函数 this addr: 0x7ffca6b2eed8
+默认析构函数 this addr: 0x7ffca6b2eed0
+<<<<< mytest1
+默认析构函数 this addr: 0x7ffca6b2eed8
+mytest2 >>>>
+默认带参构造函数 this addr: 0x7ffca6b2eed8
+默认拷贝构造函数 this addr: 0x7ffca6b2eed0
+默认重载取址运算符const函数 this addr: 0x7ffca6b2eed8
+默认重载赋值运算符函数 this addr: 0x7ffca6b2eed0
+默认拷贝构造函数 this addr: 0x7ffca6b2eeb8
+调用funA函数 param addr: 默认重载取址运算符函数 this addr: 0x7ffca6b2eeb8
+0x7ffca6b2eeb8
+默认析构函数 this addr: 0x7ffca6b2eeb8
+默认移动构造函数
+调用funA函数 param addr: 默认重载取址运算符函数 this addr: 0x7ffca6b2eeb0
+0x7ffca6b2eeb0
+默认析构函数 this addr: 0x7ffca6b2eeb0
+<<<<< mytest2
+默认析构函数 this addr: 0x7ffca6b2eed0
+默认析构函数 this addr: 0x7ffca6b2eed8
+mytest3 >>>>
+默认带参构造函数 this addr: 0x7ffca6b2eed8
+调用funA函数 param addr: 默认重载取址运算符函数 this addr: 0x7ffca6b2eed8
+0x7ffca6b2eed8
+默认析构函数 this addr: 0x7ffca6b2eed8
+<<<<< mytest3
+<<<<<<<<<<<<<<<<<<<<<<<<<
+
 
 ##shared_ptr
 https://blog.csdn.net/weixin_34128839/article/details/93301673
