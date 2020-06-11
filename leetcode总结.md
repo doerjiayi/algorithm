@@ -1480,19 +1480,33 @@ public:
 
 ##[买卖股票的最佳时机](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock)
 
+给定一个数组，它的第 i 个元素是一支给定股票第 i 天的价格。
+如果你最多只允许完成一笔交易（即买入和卖出一支股票一次），设计一个算法来计算你所能获取的最大利润。
+注意：你不能在买入股票前卖出股票。
+
+示例 1:
+输入: [7,1,5,3,6,4]
+输出: 5
+解释: 在第 2 天（股票价格 = 1）的时候买入，在第 5 天（股票价格 = 6）的时候卖出，最大利润 = 6-1 = 5 。
+     注意利润不能是 7-1 = 6, 因为卖出价格需要大于买入价格；同时，你不能在买入前卖出股票。
+
+示例 2:
+输入: [7,6,4,3,1]
+输出: 0
+解释: 在这种情况下, 没有交易完成, 所以最大利润为 0。
+ 
 class Solution {
 public:
-    int maxProfit(vector<int>& prices) {
-        int res(0),loc(0);
-        int mi(INT_MAX);
-        for(int i = 0;i < prices.size();++i)
-        {
-            mi = min(prices[i],mi);
-            loc = max(loc,prices[i]-mi);
-            res = max(res,loc);
-        }
-        return res;
-    }
+    int maxProfit(vector<int>& prices) {
+        int res(0);
+        int mi(INT_MAX);
+        for(int i = 0;i < prices.size();++i)
+        {
+            mi = min(prices[i],mi);//之前的最低价格
+            res = max(res,prices[i]-mi);//当前价格减去之前的最低价格
+        }
+        return res;
+    }
 };
 
 ##[买卖股票的最佳时机 II](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-ii)    
@@ -1525,6 +1539,32 @@ public:
 1 <= prices.length <= 3 * 10 ^ 4
 0 <= prices[i] <= 10 ^ 4
 
+
+给定一个数组，它的第 i 个元素是一支给定股票第 i 天的价格。
+设计一个算法来计算你所能获取的最大利润。你可以尽可能地完成更多的交易（多次买卖一支股票）。
+注意：你不能同时参与多笔交易（你必须在再次购买前出售掉之前的股票）。
+
+示例 1:
+输入: [7,1,5,3,6,4]
+输出: 7
+解释: 在第 2 天（股票价格 = 1）的时候买入，在第 3 天（股票价格 = 5）的时候卖出, 这笔交易所能获得利润 = 5-1 = 4 。
+     随后，在第 4 天（股票价格 = 3）的时候买入，在第 5 天（股票价格 = 6）的时候卖出, 这笔交易所能获得利润 = 6-3 = 3 。
+
+示例 2:
+输入: [1,2,3,4,5]
+输出: 4
+解释: 在第 1 天（股票价格 = 1）的时候买入，在第 5 天 （股票价格 = 5）的时候卖出, 这笔交易所能获得利润 = 5-1 = 4 。
+     注意你不能在第 1 天和第 2 天接连购买股票，之后再将它们卖出。
+     因为这样属于同时参与了多笔交易，你必须在再次购买前出售掉之前的股票。
+
+示例 3:
+输入: [7,6,4,3,1]
+输出: 0
+解释: 在这种情况下, 没有交易完成, 所以最大利润为 0。
+
+提示：
+	1 <= prices.length <= 3 * 10 ^ 4
+	0 <= prices[i] <= 10 ^ 4
 
 class Solution {
 public:
@@ -2607,7 +2647,21 @@ public:
 
  
 ##[只出现一次的数字](https://leetcode-cn.com/problems/single-number)
-异或两相同数会抵消，剩下的就是一次的
+给定一个非空整数数组，除了某个元素只出现一次以外，其余每个元素均出现两次。找出那个只出现了一次的元素。
+
+说明：
+你的算法应该具有线性时间复杂度。 你可以不使用额外空间来实现吗？
+
+示例 1:
+输入: [2,2,1]
+输出: 1
+
+示例 2:
+输入: [4,1,2,1,2]
+输出: 4
+
+异或两相同数会抵消，剩下的就是一次的那个数了
+
 class Solution {
 public:
     int singleNumber(vector<int>& nums) {
@@ -2621,7 +2675,6 @@ public:
 };
  
 ##[只出现一次的数字 II](https://leetcode-cn.com/problems/single-number-ii)
- 
 
 遍历，记录出现一次的位，出现2次的位为之前出现一次且本数，算了2次后才能算3次，3次的为出现1次且2次
 class Solution {
@@ -2669,7 +2722,31 @@ public:
 
 #链表
 ##[LRU缓存机制](https://leetcode-cn.com/problems/lru-cache)
+
+运用你所掌握的数据结构，设计和实现一个  LRU (最近最少使用) 缓存机制。它应该支持以下操作： 获取数据 get 和 写入数据 put 。
+
+获取数据 get(key) - 如果关键字 (key) 存在于缓存中，则获取关键字的值（总是正数），否则返回 -1。
+写入数据 put(key, value) - 如果关键字已经存在，则变更其数据值；如果关键字不存在，则插入该组「关键字/值」。当缓存容量达到上限时，它应该在写入新数据之前删除最久未使用的数据值，从而为新的数据值留出空间。
+
+进阶:
+你是否可以在 O(1) 时间复杂度内完成这两种操作？
+
+示例:
+LRUCache cache = new LRUCache( 2 /* 缓存容量 */ );
+
+cache.put(1, 1);
+cache.put(2, 2);
+cache.get(1);       // 返回  1
+cache.put(3, 3);    // 该操作会使得关键字 2 作废
+cache.get(2);       // 返回 -1 (未找到)
+cache.put(4, 4);    // 该操作会使得关键字 1 作废
+cache.get(1);       // 返回 -1 (未找到)
+cache.get(3);       // 返回  3
+cache.get(4);       // 返回  4
+
+
  （缓存）利用哈希表的快速访问，记录的是链表迭代器，因为迭代器需要被移动；链表的访问顺序判断访问热度
+ 
 class LRUCache {
 public:
     LRUCache(int capacity)
@@ -2681,8 +2758,8 @@ public:
         auto it = m.find(key);
         if (it != m.end())
         {
-            l.splice(l.begin(),l,it->second);
-            return it->second->second;
+            l.splice(l.begin(),l,it->second);//找到的迭代器放到列表前面去
+            return it->second->second;//返回值（迭代器的内容不会变，只是他在列表的位置变了）
         }
         return -1;
     }  
@@ -2691,18 +2768,18 @@ public:
         auto it = m.find(key);
         if (it != m.end())
         {
-            l.splice(l.begin(),l,it->second);
-            it->second->second = value;
+            l.splice(l.begin(),l,it->second);//找到的迭代器放到列表前面去
+            it->second->second = value;//修改迭代器的值
         }
         else
         {
-            if (l.size() + 1> s)
+            if (l.size() + 1 > s)
             {
-                m.erase(l.back().first);
+                m.erase(l.back().first);// 超过容量的需要移除列表最后面的迭代器，和哈希表对应的键
                 l.pop_back();
             }
-            l.push_front(make_pair(key,value));
-            m[key] = l.begin();
+            l.push_front(make_pair(key,value));//插入列表的前面
+            m[key] = l.begin();//更新哈希表的键对应的列表迭代器
         }
     }  
 private:  
@@ -2710,6 +2787,75 @@ private:  
     list<pair<int,int>> l;//key value
     int s;
 };
+
+本题的拓展思维：
+有的需求是需要增加时间检查的，哈希表的值就是时间，键就是对象的id，加入时检查容量，再定时检查对象的时间，需要回收的移动到回收的集合对象里
+方案如下：
+typedef uint32 unsigned int;
+template<typename ELEM,typename ELEM_LIST = std::list<std::pair<ELEM,uint32>>>
+struct OnlineLRUCache {
+	explicit OnlineLRUCache(uint32 capacity = 10000,uint32 expired = 60 * 10):m_capacity(capacity),m_expired(expired){}
+	void SetConfig(uint32 capacity,uint32 expired)
+	{
+		m_capacity = capacity;
+		m_expired = expired;
+	}
+	uint32 Get(const ELEM& dataid)//key(dataid),value(time)
+    {
+		m_setExpiredData.erase(dataid);
+        auto it = m_mapData.find(dataid);
+        if (it != m_mapData.end())
+        {
+        	m_listData.splice(m_listData.begin(),m_listData,it->second);
+            return it->second->second;
+        }
+        return 0;
+    }
+    void Put(const ELEM& dataid, uint32 value = ::time(nullptr))//key (data id),value time
+    {
+    	m_setExpiredData.erase(dataid);
+        auto it = m_mapData.find(dataid);
+        if (it != m_mapData.end())
+        {
+        	m_listData.splice(m_listData.begin(),m_listData,it->second);
+            it->second->second = value;
+        }
+        else
+        {
+            if (m_listData.size() + 1 > m_capacity)
+            {
+            	m_mapData.erase(m_listData.back().first);
+            	m_setExpiredData.insert(m_listData.back().first);
+            	m_listData.pop_back();
+            }
+            m_listData.push_front(std::make_pair(dataid,value));
+            m_mapData[dataid] = m_listData.begin();
+        }
+    }
+    std::unordered_set<ELEM> m_setExpiredData;
+    void CheckOvertime(uint32 value = ::time(nullptr))//检查超时的对象
+	{
+		while (m_listData.size() > 0)
+		{
+			if (m_listData.back().second + m_expired < value)
+			{
+				m_mapData.erase(m_listData.back().first);
+				m_setExpiredData.insert(m_listData.back().first);
+				m_listData.pop_back();
+			}
+			else
+			{
+				break;
+			}
+		}
+	}
+private:
+    ELEM_LIST m_listData;//key (dataid),value(time,单位秒)
+    std::unordered_map<ELEM,typename ELEM_LIST::iterator> m_mapData;//key value (iter)
+    uint32 m_capacity = 10000;
+    uint32 m_expired = 60 * 10;//超时时间，单位秒
+};
+
  
 ##[LFU缓存](https://leetcode-cn.com/problems/lfu-cache)
  
@@ -2806,10 +2952,19 @@ public:
  
 ##[相交链表](https://leetcode-cn.com/problems/intersection-of-two-linked-lists)    
  
+编写一个程序，找到两个单链表相交的起始节点。
+注意：
+	如果两个链表没有交点，返回 null.
+	在返回结果后，两个链表仍须保持原有的结构。
+	可假定整个链表结构中没有循环。
+	程序尽量满足 O(n) 时间复杂度，且仅用 O(1) 内存。
+
+以下只要遍历一次两个链表，但是需要 O(N)的空间复杂度，不符合题目要求
+
 class Solution {
 public:
     ListNode *getIntersectionNode(ListNode *headA, ListNode *headB) {
-        if (!headA || !headB)return NULL;
+        if (!headA || !headB)return nullptr;
         unordered_map<ListNode *,int> m;
         ListNode *tmp = headB;
         while(tmp)
@@ -2820,19 +2975,76 @@ public:
         tmp = headA;
         while(tmp)
         {
-            if (m[tmp] > 0)return tmp;
+            if (m[tmp] > 0)return tmp;//相交节点
             tmp = tmp->next;
         }
-        return NULL;
+        return nullptr;
+    }
+};
+
+通过 136 ms 22.2 MB Cpp
+ 
+以下只要 O(1) 空间复杂度，最多每个列表遍历两次，也算是O(n) 时间复杂度。
+class Solution {
+public:
+    ListNode *getIntersectionNode(ListNode *headA, ListNode *headB) {
+        if (!headA || !headB)return nullptr;
+        int lenA(0),lenB(0);
+        ListNode *curA = headA, *curB = headB;
+        for(;curA;curA = curA->next,lenA++);
+        for(;curB;curB = curB->next,lenB++);
+        curB = headB;
+        curA = headA;
+        if (lenB > lenA)
+        {
+            int diff = lenB - lenA;
+            //printf("diff %d \n",diff);
+            while(diff--)
+            {
+                curB = curB->next;
+            }
+        }
+        else if (lenA > lenB)
+        {
+            int diff = lenA - lenB;
+            while(diff--)
+            {
+                curA = curA->next;
+            }
+        }
+        while(curA && curB)
+        {
+            if (curA == curB)return curA;
+            curA = curA->next;
+            curB = curB->next;
+        }
+        return nullptr;
     }
 };
  
+通过 52 ms 14.5 MB Cpp
+从结果上看，第二种时间复杂度和空间复杂度都更好一点，可见哈希表查询、插入也有一定的时间消耗
 
  
 ##[对链表进行插入排序](https://leetcode-cn.com/problems/insertion-sort-list)    
  
-##[排序链表](https://leetcode-cn.com/problems/sort-list)    
- 
+##[排序链表](https://leetcode-cn.com/problems/sort-list)   
+ 
+在 O(n log n) 时间复杂度和常数级空间复杂度下，对链表进行排序。
+
+示例 1:
+输入: 4->2->1->3
+输出: 1->2->3->4
+
+
+示例 2:
+输入: -1->5->3->4->0
+输出: -1->0->3->4->5
+
+冒泡排序方案，复杂度 O(N*N),冒泡的时间复杂度是不能满足题目要求的，只是比较简单
+
+通过 1152 ms 15.3 MB
+
 class Solution {
 public:
     ListNode* sortList(ListNode* head) {
@@ -2854,7 +3066,66 @@ public:
         return head;
     }
 };
- 
+
+二路归并排序，从底到顶来合并
+通过 68 ms  15.5 MB Cpp
+从运行结果来看，归并排序要好很多
+
+class Solution {
+public:
+    ListNode* sortList(ListNode* head) {
+        if (!head) return head;
+        ListNode dummyHead(0);
+        dummyHead.next = head;
+        auto p = head;
+        int length = 0;
+        while (p) {++length;p = p->next;}
+        for (int size = 1; size < length; size <<= 1) {//size是每次需要合并的分段的长度1、2、4、、
+            auto cur = dummyHead.next;
+            auto tail = &dummyHead;
+            while (cur) {
+                auto left = cur;
+                auto right = cut(left, size); // left->@->@ right->@->@->@...
+                if (right)
+                {
+                    cur = cut(right, size); // left->@->@ right->@->@  cur->@->...  
+                    tail->next = merge(left, right);//合并左边与右边，追加到前面
+                    while (tail->next) tail = tail->next;
+                }
+                else
+                {
+                    tail->next = left;
+                    break;
+                }
+            }
+        }
+        return dummyHead.next;
+    }
+    ListNode* cut(ListNode* head, int n) {//按长度分割
+        if (!head) return nullptr;
+        while (--n && head->next) head = head->next;//最后那个节点
+        auto next = head->next;
+        head->next = nullptr;
+        return next;
+    }
+    ListNode* merge(ListNode* l1, ListNode* l2) {//合并两个排好序的l链表，复杂度是长度
+        ListNode dummyHead(0);
+        auto p = &dummyHead;
+        while (l1 && l2) {
+            if (l1->val < l2->val) {
+                p->next = l1;
+                p = l1;
+                l1 = l1->next;       
+            } else {
+                p->next = l2;
+                p = l2;
+                l2 = l2->next;
+            }
+        }
+        p->next = l1 ? l1 : l2;
+        return dummyHead.next;
+    }
+};
 
  
 ##[对链表进行插入排序](https://leetcode-cn.com/problems/insertion-sort-list)    
@@ -2887,14 +3158,22 @@ public:
 };
  
 ##[环形链表](https://leetcode-cn.com/problems/linked-list-cycle)
- 
+给定一个链表，判断链表中是否有环。
+为了表示给定链表中的环，我们使用整数 pos 来表示链表尾连接到链表中的位置（索引从 0 开始）。 如果 pos 是 -1，则在该链表中没有环。
+
+示例 1：
+输入：head = [3,2,0,-4], pos = 1
+输出：true
+解释：链表中有一个环，其尾部连接到第二个节点。
+
 使用快慢指针的方式遍历判断
+
 class Solution {
 public:
     bool hasCycle(ListNode *head)
     {
         ListNode *slow = head,*fast = head;
-        while(fast && fast->next)
+        while(fast && fast->next)//每次需要判断后面两个节点
         {
             if (slow == fast->next || slow == fast->next->next)return true;
             slow = slow->next,fast = fast->next->next;
@@ -2905,30 +3184,35 @@ public:
  
 ##[环形链表 II](https://leetcode-cn.com/problems/linked-list-cycle-ii)
  
-使用快慢指针找到重叠，重置慢指针，再找到重叠就是入环点
+给定一个链表，返回链表开始入环的第一个节点。 如果链表无环，则返回 null。
+为了表示给定链表中的环，我们使用整数 pos 来表示链表尾连接到链表中的位置（索引从 0 开始）。 如果 pos 是 -1，则在该链表中没有环。
+说明：不允许修改给定的链表。
+
+使用快慢指针找到重叠，重置快指针，再找到重叠点就是入环点
+
 class Solution {
 public:
-    ListNode *detectCycle(ListNode *head) {
-        if( head == NULL || head->next == NULL )return NULL;
+    ListNode *detectCycle(ListNode *head) {
+        if( !head || !head->next )return NULL;  
         ListNode* fp = head,* sp = head;  
         while( fp  && fp->next )
         {  
             sp = sp->next;  
             fp = fp->next->next;  
-            if( fp == sp )
+            if( fp == sp )//使用快慢指针找到重叠
             {   
                 break;  
             }  
         }  
-        if( !fp || !fp->next )return NULL;  
-        sp = head;  
-        while( fp != sp )
+        if( !fp || !fp->next )return NULL;  
+        fp = head;//重置快指针  
+        while( fp != sp )//再找到重叠点就是入环点
         {  
             sp = sp->next;  
             fp = fp->next;  
         }  
         return sp;  
-    }
+    }
 };
  
 ##[重排链表](https://leetcode-cn.com/problems/reorder-list)
@@ -3140,23 +3424,38 @@ public:
  
 ##[反转链表](https://leetcode-cn.com/problems/reverse-linked-list)    
  
+反转一个单链表。
+
+示例:
+
+输入: 1->2->3->4->5->NULL
+输出: 5->4->3->2->1->NULL
+
+进阶:
+你可以迭代或递归地反转链表。你能否用两种方法解决这道题？
+
+迭代的方案
 class Solution {
 public:
     ListNode* reverseList(ListNode* head) 
     {
         if (!head || !head->next)return head;
-        ListNode* pre = NULL;
+        ListNode* pre = nullptr;
         ListNode* cur = head;
         while(cur)
         {
-            ListNode* ne = cur->next;
-            cur->next = pre;
-            pre = cur;
-            cur = ne;
+            ListNode* next = cur->next;//先记录下一个节点
+            cur->next = pre;//连接
+            pre = cur;//移动
+            cur = next;
         }
         return pre;
     }
 };
+
+通过 12 ms 8.3 MB Cpp
+
+
  
 ##[反转链表 II](https://leetcode-cn.com/problems/reverse-linked-list-ii)    
  
@@ -3671,6 +3970,36 @@ public:
 };
 
 ##[最小栈](https://leetcode-cn.com/problems/min-stack)    
+ 
+设计一个支持 push ，pop ，top 操作，并能在常数时间内检索到最小元素的栈。
+	push(x) —— 将元素 x 推入栈中。
+	pop() —— 删除栈顶的元素。
+	top() —— 获取栈顶元素。
+	getMin() —— 检索栈中的最小元素。
+
+示例:
+
+输入：
+["MinStack","push","push","push","getMin","pop","top","getMin"]
+[[],[-2],[0],[-3],[],[],[],[]]
+
+输出：
+[null,null,null,null,-3,null,0,-2]
+
+解释：
+MinStack minStack = new MinStack();
+minStack.push(-2);
+minStack.push(0);
+minStack.push(-3);
+minStack.getMin();   --> 返回 -3.
+minStack.pop();
+minStack.top();      --> 返回 0.
+minStack.getMin();   --> 返回 -2.
+
+提示：
+	pop、top 和 getMin 操作总是在 非空栈 上调用。
+
+需要两个栈，一个正常压入数据，一个是只会压入越来越小的数据。
  
 class MinStack {
 public:
@@ -5480,6 +5809,21 @@ public:
  
 ##[求众数](https://leetcode-cn.com/problems/majority-element)    
  
+给定一个大小为 n 的数组，找到其中的多数元素。多数元素是指在数组中出现次数大于 ⌊ n/2 ⌋ 的元素。
+你可以假设数组是非空的，并且给定的数组总是存在多数元素。
+
+示例 1:
+
+输入: [3,2,3]
+输出: 3
+
+示例 2:
+
+输入: [2,2,1,1,1,2,2]
+输出: 2
+
+因为多数元素是存在的，并且大于n/2，则计数器能选拔出多数元素来。
+
 class Solution {
 public:
     int majorityElement(vector<int>& nums) {
@@ -5761,7 +6105,27 @@ public:
 ##[搜索旋转排序数组 II](https://leetcode-cn.com/problems/search-in-rotated-sorted-array-ii)    
  
 ##[数组中的第K个最大元素](https://leetcode-cn.com/problems/kth-largest-element-in-an-array) 
- 
+
+在未排序的数组中找到第 k 个最大的元素。请注意，你需要找的是数组排序后的第 k 个最大的元素，而不是第 k 个不同的元素。
+
+示例 1:
+
+输入: [3,2,1,5,6,4] 和 k = 2
+输出: 5
+
+
+示例 2:
+
+输入: [3,2,3,1,2,4,5,5,6] 和 k = 4
+输出: 4
+
+说明: 
+
+你可以假设 k 总是有效的，且 1 ≤ k ≤ 数组的长度。
+
+需要使用最小堆，才能找出第几大的。priority_queue默认是最大堆，priority_queue<int>默认是最大堆,等同于 priority_queue<int, vector<int>, less<int> >
+定义最小堆,使用priority_queue<int,vector<int>,greater<int>>
+
 class Solution {
 public:
     int findKthLargest(vector<int>& nums, int k) {
@@ -5777,7 +6141,26 @@ public:
  
 ##[存在重复元素](https://leetcode-cn.com/problems/contains-duplicate)    
 
-哈希表
+给定一个整数数组，判断是否存在重复元素。
+如果任意一值在数组中出现至少两次，函数返回 true 。如果数组中每个元素都不相同，则返回 false 。
+
+示例 1:
+
+输入: [1,2,3,1]
+输出: true
+
+示例 2:
+
+输入: [1,2,3,4]
+输出: false
+
+示例 3:
+
+输入: [1,1,1,3,3,4,3,2,4,2]
+输出: true
+
+使用哈希表来判断重复
+
 class Solution {
 public:
     bool containsDuplicate(vector<int>& nums) {
@@ -7052,6 +7435,27 @@ public:
 };
  
 ##[二叉树中的最大路径和](https://leetcode-cn.com/problems/binary-tree-maximum-path-sum)    
+给定一个非空二叉树，返回其最大路径和。
+本题中，路径被定义为一条从树中任意节点出发，达到任意节点的序列。该路径至少包含一个节点，且不一定经过根节点。
+
+示例 1:
+输入: [1,2,3]
+       1
+      / \
+     2   3
+
+输出: 6
+
+示例 2:
+输入: [-10,9,20,null,null,15,7]
+
+   -10
+   / \
+  9  20
+    /  \
+   15   7
+
+输出: 42
  
 class Solution {
 public:
@@ -7064,11 +7468,11 @@ public:
     int maxTree(TreeNode* root,int &ma) 
     {
         if (!root)return 0;
-        int leftPath = maxTree(root->left,ma);
+        int leftPath = maxTree(root->left,ma);//左边、右边路径大小最大路径和
         int rightPath = maxTree(root->right,ma);
-        int v = max(root->val,root->val + max(leftPath,0)+ max(rightPath,0));//本树路径最大值
+        int v = max(root->val,root->val + max(leftPath,0)+ max(rightPath,0));//本节点树的最大路径和
         ma = max(ma,v);
-        return max(0,max(root->val + leftPath,root->val + rightPath));//边路径最大值
+        return max(0,max(root->val + leftPath,root->val + rightPath));//返回本节点开始的边路径最大值（或者可以不使用本节点）
     }
 };
  
@@ -7362,7 +7766,38 @@ public:
  
 ##[二叉搜索树中第K小的元素](https://leetcode-cn.com/problems/kth-smallest-element-in-a-bst)
  
-因为是二叉搜索树，使用中序遍历就可以，就是从小到大。使用栈来遍历
+给定一个二叉搜索树，编写一个函数 kthSmallest 来查找其中第 k 个最小的元素。
+
+说明：
+你可以假设 k 总是有效的，1 ≤ k ≤ 二叉搜索树元素个数。
+
+示例 1:
+
+输入: root = [3,1,4,null,2], k = 1
+   3
+  / \
+ 1   4
+  \
+   2
+输出: 1
+
+示例 2:
+
+输入: root = [5,3,6,2,4,null,null,1], k = 3
+       5
+      / \
+     3   6
+    / \
+   2   4
+  /
+ 1
+输出: 3
+
+进阶：
+如果二叉搜索树经常被修改（插入/删除操作）并且你需要频繁地查找第 k 小的值，你将如何优化 kthSmallest 函数？
+
+因为是二叉搜索树，使用中序遍历就可以，就是从小到大。使用栈来实现中序遍历。
+
 class Solution {
 public:
     int kthSmallest(TreeNode* root, int k)
@@ -7376,8 +7811,8 @@ public:
         {
             while(p)
             {
-                sk.push(p);
-                p = p->left;
+                sk.push(p);//使用栈来实现中序遍历，二叉搜索树可以实现从小到大遍历
+                p = p->left;//一直放左边
             }
             p = sk.top();
             sk.pop();
@@ -7707,6 +8142,21 @@ public:
 };
  
 ##[二叉树的最大深度](https://leetcode-cn.com/problems/maximum-depth-of-binary-tree)    
+
+给定一个二叉树，找出其最大深度。
+二叉树的深度为根节点到最远叶子节点的最长路径上的节点数。
+说明: 叶子节点是指没有子节点的节点。
+
+示例：
+给定二叉树 [3,9,20,null,null,15,7]，
+    3
+   / \
+  9  20
+    /  \
+   15   7
+
+返回它的最大深度 3 。
+
 class Solution {
 public:
     int maxDepth(TreeNode* root) {
