@@ -1140,7 +1140,7 @@ chunkSize 对分裂及迁移的影响
         键的文档（也不支持空值插入）
 
 
-##
+##MongoDB中_id(ObjectId)生成 
 https://www.cnblogs.com/btgyoyo/p/7156589.html
 MongoDB 中我们经常会接触到一个自动生成的字段："_id"，类型为ObjectId。
 之前我们使用MySQL等关系型数据库时，主键都是设置成自增的。但在分布式环境下，这种方法就不可行了，会产生冲突。为此，mongodb采用了一个称之为ObjectId的类型来做主键。ObjectId是一个12字节的 BSON 类型字符串。按照字节顺序，一次代表：
@@ -1257,9 +1257,7 @@ MongoDB的缺陷
 3. MongoDB一方面在方便开发者的同时，另一方面对运维人员却提出了相当多的要求。业界并没有成熟的MongoDB运维经验，MongoDB中数据的存放格式也很随意，等等问题都对运维人员的考验。
 
 ##详解mongodb——架构模式、持久化原理和数据文件存储原理 值得收藏
-
 https://www.cnblogs.com/web-fusheng/p/6884759.html
-
 
 架构模式
 Replica set：复制集，mongodb的架构方式之一 ，通常是三个对等的节点构成一个“复制集”集群，有“primary”和secondary等多中角色（稍后详细介绍），其中primary负责读写请求，secondary可以负责读请求，这有配置决定，其中secondary紧跟primary并应用write操作；如果primay失效，则集群进行“多数派”选举，选举出新的primary，即failover机制，即HA架构。复制集解决了单点故障问题，也是mongodb垂直扩展的最小部署单位，当然sharding cluster中每个shard节点也可以使用Replica set提高数据可用性。
@@ -1352,4 +1350,55 @@ db.getCollection('testOrAnd').
 最终实现结果
 
 
+##MongoDB安装部署及操作 
+https://www.cnblogs.com/jiangyatao/p/11156390.html
+用户授权认证
+use admin
+db.createUser(
+	{
+		user: "admin",
+		pwd: "123456",
+		roles:[ { role: "root", db:"admin"}]}
+)
+--------------role里的角色可以选：
+              Built-In Roles（内置角色）：
+             .1. 数据库用户角色：read、readWrite;
+              .2. 数据库管理角色：dbAdmin、dbOwner、userAdmin；
+              .3. 集群管理角色：clusterAdmin、clusterManager、clusterMonitor、hostManager；
+              .4. 备份恢复角色：backup、restore；
+              .5. 所有数据库角色：readAnyDatabase、readWriteAnyDatabase、userAdminAnyDatabase、dbAdminAnyDatabase
+              .6. 超级用户角色：root 
+                // 这里还有几个角色间接或直接提供了系统超级用户的访问（dbOwner 、userAdmin、userAdminAnyDatabase）
+              .7. 内部角色：__system
+              具体角色： 
+                Read：允许用户读取指定数据库
+                readWrite：允许用户读写指定数据库
+                backup,retore:在进行备份、恢复时可以单独指定的角色，在db.createUser()方法中roles里面的db必须写成是admin库，要不然会 报错
+                dbAdmin：允许用户在指定数据库中执行管理函数，如索引创建、删除，查看统计或访问system.profile
+                userAdmin：允许用户向system.users集合写入，可以找指定数据库里创建、删除和管理用户
+                clusterAdmin：只在admin数据库中可用，赋予用户所有分片和复制集相关函数的管理权限。
+                readAnyDatabase：只在admin数据库中可用，赋予用户所有数据库的读权限
+                readWriteAnyDatabase：只在admin数据库中可用，赋予用户所有数据库的读写权限
+                userAdminAnyDatabase：只在admin数据库中可用，赋予用户所有数据库的userAdmin权限，
+                dbAdminAnyDatabase：只在admin数据库中可用，赋予用户所有数据库的dbAdmin权限。
+                root：只在admin数据库中可用。超级账号，超级权限
+修改配置文件
+vim /opt/mongo_cluster/mongo_27017/conf/mongodb.conf   
+ 添加
+security:
+  authorization: enabled
+
+重启服务
+mongod -f /opt/mongo_cluster/mongo_27017/conf/mongodb.conf --shutdown
+mongod -f /opt/mongo_cluster/mongo_27017/conf/mongodb.conf
+
+登录
+mongo
+show dbs 
+mongo -uadmin -p 
+show dbs
+
+
+##10分钟完成MongoDB的容量规划及硬件配置
+https://mongoing.com/archives/878
 
