@@ -291,12 +291,16 @@ https://blog.csdn.net/sunbocong/article/details/78643457
 ##Mongodb集群的三种搭建方式
 如上图所示，现假设我们有三台服务器，三台服务器上配置各配置一个分片，一个配置服务，一个Router服务。其中，每个分片，都是Replica Set，在第一节中介绍过，但是配置还是稍有不同。
 在所有服务器上运行如下Docker容器
+
 ###1.数据容器Master
 docker run -d -p 27018:27018 --name mongodb_shard_master -v /share/disk0/mongodb_cluster/mongodb_node/shard_server_master/data:/data/db mongo:latest mongod --shardsvr --port 27018 --replSet rs1 --dbpath /data/db
+
 ###2.数据容器Slaver
 docker run -d -p 27118:27118 --name mongodb_shard_slaver -v /share/disk0/mongodb_cluster/mongodb_node/shard_server_slaver/data:/data/db mongo:latest mongod --shardsvr --port 27118 --replSet rs1 --dbpath /data/db
+
 ###3.数据容器Arbiter
 docker run -d -p 27118:27118 --name mongodb_shard_arbiter -v /share/disk0/mongodb_cluster/mongodb_node/shard_server_arbiter/data:/data/db mongo:latest mongod --shardsvr --port 27118 --replSet rs1 --dbpath /data/db
+
 ###4.配置Sharding Replica Set
 docker exec -it mongo_master /bin/sh
 mongo --port 27018
@@ -311,6 +315,7 @@ user: "admin",
 pwd: "P@ssw0rd",
 roles: [ { role: "root", db: "admin" } ]
 });
+
 ###5.配置服务容器
 docker run -t -i -d -p 27019:27019 --name mongodb_configrs -v /share/disk0/mongodb_cluster/mongodb_node/config_server/data:/data/db mongo:latest mongod --configsvr --replSet csrs --dbpath /data/db
 这里--configsvr默认是27019端口
@@ -322,6 +327,7 @@ rs.add("服务器2IP: 27019")
 rs.addArb("服务器3IP: 27019")
 rs.conf()
 rs.status()
+
 ###6.路由服务容器
 这里需要在服务器2、3上先运行配置服务容器
 docker run -t -i -d -p 27020:27020 --name mongodb_router -v /share/disk0/mongodb_cluster/mongodb_node1/router_server/data:/data/db mongo:latest mongos --configdb csrs/服务器1IP:27019,服务器2IP:27019,服务器3IP:27019 --port 27020
@@ -339,6 +345,7 @@ user: "admin",
 pwd: "P@ssword",
 roles: [ { role: "root", db: "admin" } ]
 });
+
 ###7.最后，通第一节中，删除分片容器和路由容器，在启动容器时，带上--auth。这样，连接Mongodb时，必须使用用户名密码登陆。
 3.Master-Slave
 这种模式比较简单，但是官方已经不推荐使用。只用于开发时调试可以使用。
@@ -372,8 +379,8 @@ HA的三种工作方式：
 工作原理：两台主机同时运行各自的服务工作且相互监测情况，当任一台主机宕机时，另一台主机立即接管它的一切工作，保证工作实时，应用服务系统的关键数据存放在共享存储系统中。
 集群工作方式（多服务器互备方式）
 工作原理：多台主机一起工作，各自运行一个或几个服务，各为服务定义一个或多个备用主机，当某个主机故障时，运行在其上的服务就可以被其它主机接管
-###主从架构（Master-Slave）
 
+###主从架构（Master-Slave）
 Mater-Slaves
 主从架构一般用于备份或者做读写分离。由两种角色构成：
 主(Master)
@@ -554,6 +561,7 @@ https://www.jianshu.com/p/ea35f248cc68
 
 58同城作为中国最大的生活服务平台，涵盖了房产、招聘、二手、二手车、黄页等核心业务。58同城发展之初，大规模使用关系型数据库（SQL Server、MySQL等），随着业务扩展速度增加，数据量和并发量演变的越来越有挑战，此阶段58的数据存储架构也需要相应的调整以更好的满足业务快速发展的需求。
 MongoDB经过几个版本的迭代，到2.0.0以后，变的越来越稳定，它具备的高性能、高扩展性、Auto-Sharding、Free-Schema、类SQL的丰富查询和索引等特性，非常诱惑，同时58同城在一些典型业务场景下使用MongoDB也较合适，2011年，我们开始使用MongoDB，逐步扩大了使用的业务线，覆盖了58帮帮、58交友、58招聘、信息质量等等多条业务线。
+
 随着58每天处理的海量数据越来越大，并呈现不断增多的趋势，这为MongoDB在存储与处理方面带来了诸多的挑战。面对百亿量级的数据，我们该如何存储与处理，本文将详细介绍MongoDB遇到的问题以及最终如何“完美”解决。
 
 本文详细讲述MongoDB在58同城的应用实践：MongoDB在58同城的使用情况；为什么要使用MongoDB；MongoDB在58同城的架构设计与实践；针对业务场景我们在MongoDB中如何设计库和表；数据量增大和业务并发，我们遇到典型问题及其解决方案；MongoDB如何监控。
@@ -569,7 +577,9 @@ Airbnb 的通用数据产品平台架构开发设计思路
 Apache Beam 大规模乱序流数据处理
 Apache Kafka：大数据的实时处理分析实战
 阿里新一代实时计算引擎 Blink 典型的场景应用
+
 图1 MongoDB典型的使用场景：转转
+
 为什么要使用MongoDB？
 MongoDB这个来源英文单词“humongous”，homongous这个单词的意思是“巨大的”、“奇大无比的”，从MongoDB单词本身可以看出它的目标是提供海量数据的存储以及管理能力。MongoDB是一款面向文档的NoSQL数据库，MongoDB具备较好的扩展性以及高可用性，在数据复制方面，支持Master-Slaver（主从）和Replica-Set（副本集）等两种方式。通过这两种方式可以使得我们非常方便的扩展数据。
 MongoDB较高的性能也是它强有力的卖点之一，存储引擎使用的内存映射文件（MMAP的方式），将内存管理工作交给操作系统去处理。MMAP的机制，数据的操作写内存即是写磁盘，在保证数据一致性的前提下，提供了较高的性能。
@@ -583,16 +593,14 @@ MongoDB作为一款NoSQL数据库产品，Free Schema是它的特性之一，在
 MongoDB提供了自动分片（Auto-Sharding）的功能，经过我们的实际测试和线上验证，并没有使用这个功能。我们启用了MongoDB的库级Sharding；在CollectionSharding方面，我们使用手动Sharding的方式，水平切分数据量较大的文档。
 MongoDB的存储文档必须要有一个“_id”字段，可以认为是“主键”。这个字段值可以是任何类型，默认一个ObjectId对象，这个对象使用了12个字节的存储空间，每个字节存储两位16进制数字，是一个24位的字符串。这个存储空间消耗较大，我们实际使用情况是在应用程序端，使用其他的类型（比如int）替换掉到，一方面可以减少存储空间，另外一方面可以较少MongoDB服务端生成“_id”字段的开销。
 在每一个集合中，每个文档都有唯一的“_id”标示，来确保集中每个文档的唯一性。而在不同集合中，不同集合中的文档“_id”是可以相同的。比如有2个集合Collection_A和Collection_B，Collection_A中有一个文档的“_id”为1024，在Collection_B中的一个文档的“_id”也可以为1024。
+
+
 ###MongoDB集群部署
 MongoDB集群部署我们采用了Sharding+Replica-Set的部署方式。整个集群有Shard Server节点（存储节点，采用了Replica-Set的复制方式）、Config Server节点（配置节点）、Router Server（路由节点、Arbiter Server（投票节点）组成。每一类节点都有多个冗余构成。满足58业务场景的一个典型MongoDB集群部署架构如下所示[图2]：
 
 
-
-
 图2 58同城典型业务MongoDB集群部署架构
 在部署架构中，当数据存储量变大后，我们较易增加Shard Server分片。Replica-Set的复制方式，分片内部可以自由增减数据存储节点。在节点故障发生时候，可以自动切换。同时我们采用了读写分离的方式，为整个集群提供更好的数据读写服务。
-
-
 
 
 图3 Auto-Sharding MAY is not that Reliable
@@ -649,9 +657,6 @@ IM用户信息表，包含用户uid、用户登录名、用户昵称、用户签
 悲剧发生了：晚上10点后部署删除直到早上7点还没删除完毕；MongoDB集群和业务监控断续有报警；从库延迟大；QPS/TPS很低；业务无法响应。事后分析原因：虽然删除命令db.collection.remove({“flag” : 1}};很简单，但是flag字段并不是索引字段，删除操作等价于全部扫描后进行，删除速度很慢，需要删除的消息基本都是冷数据，大量的冷数据进入内存中，由于内存容量的限制，会把内存中的热数据swap到磁盘上，造成内存中全是冷数据，服务能力急剧下降。
 遇到问题不可怕，我们如何解决呢？首先我们要保证线上提供稳定的服务，采取紧急方案，找到还在执行的opid，先把此命令杀掉（kill opid），恢复服务。长期方案，我们首先优化了离线删除程序[图8]，把已读IM离线消息的删除操作，每晚定时从库导出要删除的数据，通过脚本按照objectid主键（_id）的方式进行删除，并且删除速度通过程序控制，从避免对线上服务影响。其次，我们通过用户的离线消息的读取行为来分析，用户读取离线消息时间分布相对比较均衡，不会出现比较密度读取的情形，也就不会对MongoDB的更新带来太大的影响，基于此我们把用户IM离线消息的删除由逻辑删除优化成物理删除，从而从根本上解决了历史数据的删除问题。
 
-
-
-
 图8 离线删除优化脚本
 大量数据空洞问题及其解决方案
 MongoDB集群大量删除数据后（比如上节中的IM用户离线消息删除）会存在大量的空洞，这些空洞一方面会造成MongoDB数据存储空间较大，另外一方面这些空洞数据也会随之加载到内存中，导致内存的有效利用率较低，在机器内存容量有限的前提下，会造成热点数据频繁的Swap，频繁Swap数据，最终使得MongoDB集群服务能力下降，无法提供较高的性能。
@@ -663,11 +668,7 @@ MongoDB集群大量删除数据后（比如上节中的IM用户离线消息删�
 通过这种Offline的收缩方式，我们可以做到收缩率是100%，数据完全无碎片。当然做离线的数据收缩会带来运维成本的增加，并且在Replic-Set集群只有2个副本的情况下，还会存在一段时间内的单点风险。通过Offline的数据收缩后，收缩前后效果非常明显，如[图9,图10]所示：收缩前85G存储文件，收缩后34G存储文件，节省了51G存储空间，大大提升了性能。
 
 
-
-
 图9 收缩MongoDB数据库前存储数据大小
-
-
 
 
 图10 收缩MongoDB数据库后存储数据大小
@@ -795,11 +796,13 @@ keyfile方式默认会开启鉴权，而针对初始化安装的场景，Mongodb
 1. 下载安装包
 官方地址：https://www.mongodb.com/download-center
 wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-rhel70-3.6.3.tgz
+
 2. 部署目录
 解压压缩文件，将bin目录拷贝到目标路径/opt/local/mongo-cluster，参考以下命令：
 tar -xzvf mongodb-linux-x86_64-rhel70-3.6.3.tgz
 mkdir -p  /opt/local/mongo-cluster
 cp -r mongodb-linux-x86_64-rhel70-3.6.3/bin  /opt/local/mongo-cluster
+
 3. 创建配置文件
 cd /opt/local/mongo-cluster
 mkdir conf 
@@ -1401,4 +1404,41 @@ show dbs
 
 ##10分钟完成MongoDB的容量规划及硬件配置
 https://mongoing.com/archives/878
+
+##MongoDB实战-分片概念和原理
+https://blog.csdn.net/wanght89/article/details/77842336
+
+分片一个集合
+   MongoDB的分片是基于范围的。也就是说分片集合里的每个文档都必须落在指定键的某个值范围里。MongoDB使用所谓的分片键（shard key）让每个文档在这些范围里找到自己的位置。（其他的分布式数据库里可能使用分区键partition key或分布键 distribution key来代替分片键这个术语）从假想的电子表格管理应用程序里拿出一个实例文档，这样能更好地理解分片键：
+
+{
+_id:ObjectId("4d6e9b89b600c2c196442c21")
+filename:"spreadsheet-1"
+updated_at:ISODate("2017-09-04T19:22:54.845z")
+username:"banks"
+data:"raw documnet data"
+}
+
+    在对该集合进行分片时，必须将其中的一个或多个字段申明为分片键。如果选择_id，那么文档会基于对象ID的范围进行分布。但是，处于一些原因，你要基于username和_id声明一个复合分片键：因此，这些范围通常会表示Wie一系列用户名
+   现在你需要理解块（chunk）的概念，它是位于一个分片中的一段连续的分片键范围。举例来说，可以假设docs集合分布在两个分片A和B上，它被分成下表所示的多个块。每个块的范围都由起始值和终止值来标识。
+
+起始值	终止值	分片
+-无穷大	abbot	B
+abbot	dayton	A
+dayton	harris	B
+harris	norris	A
+norris	无穷大	B
+
+     粗略扫视上表后，你会发现一个重要的、有些违反直觉的属性：虽然每个单独的块都表示一段连续范围的数据，但这些块能出现在任意分片上。关于块，第二个要点是它们是种逻辑上的东西，而非物理上的。换言之，块并不表示磁盘上连续的文档。从一定程度上来说，如果一个从harris开始到norris结束的块存在于分片A上，那么就认为可以在分片A的docs集合里找到分片键落在这个范围内的文档。这个集合里那些文档的排列没有任何必然关系。
+
+拆分与迁移
+     分片机制的重点是块的拆分（spliting）与迁移（migration）
+
+      首先，考虑一下块拆分的思想。在初始化分片集群时，只存在一个块，这个块的范围涵盖了整个分片集合。那该如何发展到有多个块的分片集群呢？答案就是块大小达到某个阈值是就会对块进行拆分。默认的块的最大块尺寸时64MB或者100000个文档，先达到哪个标准就以哪个标准为准。在向新的分片集群添加数据时，原始的块最终会达到某个阈值，触发块的拆分。这是一个简单的操作，基本就是把原来的范围一分为二，这样就有两个块，每个块都有相同数量的文档。
+
+     请注意，块的拆分是个逻辑操作。当MongoDB进行块拆分时，它只是修改块的元数据就能让一个块变为两个。因此，拆分一个块并不影响分片集合里文档的物理顺序。也就是说拆分既简单又快捷。 
+
+     你可以回想一下，设计分片系统时最大的一个困难就是保证数据始终均匀分布。MongoDB的分片集群是通过在分片中移动块来实现均衡的。我们称之为迁移，这是一个真实的物理操作。
+
+    迁移是由名为均衡器（balancer）的软件进程管理的，它的任务就是确保数据在各个分片中保持均匀变化。通过追踪各分片上块的数量，就能实现这个功能。虽然均衡的触发会随总数据量的不同而变化，但是通常来说，当集群中拥有块最多的分片与拥有块最少的分片的块数相差大于8时，均衡器就会发起一次均衡处理。在均衡过程中，块会从块较多的分片迁移到块较少非分片上，直到两个分片的块数大致相等为止。
 
