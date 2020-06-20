@@ -1,12 +1,11 @@
 
 #linux 指令
-
-##head tail
+##head和tail   cat filename | tail -n +3000 | head -n 1000
 情景linux–一张图搞懂head -n和tail -n
 https://blog.csdn.net/signjing/article/details/69357769
 
 linux取出某几行 
-一、2113从第3000行开始，显示52611000行。即显示3000~3999行4102
+一、显示3000~3999行
 cat filename | tail -n +3000 | head -n 1000
 二、显示1000行到3000行
 cat filename| head -n 3000 | tail -n +1000
@@ -18,7 +17,7 @@ head -n 1000：显示前面1000行
 三、用sed命令
 sed -n '5,10p' filename 这样就可以只查看文件的第5行到第10行。 
 
-##tee
+##tee ls | tee out.txt
 https://blog.csdn.net/weixin_34362790/article/details/86443986
 
 tee命令用于将数据重定向到文件，另一方面还可以提供一份重定向数据的副本作为后续命令的stdin。简单的说就是把数据重定向到给定文件和屏幕上。
@@ -68,8 +67,7 @@ grep：文本过滤器，如果仅仅是过滤文本，可使用grep，其效率
 sed：Stream EDitor，流编辑器，默认只处理模式空间，不处理原数据，如果你处理的数据是针对行进行处理的，可以使用sed；
 awk：报告生成器，格式化以后显示。如果对处理的数据需要生成报告之类的信息，或者你处理的数据是按列进行处理的，最好使用awk。
  
-###grep
- 
+###grep grep '[a-z]\{5}\' aa
 grep(关键字: 截取) 文本搜集工具, 结合正则表达式非常强大
 主要参数 []
 -c : 只输出匹配的行
@@ -86,7 +84,6 @@ grep(关键字: 截取) 文本搜集工具, 结合正则表达式非常强大
         http://www.cnblogs.com/-zyj/p/5760484.html
 
 ###sed
- 
 sed(关键字: 编辑) 以行为单位的文本编辑工具 sed可以直接修改档案, 不过一般不推荐这么做, 可以分析 standard input
 基本工作方式: sed [-nef] '[动作]' [输入文本]
           a\ ： 在当前行后添加一行或多行。多行时除最后一行外，每行末尾需用“\”续行
@@ -129,19 +126,27 @@ $0:表示当前行
 $1:表示当前行的第一列
 $2:表示当前行的第二列
 
-##find
+##find find . -type f -name '*.log*' | xargs grep --color -n 'Identify'
+
 find grep 联合使用 过滤所有子目录、文件
 find . -type f -name '*.log*' | xargs grep --color -n 'GetConnectIdentify'
 
 
-##traceroute
+##traceroute traceroute -n -m 5 -q 4 -w 3 www.baidu.com 
 https://www.cnblogs.com/ftl1012/p/traceroute.html
+  traceroute我们可以知道信息从你的计算机到互联网另一端的主机是走的什么路径。当然每次数据包由某一同样的出发点（source）到达某一同样的目的地(destination)走的路径可能会不一样，但基本上来说大部分时候所走的路由是相同的。
+
 traceroute -n -m 5 -q 4 -w 3 www.baidu.com 
 说明： -n 显示IP地址，不查主机名，  -m 设置跳数   
          -q 4每个网关发送4个数据包    -w 把对外发探测包的等待响应时间设置为3秒
          
+探测包使用的基本UDP端口设置6888
+traceroute -p 6888 www.baidu.com
+
+绕过正常的路由表，直接发送到网络相连的主机
+traceroute -r www.baidu.com
          
-##Linux wc命令详解 
+##Linux wc命令详解  cat /etc/passwd | wc -l
 wc常见命令参数 
 wc  -l : 统计行
 wc  -c: 统计字节数
@@ -159,8 +164,10 @@ awk '{print NR $0}' h.txt  | tail -1
  
 grep -n "." h.txt
 查看/etc/passwd有多少用户 
+
  统计行数
 [root@localhost omc]# cat /etc/passwd | wc -l
+
  统计最长
 [root@localhost omc]# cat /etc/passwd | wc -L
 
@@ -262,7 +269,7 @@ ss命令是Linux CentOS 7中iproute软件包的一部分，默认已经安装。
 一般来说，网络套接字是由IP地址，传输协议和端口来定义的。这种组合构成了双向连接的一个方面。例如：一个Web服务器可能正在侦听172.28.204.62:80上的传入TCP连接，这是套接字。不过需要说明的是套接字不是连接本身，而是连接的端点之一。
 下面我讲解如何使用ss命令查看各种信息。具体使用语法如下：
 ss [options] [ FILTER ]
-###1.列出已建立的连接
+###1.列出已建立的连接  ss | head -n 5
 默认情况下，如果我们运行ss命令而没有指定其他选项，它将显示所有已建立连接的打开的非侦听套接字的列表，例如TCP，UDP或UNIX套接字。
 [root@renwolecom ~]# ss | head -n 5
 Netid  State  Recv-Q Send-Q Local Address:Port   Peer Address:Port
@@ -271,7 +278,7 @@ u_str  ESTAB  0      0       * 19441                 * 19440
 u_str  ESTAB  0      0       * 19440                 * 19441
 u_str  ESTAB  0      0       * 19396                 * 19397
 
-###2.显示监听套接字
+###2.显示监听套接字 ss -lt
 我们可以使用-l选项专门列出当前正在侦听连接的套接字，而不是列出所有的套接字。
 [root@renwolecom ~]# ss -lt
 State   Recv-Q Send-Q    Local Address:Port       Peer Address:Port
@@ -284,14 +291,14 @@ LISTEN  0      80                   :::mysql                :::*
 LISTEN  0      100                 ::1:smtp                 :::*
 LISTEN  0      128                  :::entexthigh           :::*
 在这个示例中，我们还使用-t选项只列出TCP，稍后将对此进行详细说明。在后面的例子中，你会看到我将结合多种选择，以快速过滤掉，从而达到我们的目的。
-###3.显示进程
+###3.显示进程 ss -pl
 我们可以用-p选项打印出拥有套接字的进程或PID号。
 [root@renwolecom ~]# ss -pl
 
 Netid  State      Recv-Q Send-Q Local Address:Port     Peer Address:Port
 tcp    LISTEN     0      128    :::http                :::*                 users:(("httpd",pid=10522,fd=4),("httpd",pid=10521,fd=4),("httpd",pid=10520,fd=4),("httpd",pid=10519,fd=4),("httpd",pid=10518,fd=4),("httpd",pid=10516,fd=4))
 在上面的例子中我只列出了一个结果，没有进行进一步选项，因为ss的完整输出打印出超过500行到标准输出。所以我只列出一条结果，由此我们可以看到服务器上运行的各种Apache进程ID。
-###4.不解析服务名称
+###4.不解析服务名称 ss -n
 默认情况下，ss只会解析端口号，例如在下面的行中，我们可以看到172.28.204.62:mysql，其中mysql被列为本地端口。
 [root@renwolecom ~]# ss
 Netid State Recv-Q Send-Q   Local Address:Port      	Peer Address:Port
@@ -307,12 +314,14 @@ tcp   ESTAB 0      0 ::ffff:172.28.204.62:3306  ::ffff:172.28.204.62:51598
 tcp   ESTAB 0      0 ::ffff:172.28.204.62:3306  ::ffff:172.28.204.62:51434
 tcp   ESTAB 0      0 ::ffff:172.28.204.62:3306  ::ffff:172.28.204.62:36360
 现在显示3306，而非mysql，因为禁用了主机名和端口的所有名称解析。另外你还可以查看/etc/services得到所有服务对应的端口列表。
-###5.解析数字地址/端口
+
+###5.解析数字地址/端口 ss -r
 用-r选项可以解析IP地址和端口号。用此方法可以列出172.28.204.62服务器的主机名。
 [root@renwolecom ~]# ss -r
 Netid  State  Recv-Q Send-Q        Local Address:Port      Peer Address:Port
 tcp    ESTAB      0      0         renwolecom:mysql        renwolecom:48134
-###6.IPv4套接字
+
+###6.IPv4套接字 ss -l4
 我们可以通过-4选项只显示与IPv4套接字对应的信息。在下面的例子中，我们还使用-l选项列出了在IPv4地址上监听的所有内容。
 [root@renwolecom ~]# ss -l4
 Netid State      Recv-Q Send-Q  Local Address:Port            Peer Address:Port
@@ -331,7 +340,8 @@ udp   UNCONN     0      0                  :::21581                     :::*
 tcp   LISTEN     0      80                 :::mysql                     :::*
 tcp   LISTEN     0      100               ::1:smtp                      :::*
 tcp   LISTEN     0      128                :::entexthigh                :::*
-###8.只显示TCP
+
+###8.只显示TCP ss -lt
 -t选项只显示TCP套接字。当与-l结合只打印出监听套接字时，我们可以看到所有在TCP上侦听的内容。
 [root@renwolecom ~]# ss -lt
 State       Recv-Q Send-Q    Local Address:Port               Peer Address:Port
@@ -343,7 +353,8 @@ LISTEN      0      128           127.0.0.1:cslistener                    *:*
 LISTEN      0      80                   :::mysql                        :::*
 LISTEN      0      100                 ::1:smtp                         :::*
 LISTEN      0      128                  :::entexthigh                   :::*
-###9.显示UDP
+
+###9.显示UDP ss -ul
 -u选项可用于仅显示UDP套接字。由于UDP是一种无连接的协议，因此只运行-u选项将不显示输出，我们可以将它与-a或-l选项结合使用，来查看所有侦听UDP套接字，如下所示：
 [root@renwolecom ~]# ss -ul
 State      Recv-Q Send-Q Local Address:Port                 Peer Address:Port
@@ -354,7 +365,8 @@ UNCONN     0      0              *:9003                         *:*
 UNCONN     0      0              *:9004                         *:*
 UNCONN     0      0      127.0.0.1:terabase                     *:*
 UNCONN     0      0              *:56803                        *:*
-###10. Unix套接字
+
+###10. Unix套接字 ss -x
 -x选项只能用来显示unix域套接字。
 [root@renwolecom ~]# ss -x
 Netid State Recv-Q Send-Q                    Local Address:Port Peer Address:Port
@@ -363,7 +375,8 @@ u_str ESTAB 0      0          /tmp/zabbix_server_ipmi.sock 20155           * 190
 u_str ESTAB 0      0 /tmp/zabbix_server_preprocessing.sock 19354           * 22573
 u_str ESTAB 0      0 /tmp/zabbix_server_preprocessing.sock 21844           * 19375
 ...
-###11.显示所有信息
+
+###11.显示所有信息 ss -ua
 -a选项显示所有的监听和非监听套接字，在TCP的情况下，这意味着已建立的连接。这个选项与其他的组合很有用，例如可以添加-a选项显示所有的UDP套接字，默认情况下只有-u选项我们看不到多少信息。
 [root@renwolecom ~]# ss -u
 Recv-Q Send-Q Local Address:Port                 Peer Address:Port
@@ -378,7 +391,8 @@ UNCONN     0      0                 *:9004                            *:*
 UNCONN     0      0         127.0.0.1:terabase                        *:*
 UNCONN     0      0                 *:56803                           *:*
 ESTAB      0      0      172.28.204.66:36371                     8.8.8.8:domain
-###12.显示套接字内存使用情况
+
+###12.显示套接字内存使用情况 ss -ltm
 -m选项可用于显示每个套接字使用的内存量。
 [root@renwolecom ~]# ss -ltm
 State   Recv-Q Send-Q  Local Address:Port Peer Address:Port
@@ -390,7 +404,8 @@ LISTEN  0      128         127.0.0.1:cslistener     *:*skmem:(r0,rb87380,t0,tb16
 LISTEN  0      80                 :::mysql         :::*skmem:(r0,rb87380,t0,tb16384,f0,w0,o0,bl0)
 LISTEN  0      100               ::1:smtp          :::*skmem:(r0,rb87380,t0,tb16384,f0,w0,o0,bl0)
 LISTEN  0      128                :::entexthigh    :::*skmem:(r0,rb87380,t0,tb16384,f0,w0,o0,bl0)
-###13.显示TCP内部信息
+
+###13.显示TCP内部信息 ss -lti
 我们可以使用-i选项请求额外的内部TCP信息。
 [root@renwolecom ~]# ss -lti
 State       Recv-Q Send-Q Local Address:Port         Peer Address:Port
@@ -406,8 +421,10 @@ LISTEN      0      128               *:ssh                      *:* 	bbr cwnd:10
 LISTEN      0      100       127.0.0.1:smtp                     *:* 	bbr cwnd:10
 LISTEN      0      128               *:sunwebadmins             *:* 	bbr cwnd:10
 LISTEN      0      128              :::ssh                     :::* 	bbr cwnd:10
-在每个侦听套接字下面，我们可以看到更多信息。注意：-i选项不适用于UDP，如果您指定-u，而非-t，则不会显示这些额外的信息。
-###14.显示统计信息
+在每个侦听套接字下面，我们可以看到更多信息。
+注意：-i选项不适用于UDP，如果您指定-u，而非-t，则不会显示这些额外的信息。
+
+###14.显示统计信息 ss -s
 我们可以使用-s选项快速查看统计数据。
 [root@renwolecom ~]# ss -s
 Total: 798 (kernel 1122)
@@ -422,7 +439,7 @@ INET      112       59        53
 FRAG      0         0         0
 这使我们能够快速看到已建立连接的总数，及各种类型的套接字的计数和IPv4或IPv6的使用情况。
 
-###15.基于状态的过滤器
+###15.基于状态的过滤器 ss -t state established
 我们可以指定一个套接字的状态，只打印这个状态下的套接字。例如，我们可以指定包括已建立， established, syn-sent, syn-recv, fin-wait-1, fin-wait-2, time-wait, closed, closed-wait, last-ack监听和关闭等状态。以下示例显示了所有建立的TCP连接。为了生成这个，我通过SSH连接到了服务器，并从Apache加载了一个网页。然后我们可以看到与Apache的连接迅速转变为等待时间。
 [root@renwolecom ~]# ss -t state established
 Recv-Q Send-Q       Local Address:Port              Peer Address:Port
@@ -434,7 +451,7 @@ Recv-Q Send-Q       Local Address:Port              Peer Address:Port
 0      52           172.28.204.67:ssh              123.125.71.38:49518
 0      0     ::ffff:172.28.204.67:http      ::ffff:123.125.71.38:49262
 
-###16.根据端口号进行过滤
+###16.根据端口号进行过滤 ss -ltn sport le 500
 可以通过过滤还可以列出小于(lt)，大于(gt)，等于(eq)，不等于(ne)，小于或等于(le)，或大于或等于(ge)的所有端口。
 例如，以下命令显示端口号为500或以下的所有侦听端口：
 [root@renwolecom ~]# ss -ltn sport le 500
@@ -442,6 +459,7 @@ State       Recv-Q Send-Q Local Address:Port        Peer Address:Port
 LISTEN      0      128                *:80                     *:*
 LISTEN      0      100        127.0.0.1:25                     *:*
 LISTEN      0      100              ::1:25                    :::*
+
 为了进行比较，我们可以执行相反的操作，并查看大于500的所有端口：
 [root@renwolecom ~]# ss -ltn sport gt 500
 State       Recv-Q Send-Q Local Address:Port        Peer Address:Port
@@ -450,11 +468,13 @@ LISTEN      0      128    172.28.204.62:10051                  *:*
 LISTEN      0      128        127.0.0.1:9000                   *:*
 LISTEN      0      80                :::3306                  :::*
 LISTEN      0      128               :::12002                 :::*
+
 我们还可以根据源或目标端口等项进行筛选，例如，我们搜索具有SSH源端口运行的TCP套接字：
 [root@renwolecom ~]# ss -t '( sport = :ssh )'
 State       Recv-Q Send-Q    Local Address:Port     Peer Address:Port
 ESTAB       0      0         172.28.204.66:ssh     123.125.71.38:50140
-###17.显示SELinux上下文
+
+###17.显示SELinux上下文 ss -tlZ
 -Z与-z选项可用于显示套接字的SELinux安全上下文。 在下面的例子中，我们使用-t和-l选项来列出侦听的TCP套接字，使用-Z选项我们也可以看到SELinux的上下文。
 [root@renwolecom ~]# ss -tlZ
 State  Recv-Q Send-Q  Local Address:Port        Peer Address:Port
@@ -468,15 +488,18 @@ LISTEN 0      128         127.0.0.1:ipp                    *:*
 users:(("cupsd",pid=1145,proc_ctx=system_u:system_r:cupsd_t:s0-s0:c0.c1023,fd=12))
 LISTEN 0      100         127.0.0.1:smtp                   *:*
 users:(("master",pid=1752,proc_ctx=system_u:system_r:postfix_master_t:s0,fd=13))
-###18.显示版本号
+
+###18.显示版本号 ss -v
 -v选项可用于显示ss命令的特定版本信息，在这种情况下，我们可以看到提供ss的iproute包的版本。
 [root@renwolecom ~]# ss -v
 ss utility, iproute2-ss130716
-###19.显示帮助文档信息
+
+###19.显示帮助文档信息 ss -h
 -h选项可用于显示有关ss命令的进一步的帮助，如果需要对最常用的一些选项进行简短说明，则可以将其用作快速参考。 请注意：这里并未输入完整列表。
 [root@renwolecom ~]# ss -h
 Usage: ss [ OPTIONS ]
-###20.显示扩展信息
+
+###20.显示扩展信息 ss -lte
 我们可以使用-e选项来显示扩展的详细信息，如下所示，我们可以看到附加到每条行尾的扩展信息。
 [root@renwolecom ~]# ss -lte
 State  Recv-Q Send-Q Local Address:Port   Peer Address:Port
@@ -485,7 +508,8 @@ LISTEN 0      5      172.28.204.62:domain *:*      ino:23750 sk:ffff880073e70f80
 LISTEN 0      128                *:ssh    *:*      ino:22789 sk:ffff880073e70000 <->
 LISTEN 0      128        127.0.0.1:ipp    *:*      ino:23091 sk:ffff880073e707c0 <->
 LISTEN 0      100        127.0.0.1:smtp   *:*      ino:24659 sk:ffff880000100f80 <->
-###21.显示计时器信息
+
+###21.显示计时器信息 ss -to
 -o选项可用于显示计时器信息。该信息向我们展示了诸如重新传输计时器值、已经发生的重新传输的数量以及已发送的keepalive探测的数量。
 [root@renwolecom ~]# ss -to
 State      Recv-Q Send-Q Local Address:Port      Peer Address:Port

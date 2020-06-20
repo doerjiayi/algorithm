@@ -890,4 +890,28 @@ TIME_WAIT很令人头疼，很多问题是由TIME_WAIT造成的，但是TIME_WAI
 利用RST包从外部清掉TIME_WAIT链接：根据TCP规范，收到任何的发送到未侦听端口、已经关闭的连接的数据包、连接处于任何非同步状态（LISTEN, SYS-SENT, SYN-RECEIVED）并且收到的包的ACK在窗口外，或者安全层不匹配，都要回执以RST响应(而收到滑动窗口外的序列号的数据包，都要丢弃这个数据包，并回复一个ACK包)，内核收到RST将会产生一个错误并终止该连接。我们可以利用RST包来终止掉处于TIME_WAIT状态的连接，其实这就是所谓的RST攻击了。
 为了描述方便：假设Client和Server有个连接Connect1，Server主动关闭连接并进入了TIME_WAIT状态，我们来描述一下怎么从外部使得Server的处于 TIME_WAIT状态的连接Connect1提前终止掉。要实现这个RST攻击，首先我们要知道Client在Connect1中的端口port1(一般这个端口是随机的，比较难猜到，这也是RST攻击较难的一个点)，利用IP_TRANSPARENT这个socket选项，它可以bind不属于本地的地址，因此可以从任意机器绑定Client地址以及端口port1，然后向Server发起一个连接，Server收到了窗口外的包于是响应一个ACK，这个ACK包会路由到Client处，这个时候99%的可能Client已经释放连接connect1了，这个时候Client收到这个ACK包，会发送一个RST包，server收到RST包然后就释放连接connect1提前终止TIME_WAIT状态了。提前终止TIME_WAIT状态是可能会带来(问题二、)中说的三点危害，具体的危害情况可以看下RFC1337。RFC1337中建议，不要用RST过早的结束TIME_WAIT状态。
 
+
+#高性能网络编程
+##高性能网络编程7--tcp连接的内存使用
+https://cloud.tencent.com/developer/article/1345061
+
+##大并发下TCP内存消耗优化小记（86万并发业务正常服务） 
+https://www.cnblogs.com/x_wukong/p/7998903.html
+
+TCP能够使用的内存：这三个值就是TCP使用内存的大小，单位是页，每个页是4K的大小，如下：
  
+这三个值分别代表
+Low：6179424   （6179424*4/1024/1024大概23g）
+Pressure：8239232 （8239232*4/1024/1024大概31g）
+High：12358848   （echo 12358848*4/1024/1024大概47g）
+
+这个也是系统装后的默认取值，也就是说最大有47个g（75%的内存）可以用作TCP连接，这三个量也同时代表了三个阀值，TCP的使用小于第二个值时kernel不会有任何提示操作，当大于第二个值时进入压力模式，当高于第三个值时将不接受新的TCP连接，同时会报出“Out  of  socket memory”或者“TCP:too many of orphaned sockets”。
+
+TCP读缓存大小，单位是字节：第一个是最小值4K，第二个是默认值85K，第三个是最大值16M
+
+##tcp内存占用/socket内存占用 
+https://www.cnblogs.com/shengulong/p/11623621.html
+
+##Linux 中每个 TCP 连接最少占用多少内存？
+https://zhuanlan.zhihu.com/p/25241630
+https://www.ctolib.com/topics-110215.html
