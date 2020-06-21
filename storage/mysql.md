@@ -633,3 +633,110 @@ InnoDB 没有数据库级别的锁，也没有页级别的锁(InnoDB只能在表
 ##mysql--主主复制
 https://www.jianshu.com/p/469279c1ad39
 
+##MySQL索引
+https://www.jianshu.com/p/c82148473235
+三、索引的分类
+常见的索引类型有：主键索引、唯一索引、普通索引、全文索引、组合索引
+
+1、主键索引：即主索引，根据主键pk_clolum（length）建立索引，不允许重复，不允许空值；
+
+ALTER TABLE 'table_name' ADD PRIMARY KEY pk_index('col')；
+2、唯一索引：用来建立索引的列的值必须是唯一的，允许空值
+
+ALTER TABLE 'table_name' ADD UNIQUE index_name('col')；
+3、普通索引：用表中的普通列构建的索引，没有任何限制
+
+ALTER TABLE 'table_name' ADD INDEX index_name('col')；
+4、全文索引：用大文本对象的列构建的索引（下一部分会讲解）
+
+ALTER TABLE 'table_name' ADD FULLTEXT INDEX ft_index('col')；
+5、组合索引：用多个列组合构建的索引，这多个列中的值不允许有空值
+
+ALTER TABLE 'table_name' ADD INDEX index_name('col1','col2','col3')；
+*遵循“最左前缀”原则，把最常用作为检索或排序的列放在最左，依次递减，组合索引相当于建立了col1,col1col2,col1col2col3三个索引，而col2或者col3是不能使用索引的。
+
+*在使用组合索引的时候可能因为列名长度过长而导致索引的key太大，导致效率降低，在允许的情况下，可以只取col1和col2的前几个字符作为索引
+
+ALTER TABLE 'table_name' ADD INDEX index_name(col1(4),col2（3))；
+
+表示使用col1的前4个字符和col2的前3个字符作为索引
+
+四、索引的实现原理
+MySQL支持诸多存储引擎，而各种存储引擎对索引的支持也各不相同，因此MySQL数据库支持多种索引类型，如BTree索引，B+Tree索引，哈希索引，全文索引等等，
+
+1、哈希索引：
+
+只有memory（内存）存储引擎支持哈希索引，哈希索引用索引列的值计算该值的hashCode，然后在hashCode相应的位置存执该值所在行数据的物理位置，因为使用散列算法，因此访问速度非常快，但是一个值只能对应一个hashCode，而且是散列的分布方式，因此哈希索引不支持范围查找和排序的功能。
+
+2、全文索引：
+
+FULLTEXT（全文）索引，仅可用于MyISAM和InnoDB，针对较大的数据，生成全文索引非常的消耗时间和空间。对于文本的大对象，或者较大的CHAR类型的数据，如果使用普通索引，那么匹配文本前几个字符还是可行的，但是想要匹配文本中间的几个单词，那么就要使用LIKE %word%来匹配，这样需要很长的时间来处理，响应时间会大大增加，这种情况，就可使用时FULLTEXT索引了，在生成FULLTEXT索引时，会为文本生成一份单词的清单，在索引时及根据这个单词的清单来索引。FULLTEXT可以在创建表的时候创建，也可以在需要的时候用ALTER或者CREATE INDEX来添加：
+
+//创建表的时候添加FULLTEXT索引
+CTREATE TABLE my_table(
+    id INT(10) PRIMARY KEY,
+    name VARCHAR(10) NOT NULL,
+    my_text TEXT,
+    FULLTEXT(my_text)
+)ENGINE=MyISAM DEFAULT CHARSET=utf8;
+//创建表以后，在需要的时候添加FULLTEXT索引
+ALTER TABLE my_table ADD FULLTEXT INDEX ft_index(column_name);
+全文索引的查询也有自己特殊的语法，而不能使用LIKE %查询字符串%的模糊查询语法
+
+SELECT * FROM table_name MATCH(ft_index) AGAINST('查询字符串');
+注意：
+
+*对于较大的数据集，把数据添加到一个没有FULLTEXT索引的表，然后添加FULLTEXT索引的速度比把数据添加到一个已经有FULLTEXT索引的表快。
+
+*5.6版本前的MySQL自带的全文索引只能用于MyISAM存储引擎，如果是其它数据引擎，那么全文索引不会生效。5.6版本之后InnoDB存储引擎开始支持全文索引
+
+*在MySQL中，全文索引支队英文有用，目前对中文还不支持。5.7版本之后通过使用ngram插件开始支持中文。
+
+*在MySQL中，如果检索的字符串太短则无法检索得到预期的结果，检索的字符串长度至少为4字节，此外，如果检索的字符包括停止词，那么停止词会被忽略。
+
+3、BTree索引和B+Tree索引
+
+BTree索引
+BTree是平衡搜索多叉树，设树的度为2d（d>1），高度为h，那么BTree要满足以一下条件：
+
+每个叶子结点的高度一样，等于h；
+每个非叶子结点由n-1个key和n个指针point组成，其中d<=n<=2d,key和point相互间隔，结点两端一定是key；
+叶子结点指针都为null；
+非叶子结点的key都是[key,data]二元组，其中key表示作为索引的键，data为键值所在行的数据；
+
+
+B+Tree索引
+B+Tree是BTree的一个变种，设d为树的度数，h为树的高度，B+Tree和BTree的不同主要在于：
+
+B+Tree中的非叶子结点不存储数据，只存储键值；
+B+Tree的叶子结点没有指针，所有键值都会出现在叶子结点上，且key存储的键值对应data数据的物理地址；
+B+Tree的每个非叶子节点由n个键值key和n个指针point组成；
+
+B+Tree对比BTree的优点：
+
+1、磁盘读写代价更低
+
+一般来说B+Tree比BTree更适合实现外存的索引结构，因为存储引擎的设计专家巧妙的利用了外存（磁盘）的存储结构，即磁盘的最小存储单位是扇区（sector），而操作系统的块（block）通常是整数倍的sector，操作系统以页（page）为单位管理内存，一页（page）通常默认为4K，数据库的页通常设置为操作系统页的整数倍，因此索引结构的节点被设计为一个页的大小，然后利用外存的“预读取”原则，每次读取的时候，把整个节点的数据读取到内存中，然后在内存中查找，已知内存的读取速度是外存读取I/O速度的几百倍，那么提升查找速度的关键就在于尽可能少的磁盘I/O，那么可以知道，每个节点中的key个数越多，那么树的高度越小，需要I/O的次数越少，因此一般来说B+Tree比BTree更快，因为B+Tree的非叶节点中不存储data，就可以存储更多的key。
+
+2、查询速度更稳定
+
+由于B+Tree非叶子节点不存储数据（data），因此所有的数据都要查询至叶子节点，而叶子节点的高度都是相同的，因此所有数据的查询速度都是一样的。
+
+更多操作系统内容参考：
+
+硬盘结构
+
+扇区、块、簇、页的区别
+
+操作系统层优化（进阶，初学不用看）
+
+带顺序索引的B+TREE
+很多存储引擎在B+Tree的基础上进行了优化，添加了指向相邻叶节点的指针，形成了带有顺序访问指针的B+Tree，这样做是为了提高区间查找的效率，只要找到第一个值那么就可以顺序的查找后面的值。
+
+总结如下：
+
+InnoDB 支持事务，支持行级别锁定，支持 B-tree、Full-text 等索引，不支持 Hash 索引；
+MyISAM 不支持事务，支持表级别锁定，支持 B-tree、Full-text 等索引，不支持 Hash 索引；
+此外，Memory 不支持事务，支持表级别锁定，支持 B-tree、Hash 等索引，不支持 Full-text 索引；
+
+
