@@ -56,9 +56,3 @@ I/O多路复用(multiplexing)是网络编程中最常用的模型，像我们最
 
 https://blog.csdn.net/zh13544539220/article/details/44856363
 
-##HTTP性能极限优化
-https://blog.csdn.net/russell_tao/article/details/103952639#comments
-
-##详解HTTP2四大核心特性
-https://developer.51cto.com/art/201910/604255.htm
-
