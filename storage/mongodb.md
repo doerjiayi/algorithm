@@ -289,19 +289,31 @@ https://blog.csdn.net/after_you/article/details/68059774
 https://blog.csdn.net/sunbocong/article/details/78643457
 
 ##Mongodb集群的三种搭建方式
-如上图所示，现假设我们有三台服务器，三台服务器上配置各配置一个分片，一个配置服务，一个Router服务。其中，每个分片，都是Replica Set，在第一节中介绍过，但是配置还是稍有不同。
-在所有服务器上运行如下Docker容器
+https://www.jianshu.com/p/09a78243bc8f
 
-###1.数据容器Master
+最近，对Mongodb的勒索案件层出不穷，大多数是对于Mongo没有进行安全认证的配置，导致了数据直接被攻击者拿到。我们今天讲讲如何配置Mongo集群，并进行安全配置。
+Mongo有三种集群方式
+1.Replica Set副本
+
+2.Sharding分片
+
+3.Master-slave主备
+通常来说，我们用第1、2种较多，第3种官方并不推荐。下面，我们来讲解下这三种集群方式的搭建方式。本文，假设读者已经对Docker有所了解，我们整个过程使用Docker搭建Mongo的集群环境。
+
+
+###2.Sharding分片集群
+
+现假设我们有三台服务器，三台服务器上配置各配置一个分片，一个配置服务，一个Router服务。其中，每个分片，都是Replica Set
+####1.数据容器Master
 docker run -d -p 27018:27018 --name mongodb_shard_master -v /share/disk0/mongodb_cluster/mongodb_node/shard_server_master/data:/data/db mongo:latest mongod --shardsvr --port 27018 --replSet rs1 --dbpath /data/db
 
-###2.数据容器Slaver
+####2.数据容器Slaver
 docker run -d -p 27118:27118 --name mongodb_shard_slaver -v /share/disk0/mongodb_cluster/mongodb_node/shard_server_slaver/data:/data/db mongo:latest mongod --shardsvr --port 27118 --replSet rs1 --dbpath /data/db
 
-###3.数据容器Arbiter
+####3.数据容器Arbiter
 docker run -d -p 27118:27118 --name mongodb_shard_arbiter -v /share/disk0/mongodb_cluster/mongodb_node/shard_server_arbiter/data:/data/db mongo:latest mongod --shardsvr --port 27118 --replSet rs1 --dbpath /data/db
 
-###4.配置Sharding Replica Set
+####4.配置Sharding Replica Set
 docker exec -it mongo_master /bin/sh
 mongo --port 27018
 rs.initiate()
@@ -316,7 +328,7 @@ pwd: "P@ssw0rd",
 roles: [ { role: "root", db: "admin" } ]
 });
 
-###5.配置服务容器
+####5.配置服务容器
 docker run -t -i -d -p 27019:27019 --name mongodb_configrs -v /share/disk0/mongodb_cluster/mongodb_node/config_server/data:/data/db mongo:latest mongod --configsvr --replSet csrs --dbpath /data/db
 这里--configsvr默认是27019端口
 假设在服务器1上运行如下命令
@@ -328,7 +340,7 @@ rs.addArb("服务器3IP: 27019")
 rs.conf()
 rs.status()
 
-###6.路由服务容器
+####6.路由服务容器
 这里需要在服务器2、3上先运行配置服务容器
 docker run -t -i -d -p 27020:27020 --name mongodb_router -v /share/disk0/mongodb_cluster/mongodb_node1/router_server/data:/data/db mongo:latest mongos --configdb csrs/服务器1IP:27019,服务器2IP:27019,服务器3IP:27019 --port 27020
 这样，路由服务容器和配置服务容器建立了关系。然后通过路由服务添加分片到配置服务中
@@ -346,7 +358,7 @@ pwd: "P@ssword",
 roles: [ { role: "root", db: "admin" } ]
 });
 
-###7.最后，通第一节中，删除分片容器和路由容器，在启动容器时，带上--auth。这样，连接Mongodb时，必须使用用户名密码登陆。
+####7.最后，通第一节中，删除分片容器和路由容器，在启动容器时，带上--auth。这样，连接Mongodb时，必须使用用户名密码登陆。
 3.Master-Slave
 这种模式比较简单，但是官方已经不推荐使用。只用于开发时调试可以使用。
 服务器1

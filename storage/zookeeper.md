@@ -77,7 +77,9 @@ Zookeeper规定所有有效的投票都必须在同一轮次中。每个服务�
 投票终止后，服务器开始更新自身状态。若过半的票投给了自己，则将自己的服务器状态更新为LEADING，否则将自己的状态更新为FOLLOWING
 
 
-#[Zookeeper一致性协议原理Zab](https://www.cnblogs.com/hongdada/p/8145075.html)
+#[Zookeeper一致性协议原理Zab]
+(https://www.cnblogs.com/hongdada/p/8145075.html)
+
  ZooKeeper为高可用的一致性协调框架，自然的ZooKeeper也有着一致性算法的实现，ZooKeeper使用的是ZAB协议作为数据一致性的算法， ZAB（ZooKeeper Atomic Broadcast ） 全称为：原子消息广播协议；
 ZAB可以说是在Paxos算法基础上进行了扩展改造而来的，ZAB协议设计了支持崩溃恢复，ZooKeeper使用单一主进程Leader用于处理客户端所有事务请求，采用ZAB协议将服务器数状态以事务形式广播到所有Follower上；
 由于事务间可能存在着依赖关系，ZAB协议保证Leader广播的变更序列被顺序的处理，：一个状态被处理那么它所依赖的状态也已经提前被处理；
@@ -86,51 +88,74 @@ ZAB协议支持的崩溃恢复可以保证在Leader进程崩溃的时候可以�
 
 ##ZooKeeper从以下几点保证了数据的一致性
 ① 顺序一致性
+
 来自任意特定客户端的更新都会按其发送顺序被提交。也就是说，如果一个客户端将Znode z的值更新为a，在之后的操作中，它又将z的值更新为b，则没有客户端能够在看到z的值是b之后再看到值a（如果没有其他对z的更新）。
+
 ② 原子性
+
 每个更新要么成功，要么失败。这意味着如果一个更新失败，则不会有客户端会看到这个更新的结果。
+
 ③ 单一系统映像
+
 一个客户端无论连接到哪一台服务器，它看到的都是同样的系统视图。这意味着，如果一个客户端在同一个会话中连接到一台新的服务器，它所看到的系统状态不会比在之前服务器上所看到的更老。当一台服务器出现故障，导致它的一个客户端需要尝试连接集合体中其他的服务器时，所有滞后于故障服务器的服务器都不会接受该连接请求，除非这些服务器赶上故障服务器。
+
 ④ 持久性
+
 一个更新一旦成功，其结果就会持久存在并且不会被撤销。这表明更新不会受到服务器故障的影响。
 
 ##ZAB协议的两个基本模式：恢复模式和广播模式
+
 恢复模式:（选举）
+
 当服务启动或者在领导者崩溃后，Zab就进入了恢复模式，当领导者被选举出来，且大多数server完成了和leader的状态同步以后，恢复模式就结束了。状态同步保证了leader和server具有相同的系统状态。
+
 具体选举看下面文章
 http://www.jasongj.com/zookeeper/fastleaderelection/
+
 崩溃恢复过程中，为了保证数据一致性需要处理特殊情况：
+
 1、已经被leader提交的proposal确保最终被所有的服务器follower提交
+
 2、确保那些只在leader被提出的proposal被丢弃
+
 针对这个要求,如果让leader选举算法能够保证新选举出来的Leader服务器拥有集群中所有机器最高的ZXID事务proposal，就可以保证这个新选举出来的Leader一定具有所有已经提交的提案，也可以省去Leader服务器检查proposal的提交与丢弃的工作。
  
 广播模式：（数据同步）
+
 一旦Leader已经和多数的Follower进行了状态同步后，他就可以开始广播消息了，即进入广播状态。
 这时候当一个Server加入ZooKeeper服务中，它会在恢复模式下启动，发现Leader，并和Leader进行状态同步。待到同步结束，它也参与消息广播。
 ZooKeeper服务一直维持在广播状态，直到Leader崩溃了或者Leader失去了大部分的Followers支持。
-广播模式极其类似于分布式事务中的2pc（two-phrase commit 两阶段提交）：即Leader提起一个决议，由Followers进行投票，Leader对投票结果进行计算决定是否通过该决议，如果通过执行该决议（事务），否则什么也不做。
+
+广播模式极其类似于分布式事务中的2pc（two-phrase commit 两阶段提交）：
+即Leader提起一个决议，由Followers进行投票，Leader对投票结果进行计算决定是否通过该决议，如果通过执行该决议（事务），否则什么也不做。
 
 广播协议在所有的通讯过程中使用TCP的FIFO信道，通过使用该信道，使保持有序性变得非常的容易。通过FIFO信道，消息被有序的deliver。只要收到的消息一被处理，其顺序就会被保存下来。
+
 Leader会广播已经被deliver的Proposal消息。在发出一个Proposal消息前，Leader会分配给Proposal一个单调递增的唯一id，称之为zxid。
 广播是把Proposal封装到消息当中，并添加到指向Follower的输出队列中，通过FIFO信道发送到Follower。
+
 当Follower收到一个Proposal时，会将其写入到磁盘，可以的话进行批量写入。一旦被写入到磁盘媒介当中，Follower就会发送一个ACK给Leader。
 当Leader收到了指定数量的ACK时，Leader将广播commit消息并在本地递交该消息。当收到Leader发来commit消息时，Follower也会递交该消息。
 
  
 ZAB协议简化了2PC事务提交：
 1、去除中断逻辑移除，follower要么ack，要么抛弃Leader；
+
 2、leader不需要所有的Follower都响应成功，只要一个多数派ACK即可。
  
 丢弃的事务proposal处理过程：
 
 ZAB协议中使用ZXID作为事务编号，ZXID为64位数字，低32位为一个递增的计数器，每一个客户端的一个事务请求时Leader产生新的事务后该计数器都会加1，
 高32位为Leader周期epoch编号，当新选举出一个Leader节点时Leader会取出本地日志中最大事务Proposal的ZXID解析出对应的epoch把该值加1作为新的epoch，将低32位从0开始生成新的ZXID；
+
 ZAB使用epoch来区分不同的Leader周期，能有效避免了不同的leader服务器错误的使用相同的ZXID编号提出不同的事务proposal的异常情况，大大简化了提升了数据恢复流程；
 所以这个崩溃的机器启动时，也无法成为新一轮的Leader，因为当前集群中的机器一定包含了更高的epoch的事务proposal。
 
-#注册中心篇（七）：Zookeeper 简介和使用入门 https://xueyuanjun.com/post/21225
+#注册中心篇（七）：Zookeeper 简介和使用入门 
+https://xueyuanjun.com/post/21225
 
-#Zookeeper原理架构  https://www.cnblogs.com/ChrisMurphy/p/6683397.html
+#Zookeeper原理架构  
+https://www.cnblogs.com/ChrisMurphy/p/6683397.html
 Zookeeper能干嘛？！
 1. 配置管理
 这个好理解。分布式系统都有好多机器，比如我在搭建hadoop的HDFS的时候，需要在一个主机器上（Master节点）配置好HDFS需要的各种配置文件，然后通过scp命令把这些配置文件拷贝到其他节点上，这样各个机器拿到的配置信息是一致的，才能成功运行起来HDFS服务。Zookeeper提供了这样的一种服务：一种集中管理配置的方法，我们在这个集中的地方修改了配置，所有对这个配置感兴趣的都可以获得变更。这样就省去手动拷贝配置了，还保证了可靠和一致性。 
@@ -161,7 +186,8 @@ YARN的HA方案
 HBase：必须依赖Zookeeper，保存了Regionserver的心跳信息，和其他的一些关键信息。 
 Flume：负载均衡，单点故障
 
-#关于zookeeper第三方客户端zkclient的使用说明 https://blog.csdn.net/sun_wangdong/article/details/77461108 
+#关于zookeeper第三方客户端zkclient的使用说明
+ https://blog.csdn.net/sun_wangdong/article/details/77461108 
 ZkClient
        在使用ZooKeeper的Java客户端时，经常需要处理几个问题：重复注册watcher、session失效重连、异常处理。
        要解决上述的几个问题，可以自己解决，也可以采用第三方的java客户端来完成。这里就介绍一种常用的客户端zkclient，目前已经运用到了很多项目中，知名的有Dubbo、Kafka、Helix。
@@ -235,5 +261,6 @@ Watcher自动重注册：这个要是依赖于hasListeners（）的判断，来�
 相比于ZooKeeper官方客户端，使用ZKClient时，只需要关注实际的Listener实现即可。所以这个客户端，还是推荐大家使用的。
 另外，是关于zkclient的一些接口，我们可以通过这些接口直接调用，使其完成一些相应的任务。
 
-#Zookeeper的基本概念和重要特性  https://www.cnblogs.com/takumicx/p/9508706.html
+#Zookeeper的基本概念和重要特性  
+https://www.cnblogs.com/takumicx/p/9508706.html
 

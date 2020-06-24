@@ -909,6 +909,7 @@ redis的修改
 https://github.com/CodisLabs/codis/blob/release3.2/doc/redis_change_zh.md
 go安装
 https://golang.org/doc/install
+
 二，Codis 3.x
 最新 release 版本为 codis-3.2，codis-server 基于 redis-3.2.8
 支持 slot 同步迁移、异步迁移和并发迁移，对 key 大小无任何限制，迁移性能大幅度提升
@@ -925,20 +926,27 @@ slot auto rebalance 算法从 2.0 的基于 max memory policy 变更成基于 gr
 提供了更加友好的 dashboard 和 fe 界面，新增了很多按钮、跳转链接、错误状态等，有利于快速发现、处理集群故障
 新增 SLOTSSCAN 指令，便于获取集群各个 slot 下的所有 key
 codis-proxy 与 codis-dashbaord 支持 docker 部署
+
 三，Codis 3.x 由以下组件组成：
 Codis Server：基于 redis-3.2.8 分支开发。增加了额外的数据结构，以支持 slot 有关的操作以及数据迁移指令。具体的修改可以参考文档 redis 的修改。
+
 Codis Proxy：客户端连接的 Redis 代理服务, 实现了 Redis 协议。 除部分命令不支持以外(不支持的命令列表)，表现的和原生的 Redis 没有区别（就像 Twemproxy）。
 对于同一个业务集群而言，可以同时部署多个 codis-proxy 实例；
+
 不同 codis-proxy 之间由 codis-dashboard 保证状态同步。
-Codis Dashboard：集群管理工具，支持 codis-proxy、codis-server 的添加、删除，以及据迁移等操作。在集群状态发生改变时，codis-dashboard 维护集群下所有 codis-proxy 的状态的
-一致性。
+
+Codis Dashboard：集群管理工具，支持 codis-proxy、codis-server 的添加、删除，以及据迁移等操作。在集群状态发生改变时，codis-dashboard 维护集群下所有 codis-proxy 的状态的一致性。
+
 对于同一个业务集群而言，同一个时刻 codis-dashboard 只能有 0个或者1个；
 所有对集群的修改都必须通过 codis-dashboard 完成。
+
 Codis Admin：集群管理的命令行工具。
 可用于控制 codis-proxy、codis-dashboard 状态以及访问外部存储。
+
 Codis FE：集群管理界面。
 多个集群实例共享可以共享同一个前端展示页面；
 通过配置文件管理后端 codis-dashboard 列表，配置文件可自动更新。
+
 Storage：为集群状态提供外部存储。
 提供 Namespace 概念，不同集群的会按照不同 product name 进行组织；
 目前仅提供了 Zookeeper、Etcd、Fs 三种实现，但是提供了抽象的 interface 可自行扩展。
