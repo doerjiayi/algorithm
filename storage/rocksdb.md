@@ -1,37 +1,54 @@
-#leveldb
-##leveldb 安装及使用
-https://blog.csdn.net/ronon77/article/details/84908778
-https://blog.csdn.net/chdhust/article/details/49402989
-https://blog.csdn.net/salyty/article/details/83106237
-https://blog.csdn.net/chenriwei2/article/details/45178249
-https://blog.csdn.net/weixin_42663840/article/details/82253556
-https://blog.csdn.net/xiongwenwu/article/details/53262804
 
-##leveldb源码
-https://baijiahao.baidu.com/s?id=1634577516618476849&wfr=spider&for=pc
-https://www.cnblogs.com/haippy/archive/2011/12/04/2276064.html
-http://blog.itpub.net/31561269/viewspace-2375371/
-https://yq.aliyun.com/articles/684218?utm_content=g_1000035187
-https://github.com/google/leveldb/blob/master/benchmarks/db_bench.cc
+##RocksDB 介绍
+RocksDB是facebook开源的NOSQL存储系统，其设计是基于Google开源的LevelDB，优化了LevelDB中存在的一些问题，其性能要比LevelDB强，设计与LevelDB极其类似。
+LevelDB的开源发起者：Jeff Dean和Sanjay Ghemawat，这两位是Google公司重量级的工程师。
+Jeff Dean是Google大规模分布式平台Bigtable和MapReduce主要设计和实现者。
+Sanjay Ghemawat是Google大规模分布式平台GFS，Bigtable和MapReduce主要设计和实现工程师。
+如果了解Bigtable的话，应该知道在这个影响深远的分布式存储系统中有两个核心的部分：Master Server和Tablet Server。其中Master Server做一些管理数据的存储以及分布式调度工作，实际的分布式数据存储以及读写操作是由Tablet Server完成的，而LevelDB则可以理解为一个简化版的Tablet Server。
+RocksDB相对传统的关系数据库的一大改进是采用LSM树存储引擎。LSM树是非常有创意的一种数据结构，它和传统的B+树不太一样，下面先说说B+树。
 
-##leveldb api
-https://blog.csdn.net/qq_32293345/article/details/85063531
+###B+树
 
-#ssdb
-##单实例支撑每天上亿个请求的SSDB
-http://www.ideawu.net/blog/archives/736.html
-SSDB 是一个 C++ 开发的 NoSQL 存储服务器, 支持 zset, map 数据结构, 可替代 Redis, 特别适合存储集合数据. SSDB 被开发和开源出来后, 已经在生产环境经受了3个季度的考验, 一直稳定运行.
-在一个支撑数千万用户的列表数据(例如用户的订单历史, 用户的好友列表, 用户的消息列表等)的实例上, SSDB 每天处理上亿个读写请求, 仍然能保持 CPU 占用在3%左右, 内存占用为 1G. 这种数据规模是我们原来使用的 Redis 所无法满足的, 因为 Redis 无法保存如此大量的数据, 物理内存的容量限制了 Redis 的能力. 根据我们的经验, Redis在10G数据规模时比较适用, 数据规模再扩大时, Redis 就非常吃力, 而且几乎无法扩展. 这时, 必须改用 SSDB.
-SSDB 具有和 Redis 高度重合的 API, 而且对于 hash(map) 还是可分段遍历的, 相比较, Redis 只能通过 hgetall 一次遍历 hash 中的所有元素, 在大的 hash 中, 这个操作非常低效.
-如果要列出几条必须放弃 Redis, 改为使用 SSDB 的观点, 我相信这几条非常有吸引力:
-单个实例的存储容量相当于 100 个 Redis 实例!
-内存占用只有 Redis 的一千分之一(最大设计容量时).
-所有的数据集合(包括 KV)都是可分段(分页)遍历的.
-特别适合存储列表等集合数据.
-SSDB 是一个开源的项目(https://github.com/ideawu/ssdb), 你可以免费获取它的源码, 并且不需要编程和修改配置文件就可以启动服务器.
+B+树根节点和枝节点分别记录每个叶子节点的最小值，并用一个指针指向叶子节点。叶子节点里每个键值都指向真正的数据块，每个叶子节点都有前指针和后指针，这是为了做范围查询时，叶子节点间可以直接跳转，从而避免再去回溯至枝和跟节点。
+B+树最大的性能问题是会产生大量的随机IO，随着新数据的插入，叶子节点会慢慢分裂，逻辑上连续的叶子节点在物理上往往不连续，甚至分离的很远，但做范围查询时，会产生大量读随机IO。
+对于大量的随机写也一样，举一个插入key跨度很大的例子，如7->1000->3->2000 … 新插入的数据存储在磁盘上相隔很远，会产生大量的随机写IO，低下的磁盘寻道速度严重影响性能。
+
+###LSM树（Log-Structured Merge Tree）
+LSM树而且通过批量存储技术规避磁盘随机写入问题。 LSM树的设计思想非常朴素, 它的原理是把一颗大树拆分成N棵小树， 它首先写入到内存中（内存没有寻道速度的问题，随机写的性能得到大幅提升），在内存中构建一颗有序小树，随着小树越来越大，内存的小树会flush到磁盘上。磁盘中的树定期可以做merge操作，合并成一棵大树，以优化读性能。
 
 
-#rocksdb
+###LevelDB特点
+
+LevelDB是一个持久化存储的KV系统，和Redis这种内存型的KV系统不同，LevelDB不会像Redis一样狂吃内存，而是将大部分数据存储到磁盘上。
+LevleDb在存储数据时，是根据记录的key值有序存储的，就是说相邻的key值在存储文件中是依次顺序存储的，而应用可以自定义key大小比较函数。
+LevelDB支持数据快照（snapshot）功能，使得读取操作不受写操作影响，可以在读操作过程中始终看到一致的数据。
+LevelDB还支持数据压缩等操作，这对于减小存储空间以及增快IO效率都有直接的帮助。
+
+
+###RocksDB对LevelDB的优化
+
+增加了column family，这样有利于多个不相关的数据集存储在同一个db中，因为不同column family的数据是存储在不同的sst和memtable中，所以一定程度上起到了隔离的作用。
+采用了多线程同时进行compaction的方法，优化了compact的速度。
+增加了merge operator，优化了modify的效率
+将flush和compaction分开不同的线程池，能有效的加快flush，防止stall。
+增加了对write ahead log(WAL)的特殊管理机制，这样就能方便管理WAL文件，因为WAL是binlog文件。
+RocksDB的整体结构：
+
+rocksdb从3.0开始支持ColumnFamily的概念。每个columnfamilyl的meltable与sstable都是分开的，所以每一个column family都可以单独配置，所有column family共用同一个WA文件，可以保证跨column family写入时的原子性。
+
+###RocksDB 写入与删除
+
+写操作包含两个具体步骤：
+
+首先是将这条KV记录以顺序写的方式追加到log文件末尾，因为尽管这是一个磁盘读写操作，但是文件的顺序追加写入效率是很高的，所以并不会导致写入速度的降低。
+第二个步骤是:如果写入log文件成功，那么将这条KV记录插入内存中的Memtable中，Memtable只是一层封装，其内部其实是一个Key有序的SkipList列表，插入一条新记录的过程也很简单，即先查找合适的插入位置，然后修改相应的链接指针将新记录插入即可。完成这一步，写入记录就算完成了，所以一个插入记录操作涉及一次磁盘文件追加写和内存SkipList插入操作，这是为何RocksDB写入速度如此高效的根本原因。
+删除操作与插入操作相同，区别是，插入操作插入的是Key:Value值，而删除操作插入的是“Key:删除标记”，并不真正去删除记录，而是后台Compaction的时候才去做真正的删除操作。
+
+###RocksDB 读取记录
+
+RocksDB首先会去查看内存中的Memtable，如果Memtable中包含key及其对应的value，则返回value值即可；如果在Memtable没有读到key，则接下来到同样处于内存中的Immutable Memtable中去读取，类似地，如果读到就返回，若是没有读到,那么会从磁盘中的SSTable文件中查找。
+总的读取原则是这样的：首先从属于level 0的文件中查找，如果找到则返回对应的value值，如果没有找到那么到level 1中的文件中去找，如此循环往复，直到在某层SSTable文件中找到这个key对应的value为止（或者查到最高level，查找失败，说明整个系统中不存在这个Key)。
+相对写操作，读操作处理起来要复杂很多。RocksDB为了提高读取速递，增加了读cache和Bloomfilter。
 
 ##RocksDB事务实现TransactionDB分析
 基本概念
@@ -246,57 +263,4 @@ s = txn->Put("key", "value");
 s = txn->Delete("key2");
 然后对事务进行提交
 s = txn->Commit();
-
-##RocksDB 介绍
-RocksDB是facebook开源的NOSQL存储系统，其设计是基于Google开源的LevelDB，优化了LevelDB中存在的一些问题，其性能要比LevelDB强，设计与LevelDB极其类似。
-LevelDB的开源发起者：Jeff Dean和Sanjay Ghemawat，这两位是Google公司重量级的工程师。
-Jeff Dean是Google大规模分布式平台Bigtable和MapReduce主要设计和实现者。
-Sanjay Ghemawat是Google大规模分布式平台GFS，Bigtable和MapReduce主要设计和实现工程师。
-如果了解Bigtable的话，应该知道在这个影响深远的分布式存储系统中有两个核心的部分：Master Server和Tablet Server。其中Master Server做一些管理数据的存储以及分布式调度工作，实际的分布式数据存储以及读写操作是由Tablet Server完成的，而LevelDB则可以理解为一个简化版的Tablet Server。
-RocksDB相对传统的关系数据库的一大改进是采用LSM树存储引擎。LSM树是非常有创意的一种数据结构，它和传统的B+树不太一样，下面先说说B+树。
-
-###B+树
-
-B+树根节点和枝节点分别记录每个叶子节点的最小值，并用一个指针指向叶子节点。叶子节点里每个键值都指向真正的数据块，每个叶子节点都有前指针和后指针，这是为了做范围查询时，叶子节点间可以直接跳转，从而避免再去回溯至枝和跟节点。
-B+树最大的性能问题是会产生大量的随机IO，随着新数据的插入，叶子节点会慢慢分裂，逻辑上连续的叶子节点在物理上往往不连续，甚至分离的很远，但做范围查询时，会产生大量读随机IO。
-对于大量的随机写也一样，举一个插入key跨度很大的例子，如7->1000->3->2000 … 新插入的数据存储在磁盘上相隔很远，会产生大量的随机写IO，低下的磁盘寻道速度严重影响性能。
-
-###LSM树（Log-Structured Merge Tree）
-LSM树而且通过批量存储技术规避磁盘随机写入问题。 LSM树的设计思想非常朴素, 它的原理是把一颗大树拆分成N棵小树， 它首先写入到内存中（内存没有寻道速度的问题，随机写的性能得到大幅提升），在内存中构建一颗有序小树，随着小树越来越大，内存的小树会flush到磁盘上。磁盘中的树定期可以做merge操作，合并成一棵大树，以优化读性能。
-
-
-###LevelDB特点
-
-LevelDB是一个持久化存储的KV系统，和Redis这种内存型的KV系统不同，LevelDB不会像Redis一样狂吃内存，而是将大部分数据存储到磁盘上。
-LevleDb在存储数据时，是根据记录的key值有序存储的，就是说相邻的key值在存储文件中是依次顺序存储的，而应用可以自定义key大小比较函数。
-LevelDB支持数据快照（snapshot）功能，使得读取操作不受写操作影响，可以在读操作过程中始终看到一致的数据。
-LevelDB还支持数据压缩等操作，这对于减小存储空间以及增快IO效率都有直接的帮助。
-
-
-###RocksDB对LevelDB的优化
-
-增加了column family，这样有利于多个不相关的数据集存储在同一个db中，因为不同column family的数据是存储在不同的sst和memtable中，所以一定程度上起到了隔离的作用。
-采用了多线程同时进行compaction的方法，优化了compact的速度。
-增加了merge operator，优化了modify的效率
-将flush和compaction分开不同的线程池，能有效的加快flush，防止stall。
-增加了对write ahead log(WAL)的特殊管理机制，这样就能方便管理WAL文件，因为WAL是binlog文件。
-RocksDB的整体结构：
-
-rocksdb从3.0开始支持ColumnFamily的概念。每个columnfamilyl的meltable与sstable都是分开的，所以每一个column family都可以单独配置，所有column family共用同一个WA文件，可以保证跨column family写入时的原子性。
-
-###RocksDB 写入与删除
-
-写操作包含两个具体步骤：
-
-首先是将这条KV记录以顺序写的方式追加到log文件末尾，因为尽管这是一个磁盘读写操作，但是文件的顺序追加写入效率是很高的，所以并不会导致写入速度的降低。
-第二个步骤是:如果写入log文件成功，那么将这条KV记录插入内存中的Memtable中，Memtable只是一层封装，其内部其实是一个Key有序的SkipList列表，插入一条新记录的过程也很简单，即先查找合适的插入位置，然后修改相应的链接指针将新记录插入即可。完成这一步，写入记录就算完成了，所以一个插入记录操作涉及一次磁盘文件追加写和内存SkipList插入操作，这是为何RocksDB写入速度如此高效的根本原因。
-删除操作与插入操作相同，区别是，插入操作插入的是Key:Value值，而删除操作插入的是“Key:删除标记”，并不真正去删除记录，而是后台Compaction的时候才去做真正的删除操作。
-
-###RocksDB 读取记录
-
-RocksDB首先会去查看内存中的Memtable，如果Memtable中包含key及其对应的value，则返回value值即可；如果在Memtable没有读到key，则接下来到同样处于内存中的Immutable Memtable中去读取，类似地，如果读到就返回，若是没有读到,那么会从磁盘中的SSTable文件中查找。
-总的读取原则是这样的：首先从属于level 0的文件中查找，如果找到则返回对应的value值，如果没有找到那么到level 1中的文件中去找，如此循环往复，直到在某层SSTable文件中找到这个key对应的value为止（或者查到最高level，查找失败，说明整个系统中不存在这个Key)。
-相对写操作，读操作处理起来要复杂很多。RocksDB为了提高读取速递，增加了读cache和Bloomfilter。
-
-
 
