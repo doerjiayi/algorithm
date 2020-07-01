@@ -63,4 +63,42 @@ https://github.com/AhaMessageQueue/paxos_raft_protocol/blob/master/raft/raft.md
 ##Raft在网络分区时leader选举的一个疑问？
 https://www.zhihu.com/question/302761390
 
+##RAFT算法随想
+https://blog.csdn.net/hfty290/article/details/75331948
 
+一、确定性状态机
+    在RAFT论文与Paxos论文中都有提及。如Paxos make simple中提到的：服务器可以看成是一个以某种顺序执行客户端命令的确定性状态机。
+    为什么是确定性状态机呢？其实这和主备同步有关。
+    确定性状态机的意思是：对于一个输入，只有一个固定的状态变迁。而非确定状态机则是有多种状态变迁，选择其中一种。在主备同步过程中，若同步的命令不满足确定性的要求那么主备就无法保持一致。例如：
+要同步一个命令 x=rand()，在主上执行的结果很可能与备是不同的，因此此时在同步命令时就需要对该命令进行转换。如：在Master上执行的结果为
+ x=100; 那么Master可以将x=100这条命令同步给Slave就能够实现状态一致。
+也就是说，Master在执行命令时，若一条命令不满足确定性的条件，那么Master要根据执行结果将其转换成确定性的命令同步给Slave以保持主备一致。
+
+二、丢弃term<current term的请求
+    看论文的时候当请求报文的term参数小于current term时，只是笼统的说返回false或者拒绝。这点参考了etcd的源码，在etcd之中的处理是直接丢弃该请求报文。在etcd之中，对于每个请求报文会做两个检查，首先请求者ID必须是认可的集群成员，其次是term要大于等于current
+ term，若不满足任何一个都是丢弃请求报文。丢弃应该是比返回false更好的方法，比如：一个已经被删除的成员向集群中发消息，此时通过检查请求者ID是否属于集群成员的方式就可以避免受到干扰。返回false就会把current
+ term带上，对方受到该回复报文之后，由于自己的term较小就会立即转换成Follower，那么原先的集群马上就没有Leader。
+
+三、Leader自动降级
+    Leader根据心跳超时时间向外发送心跳包，以获取Follower的授权。假若在一个选举超时时间内没有收到多数Follower的授权回复，此时Leader可以采取降级措施，以避免存在两个Master的请情况。
+    在ETCD之中，这种自动降级操作是可配置的，默认不会自动降级。若没有自动降级，在收到新Leader心跳包时，由于请求的term>current
+ term，则老Leader自动变成Follower。
+但是若该Leader处于一个网络分区之中，可能收不到新Leader的心跳包，因此配置成自动降级是比较合理的。
+
+四、日志的顺序复制与preLogTerm、preLogIndex匹配规则
+    RAFT算法中的日志必须是顺序复制的。就是说，假如有一条旧的日志还未复制给FollowerA，那么更新的日志就不能复制。因为，如果Follower接收了该日志，那么就会造成日志空洞。其次，根据复制日志时必须匹配preLogIndex、preLogTerm的要求，实际上也无法满足该条件，因此当有旧日志未复制，而直接复制新日志，Follower应该返回false。
+    日志的顺序复制，很大程度上简化了Raft算法。比如查看各成员日志的新旧，只要比较最后一条日志即可。
+    preLogTerm、preLogIndex的匹配规则是用于实现顺序复制的手段。有了这个规则，根据归纳假设就很容易得到所有的Follower日志最终都会与Leader完全一致。
+
+四、新的Leader为何必须具有所有已提交日志
+    根据Raft的日志复制规则，所有的Follower的日志最终会与Leader的日志完全一致。另外若一个日志被设置成已提交，那么必须假设该条日志被应用于状态机。
+    因此若一条日志被一个Leader提交了，即使该Leader提交日志，应用到状态机之后，提交状态还未同步给Follower就宕机了，也要保证所有其他机器在将来将该日志应用到状态机。又因为Follower的日志提交与日志内容都是完全与Leader一致，那么就需要保证后续的Leader必须具有原Leader提交的日志，并且会在何时的时候提交，然后将提交状态同步给Follower，然后Follower提交并应用到状态机。
+
+五、新的Leader如何保证具有前面Leader提交的日志
+    这是通过Leader选举规则来保证的。前面说过，日志是顺序复制的，日志的新旧可以通过查看最后一条日志来判断。
+    在Leader选举中，请求报文中有Candidate最后一条日志的term和index。收到投票请求的Follower会检查本地最后一条日志的term、index。只有Candidate的最后一条日志大于等于本地日志时才能投票。
+    而提交日志的条件是日志复制给集群中的多数成员，Candidate选举为Leader的条件也是需要多数成员的投票。那么这两个成员之间必须有一个交叉，即有一个成员具有该日志，并且投票给了新Leader，也就意味着新Leader的日志至少不比该成员旧，那么新Leader也具有该日志。这样就得到证明了，后续的Leader一定具有前面Leader提交的日志。
+
+六、为何一个Leader不能提交前面Term下的日志
+    假设新的term=10，要提交term=8的日志。那么在term=9的时候有一个Leader，这个Leader是在提交term=8这条日志之前就选出来的。因此term=9的这个Leader不能保证会有term=8的这条日志。若term=10的这个Leader提交term=8的日志并应用到状态机之后，马上宕机。而term=9的这个Leader重新选举为term=11的Leader，那么term=8的这条日志很可能就被新Leader覆盖掉，而再不会被提交与应用。
+    其实这里的关键就是：新的Leader会有前面Leader提交的日志，而旧的Leader则不能保证。

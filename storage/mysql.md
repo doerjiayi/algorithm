@@ -767,3 +767,11 @@ MyISM使用的是非聚簇索引，非聚簇索引的两棵B+树看上去没什�
 所以Innodb不建议使用过长的主键，否则会使辅助索引变得过大。
 
 建议使用自增的字段作为主键，这样B+Tree的每一个结点都会被顺序的填满，而不会频繁的分裂调整，会有效的提升插入数据的效率。
+
+##MySQL 8.0 InnoDB全文索引可用于生产环境吗（续）
+https://blog.csdn.net/n88Lpo/article/details/106045113
+
+##MySQL每秒57万的写入，带你飞~
+https://blog.csdn.net/n88Lpo/article/details/78718321
+
+

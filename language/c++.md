@@ -1519,10 +1519,6 @@ https://zhuanlan.zhihu.com/p/38139553
 ##使用 gcc 命令把C语言程序反汇编 
 https://www.cnblogs.com/yeyeck/p/9750396.html
 
-##Eclipse开发C/C++之使用技巧小结，写给新手 
-https://www.cnblogs.com/jiftle/p/7156057.html
-
-
 #《编写高质量代码改善C++程序的150个建议》简要归纳：
 《编写高质量代码改善C++程序的150个建议》简要归纳：
  
@@ -2287,8 +2283,6 @@ map的特性是，所有元素都会根据元素的键值自动被排序。map�
 multimap的特性以及用法与map完全相同，唯一的差别在于它允许键值重复，因此它的插入操作采用的是底层机制RB-tree的insert_equal()而非insert_unique。 
 
 
-#cppreference
-https://zh.cppreference.com/w/%E9%A6%96%E9%A1%B5
 
 #现代 C++ 教程：高速上手 C++ 11/14/17/20
 https://changkun.de/modern-cpp/zh-cn/00-preface/
@@ -2589,3 +2583,8 @@ Vector和string的迭代器通常是指针，所以当错误地使用iterator时
 条款50：熟悉与STL相关的web站点
 1. SGI STL站点、STLport站点、Boost站点
 
+#runoob
+https://www.runoob.com/cplusplus/cpp-tutorial.html
+
+#cppreference
+http://www.cplusplus.com/reference/atomic/atomic/exchange/
