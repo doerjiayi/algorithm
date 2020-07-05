@@ -1,3 +1,8 @@
+
+##MySQL 主从同步延迟的原因及解决办法
+https://blog.csdn.net/hao_yunfeng/article/details/82392261
+ 
+
 ##隔离级别
 事务的四种隔离级别
 https://www.cnblogs.com/catmelo/p/8878961.html
