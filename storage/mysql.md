@@ -32,9 +32,11 @@ https://blog.csdn.net/u010002184/article/details/88526708
 一、重做日志（redo log）
 作用：
 确保事务的持久性。防止在发生故障的时间点，尚有脏页未写入磁盘，在重启mysql服务的时候，根据redo log进行重做，从而达到事务的持久性这一特性。
+
 二、回滚日志（undo log）
 作用：
 保存了事务发生之前的数据的一个版本，可以用于回滚，同时可以提供多版本并发控制下的读（MVCC），也即非锁定读
+
 三、二进制日志（binlog）：
 作用：
 用于复制，在主从复制中，从库利用主库上的binlog进行重播，实现主从同步。 
@@ -45,12 +47,17 @@ https://blog.csdn.net/u010002184/article/details/88526708
 （2）执行事务，并写redo日志到log buffer；
 （3）如果innodb_flush_log_at_trx_commit=1，则将redo日志写到log file，并刷新落盘。
 （4）提交事务。
+
 可能有同学会问，为什么没有写data file，事务就提交了？
 在数据库的世界里，数据从来都不重要，日志才是最重要的，有了日志就有了一切。
+
 因为data buffer中的数据会在合适的时间 由存储引擎写入到data file，如果在写入之前，数据库宕机了，根据落盘的redo日志，完全可以将事务更改的数据恢复。好了，看出日志的重要性了吧。先持久化日志的策略叫做Write Ahead Log，即预写日志。
+
 分析几种异常情况：
 innodb_flush_log_at_trx_commit=2（innodb_flush_log_at_trx_commit和sync_binlog参数详解）时，将redo日志写入logfile后，为提升事务执行的性能，存储引擎并没有调用文件系统的sync操作，将日志落盘。如果此时宕机了，那么未落盘redo日志事务的数据是无法保证一致性的。
+
 undo日志同样存在未落盘的情况，可能出现无法回滚的情况。
+
 checkpoint：
 checkpoint是为了定期将db buffer的内容刷新到data file。当遇到内存不足、db buffer已满等情况时，需要将db buffer中的内容/部分内容（特别是脏数据）转储到data file中。在转储时，会记录checkpoint发生的”时刻“。在故障回复时候，只需要redo/undo最近的一次checkpoint之后的操作。
 
@@ -224,9 +231,7 @@ fuzzy checkpoint在数据库运行的时候，进行页面的落盘操作，不�
 Fuzzy落盘的条件:
 
 1. master thread checkpoint： master每一秒或者十秒落盘
-
 2. sync check point： redo 不可用的时候，这时候刷新到磁盘是从脏页链表中刷新的。
-
 3. Flush_lru_list check point : 刷新flush list的时候
 
 落盘的操作是异步的，因此不会阻塞其他事务执行。
@@ -234,27 +239,26 @@ Fuzzy落盘的条件:
 检查点的作用:
 
 缩短数据库的恢复时间
-
 缓冲池不够用的时候，将脏页刷新到磁盘
-
 重做日志不可用的时候，刷新脏页（循环使用redo文件，当旧的redo要被覆盖的时候，需要刷新脏页，造成检查点）
 
 ### 10.两阶段提交
 
- MySQL二阶段提交流程：
+MySQL二阶段提交流程：
 事务的提交主要分三个主要步骤：
 
-1.Storage Engine（InnoDB） transaction prepare阶段：存储引擎的准备阶段,写redo-buffer
+####1.Storage Engine（InnoDB） transaction prepare阶段：
 
+存储引擎的准备阶段,写redo-buffer
 此时SQL已经成功执行，并生成xid信息及redo和undo的内存日志。
 
-2.Binary log日志提交：写binlog并落盘.
+####2.Binary log日志提交：
 
+写binlog并落盘.
 write()将binary log内存日志数据写入文件系统缓存。
-
 fsync()将binary log文件系统缓存日志数据永久写入磁盘。
 
-3.Storage Engine（InnoDB）内部提交：落盘redo日志.
+####3.Storage Engine（InnoDB）内部提交：落盘redo日志.
 
 修改内存中事务对应的信息，并且将日志写入重做日志缓冲。
 
@@ -266,14 +270,16 @@ fsync()将binary log文件系统缓存日志数据永久写入磁盘。
 
 binlog落盘条件：参数sync_binlog： 0每秒落盘，1每次commit落盘  n 每n个事物落盘
 
-此外需要注意的是，每个步骤都需要进行一次fsync操作才能保证上下两层数据的一致性。步骤2的fsync参数由sync_binlog控制，步骤2的fsync由参数innodb_flush_log_at_trx_commit控制。(双1配置)
+此外需要注意的是，每个步骤都需要进行一次fsync操作才能保证上下两层数据的一致性。
+步骤2的fsync参数由sync_binlog控制，步骤2的fsync由参数innodb_flush_log_at_trx_commit控制。(双1配置)
 
-两阶段提交:先写redo -buffer再写binlog 并落盘最后落盘redo-buffer.
+两阶段提交:先写redo -buffer 再写binlog 并落盘最后落盘redo-buffer.
 
 最终:mysql在落盘日志的时候,先落盘binlog,再落盘redo.
 
  
 ###11.Rollback过程
+
 当事务在binlog阶段crash，此时日志还没有成功写入到磁盘中，启动时会rollback此事务。
 当事务在binlog日志已经fsync()到磁盘后crash，但是InnoDB没有来得及commit，此时MySQL数据库recovery的时候将会从二进制日志的Xid（MySQL数据库内部分布式事务XA）中获取提交的信息重新将该事务重做并commit使存储引擎和二进制日志始终保持一致。
 
