@@ -1,4 +1,5 @@
 
+#文本指令
 ##head和tail   cat filename | tail -n +3000 | head -n 1000
 情景linux–一张图搞懂head -n和tail -n
 https://blog.csdn.net/signjing/article/details/69357769
