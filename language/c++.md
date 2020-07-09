@@ -126,6 +126,9 @@ https://blog.csdn.net/huanghxyz/article/details/84568155
 
 #c++11
 
+##shared_ptr原理分析及实现
+https://blog.csdn.net/peng864534630/article/details/77932574
+
 ##c++ future
 https://blog.csdn.net/lijinqi1987/article/details/78909479
 
@@ -2013,6 +2016,8 @@ _stdcall 是StandardCall的缩写，是C++的标准调用方式：所有参数�
 9.        while( *cp++ = *src++ ) ;       /* Copy src to end of dst */  
 10.        return( dst );                  /* return dst */  
 11.}  
+
+
 
 ##字符串拷贝
 [cpp] view plain copy
