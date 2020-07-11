@@ -18,6 +18,7 @@ https://blog.csdn.net/huhigher/article/details/106347347
 ##C++面试常见题
 https://www.cnblogs.com/inception6-lxc/p/8686156.html
 
+<<<<<<< HEAD
 #zk
 ##zookeeper的原理和应用（非常详细透彻）
 https://blog.csdn.net/csd850182221/article/details/100543025
@@ -75,5 +76,27 @@ Redis检查内存使用情况，如果大于maxmemory的限制， 则根据设�
 ##面试官：说说你对ZooKeeper集群与Leader选举的理解？
 https://blog.csdn.net/g6U8W7p06dCO99fQ3/article/details/89166894
 
+=======
+##面试之C++11
+https://blog.csdn.net/xp178171640/article/details/104366004
+
+##C++面试常见题
+https://www.cnblogs.com/inception6-lxc/p/8686156.html
+
+##当面试官问我C++ 11新特性的时候，应该怎样回答？
+https://www.zhihu.com/question/65209863/answer/230185590
+
+##面试笔记——C++11新特性
+https://www.cnblogs.com/SHOR/p/6641688.html
+
+##真实面试经历：十面阿里，七面头条，六个Offer
+https://www.pianshen.com/article/2178153039/
+
+##面试鹅厂
+https://zhuanlan.zhihu.com/p/83936791
+
+##RAFT算法详解
+https://www.cnblogs.com/charlieroro/articles/12655975.html
+>>>>>>> branch 'master' of https://github.com/doerjiayi/algorithm.git
 
 

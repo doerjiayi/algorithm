@@ -131,8 +131,16 @@ https://blog.csdn.net/lijinqi1987/article/details/78909479
 
 ##智能指针
 
+<<<<<<< HEAD
 ##如何用shared_ptr减少锁的争用
 https://blog.csdn.net/weixin_30906671/article/details/96328883
+=======
+##C++之智能指针std::shared_ptr简单使用和理解
+https://blog.csdn.net/u011068702/article/details/83692838
+
+##std::shared_ptr使用中遇到的问题
+https://www.jianshu.com/p/b903df9072a8
+>>>>>>> branch 'master' of https://github.com/doerjiayi/algorithm.git
 
 ##用weak_ptr解决shared_ptr的环形引用问题
 https://blog.csdn.net/gcs6564157/article/details/70144846
