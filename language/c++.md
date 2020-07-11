@@ -131,6 +131,9 @@ https://blog.csdn.net/lijinqi1987/article/details/78909479
 
 ##智能指针
 
+##如何用shared_ptr减少锁的争用
+https://blog.csdn.net/weixin_30906671/article/details/96328883
+
 ##用weak_ptr解决shared_ptr的环形引用问题
 https://blog.csdn.net/gcs6564157/article/details/70144846
 
