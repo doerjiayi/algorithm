@@ -4,17 +4,6 @@ c++编程思想
 ##c++反射
 https://www.cnblogs.com/lizhanwu/p/4428990.html
 
-##原子变量
-https://blog.csdn.net/caychen/article/details/79711118
-https://www.cnblogs.com/haippy/p/3252056.html
-
-https://blog.csdn.net/WizardtoH/article/details/81111549
-https://www.cnblogs.com/FateTHarlaown/p/8919235.html
-https://en.cppreference.com/w/cpp/atomic/atomic_flag/test_and_set
-
-##原子原理
-https://www.cnblogs.com/zhanghu52030/p/9167014.html
-
 ##字节对齐
 https://blog.csdn.net/cclethe/article/details/79659590
 
@@ -119,6 +108,32 @@ https://blog.csdn.net/huanghxyz/article/details/84568155
 
 
 #多线程
+
+##原子变量
+
+###atomic_flag 
+C++11 并发指南六(atomic 类型详解一 atomic_flag 介绍)
+https://www.cnblogs.com/haippy/p/3252056.html
+
+C++11特性（13）：原子操作及原子数据类型（1）
+https://blog.csdn.net/caychen/article/details/79711118
+
+https://blog.csdn.net/WizardtoH/article/details/81111549
+https://www.cnblogs.com/FateTHarlaown/p/8919235.html
+https://en.cppreference.com/w/cpp/atomic/atomic_flag/test_and_set
+
+
+###c++并发编程之原子操作的实现原理
+https://www.cnblogs.com/zhanghu52030/p/9167014.html
+
+###C++11多线程-原子操作
+C++11多线程-原子操作(1)
+https://www.jianshu.com/p/c0da859a7ce0
+C++11多线程-原子操作(2)
+https://www.jianshu.com/p/fc6fce6543a9
+C++11多线程-内存模型
+https://www.jianshu.com/p/7d237771dc94
+
 ##c++11 线程池学习笔记 (一) 任务队列
 https://www.cnblogs.com/itdef/p/8454389.html
 
@@ -742,13 +757,6 @@ deferred: ++++++++++----------
 ##thread_local
 https://www.jianshu.com/p/8df45004bbcb
 
-##C++11多线程-原子操作
-C++11多线程-原子操作(1)
-https://www.jianshu.com/p/c0da859a7ce0
-C++11多线程-原子操作(2)
-https://www.jianshu.com/p/fc6fce6543a9
-C++11多线程-内存模型
-https://www.jianshu.com/p/7d237771dc94
 
 ##c++ future
 https://blog.csdn.net/lijinqi1987/article/details/78909479
