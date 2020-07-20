@@ -1,3 +1,98 @@
+
+##锁
+###MongoDB中的读写锁
+https://www.cnblogs.com/duanxz/p/10737548.html
+
+2. 锁的粒度
+
+在 2.2 版本以前，一个mongodb实例一个写锁，多个读锁。也就是说mongod 只有全局锁(锁定一个server)；
+
+在2.2-3.0的版本，一个数据库一个写锁，多个读锁。例如如果一个 mongod 实例上有 5 个库，如果只对一个库中的一个集合执行写操作，那么在写操作过程中，这个库被锁；而其它 4 个库不影响。相比 RDBMS 来说，这个粒度已经算很大了！
+
+在3.0之后的版本，WiredTiger提供了文档（不是集合）级别的锁。
+
+更新：MongoDB 3.4版本，写操作的锁定粒度在表中数据记录(document)级别，即使操作对象可能是多条数据，每条数据在被写入时都会被锁定，防止其他进程写入；但是写操作是非事务性的，即写入多条数据，即使当前写入操作还没有完成，前面已经写入的数据也可以被其他进程修改。除非指定了$isolated，一次写入操作影响的数据无法在本次操作结束之前被其他进程修改。
+$isolated也是非事务性的，即如果写入过程出错，已经完成的写入操作不会被rollback；另外，$isolated需要额外的锁，无法用于sharded方式部署的集群。
+官网文档链接
+
+MongoDB高吞吐的原因：
+
+MongoDB 没有完整事务支持，操作原子性只到单个 document 级别，所以通常操作粒度比较小；
+MongoDB 锁实际占用时间是内存数据计算和变更时间，通常很快；
+MongoDB 锁有一种临时放弃机制，当出现需要等待慢速 IO 读写数据时，可以先临时放弃，等 IO 完成之后再重新获取锁。
+ 
+
+3. 如何查看锁的状态
+
+db.serverStatus()
+db.currentOp()
+mongotop # 类似top命令，每秒刷新
+mongostat
+the MongoDB Monitoring Service (MMS)
+
+
+4. 哪些操作会对数据库产生锁？
+
+下表列出了常见数据库操作产生的锁。
+
+操作	锁定类型
+查询	读锁
+通过cursor读取数据	读锁
+插入数据	写锁
+删除数据	写锁
+修改数据	写锁
+Map-reduce	读写锁均有，除非指定为non-atomic，部分mapreduce任务可以同时执行(猜测是生成的中间表不冲突的情况下)
+添加index	通过前台API添加index，锁定数据库一段时间
+db.eval()	写锁，同时阻塞其他运行在MongoDB上的JavaScript进程
+eval	写锁，如果设定锁定选项是nolock，则不会有些锁，而且eval无法向数据库写入数据
+aggregate()	读锁
+ 
+
+附上原文：
+Operation Lock Type
+Issue a query Read lock
+Get more data from a cursor Read lock
+Insert data Write lock
+Remove data Write lock
+Update data Write lock
+Map-reduce Read lock and write lock, unless operations are specified as non-atomic. Portions of map-reduce jobs can run concurrently.
+Create an index Building an index in the foreground, which is the default, locks the database for extended periods of time.
+db.eval() Write lock. db.eval() blocks all other JavaScript processes.
+eval Write lock. If used with the nolock lock option, the eval option does not take a write lock and cannot write data to the database.
+aggregate() Read lock
+
+###Mongodb锁机制
+https://blog.csdn.net/tang_jin2015/article/details/61192020
+
+Mongodb使用读写锁来允许很多用户同时去读一个资源，比如数据库或者集合。读采用的是共享锁，写采用的是排它锁。
+
+对于大部分的读写操作，WiredTiger使用的都是乐观锁，在全局、数据库、集合级别，WiredTiger使用的是意向锁。当引擎探测到两个操作之间发生了冲突，将会产生一个写冲突，mongodb将会重新执行操作。只有如删除集合等操作需要排它锁。
+
+
+
+##分布式一致性协议
+###分布式一致性协议在MongoDB选举中的应用
+https://www.jianshu.com/p/916e5e443ad7
+
+算法应用
+MongoDB在实现时对Raft算法做了一些调整：
+
+Secondary节点不只是被动接受，也会发起心跳监测
+当Secondary节点发现集群中没有Primary或者自己priority比Primary高时发起选举
+保留了优先级但只考虑自己和当前主结点的优先级，其他结点的优先级不决定选举与否，也不影响投票
+
+
+对比新旧版本的选举：
+
+Raft为MongoDB选举引入Term，取消Bully的选举锁，效率更高，更优雅的避免重复投票，减少投票等待时间。
+Raft弱化了priority功能，可能出现非最高priority候选节点当选的情况，后续的心跳中会发现，并重新选举。
+取消了veto，选举不一定需要等待心跳超时。
+主节点的降级有自己发起，效率更高。
+
+
+##Raft与MongoDB复制集协议比较
+https://www.cnblogs.com/xybaby/p/10165564.html
+
 ##自增id
 ###mongodb实现主键自增
 https://www.cnblogs.com/arcticBoiledWater/p/9681498.html
