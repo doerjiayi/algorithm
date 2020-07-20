@@ -1,3 +1,8 @@
+##自增id
+###mongodb实现主键自增
+https://www.cnblogs.com/arcticBoiledWater/p/9681498.html
+
+
 ##mongodb语法
 mongodb查询的语法（大于，小于，大于或等于，小于或等于等等）  
 https://www.cnblogs.com/Logan626/articles/4858728.html
