@@ -1,18 +1,102 @@
 
-##MongoDB wiredTiger存储引擎下的存储方式LSM和B-Tree比较 
-https://www.cnblogs.com/sylvialucy/p/8883646.html
+##锁
+###MongoDB中的读写锁
+https://www.cnblogs.com/duanxz/p/10737548.html
 
-前段时间做拦截件监控的时候把拦截件生命期存入mongodb，因生命期有各种变化，因此对此表的更新写操作非常多，老大给我看了一篇文章，才知道mongodb已经支持lsm存储方式了。
-原文如连接：https://github.com/wiredtiger/wiredtiger/wiki/Btree-vs-LSM
-文中对比了LSM和B-Tree的读写吞吐量，在单线程写操作下和多线程读操作下的差异。英文差的小伙伴别指望我这个半吊子来翻译了。
-总结一点就是：在写操作上，LSM的吞吐量会是B-Tree的1.5~2倍   而在读操作上，随着读线程的增加，LSM性能下降很明显，B-Tree在读的性能上吞吐量是LSM的1.5~2倍。
-因此在一个表需要频繁的进行写操作时，换成LSM的存储方式，将会是一个不错的选择。
-目前正准备从B-Tree转向LSM，需要一段时间验证其效果。
-另，目前只知道在创建collection的时候可以修改存储方式，脚本如下：
-db.createCollection(
-"TestTable",
-{storageEngine: { wiredTiger: {configString: "type=lsm"}}}
-)
+2. 锁的粒度
+
+在 2.2 版本以前，一个mongodb实例一个写锁，多个读锁。也就是说mongod 只有全局锁(锁定一个server)；
+
+在2.2-3.0的版本，一个数据库一个写锁，多个读锁。例如如果一个 mongod 实例上有 5 个库，如果只对一个库中的一个集合执行写操作，那么在写操作过程中，这个库被锁；而其它 4 个库不影响。相比 RDBMS 来说，这个粒度已经算很大了！
+
+在3.0之后的版本，WiredTiger提供了文档（不是集合）级别的锁。
+
+更新：MongoDB 3.4版本，写操作的锁定粒度在表中数据记录(document)级别，即使操作对象可能是多条数据，每条数据在被写入时都会被锁定，防止其他进程写入；但是写操作是非事务性的，即写入多条数据，即使当前写入操作还没有完成，前面已经写入的数据也可以被其他进程修改。除非指定了$isolated，一次写入操作影响的数据无法在本次操作结束之前被其他进程修改。
+$isolated也是非事务性的，即如果写入过程出错，已经完成的写入操作不会被rollback；另外，$isolated需要额外的锁，无法用于sharded方式部署的集群。
+官网文档链接
+
+MongoDB高吞吐的原因：
+
+MongoDB 没有完整事务支持，操作原子性只到单个 document 级别，所以通常操作粒度比较小；
+MongoDB 锁实际占用时间是内存数据计算和变更时间，通常很快；
+MongoDB 锁有一种临时放弃机制，当出现需要等待慢速 IO 读写数据时，可以先临时放弃，等 IO 完成之后再重新获取锁。
+ 
+
+3. 如何查看锁的状态
+
+db.serverStatus()
+db.currentOp()
+mongotop # 类似top命令，每秒刷新
+mongostat
+the MongoDB Monitoring Service (MMS)
+
+
+4. 哪些操作会对数据库产生锁？
+
+下表列出了常见数据库操作产生的锁。
+
+操作	锁定类型
+查询	读锁
+通过cursor读取数据	读锁
+插入数据	写锁
+删除数据	写锁
+修改数据	写锁
+Map-reduce	读写锁均有，除非指定为non-atomic，部分mapreduce任务可以同时执行(猜测是生成的中间表不冲突的情况下)
+添加index	通过前台API添加index，锁定数据库一段时间
+db.eval()	写锁，同时阻塞其他运行在MongoDB上的JavaScript进程
+eval	写锁，如果设定锁定选项是nolock，则不会有些锁，而且eval无法向数据库写入数据
+aggregate()	读锁
+ 
+
+附上原文：
+Operation Lock Type
+Issue a query Read lock
+Get more data from a cursor Read lock
+Insert data Write lock
+Remove data Write lock
+Update data Write lock
+Map-reduce Read lock and write lock, unless operations are specified as non-atomic. Portions of map-reduce jobs can run concurrently.
+Create an index Building an index in the foreground, which is the default, locks the database for extended periods of time.
+db.eval() Write lock. db.eval() blocks all other JavaScript processes.
+eval Write lock. If used with the nolock lock option, the eval option does not take a write lock and cannot write data to the database.
+aggregate() Read lock
+
+###Mongodb锁机制
+https://blog.csdn.net/tang_jin2015/article/details/61192020
+
+Mongodb使用读写锁来允许很多用户同时去读一个资源，比如数据库或者集合。读采用的是共享锁，写采用的是排它锁。
+
+对于大部分的读写操作，WiredTiger使用的都是乐观锁，在全局、数据库、集合级别，WiredTiger使用的是意向锁。当引擎探测到两个操作之间发生了冲突，将会产生一个写冲突，mongodb将会重新执行操作。只有如删除集合等操作需要排它锁。
+
+
+
+##分布式一致性协议
+###分布式一致性协议在MongoDB选举中的应用
+https://www.jianshu.com/p/916e5e443ad7
+
+算法应用
+MongoDB在实现时对Raft算法做了一些调整：
+
+Secondary节点不只是被动接受，也会发起心跳监测
+当Secondary节点发现集群中没有Primary或者自己priority比Primary高时发起选举
+保留了优先级但只考虑自己和当前主结点的优先级，其他结点的优先级不决定选举与否，也不影响投票
+
+
+对比新旧版本的选举：
+
+Raft为MongoDB选举引入Term，取消Bully的选举锁，效率更高，更优雅的避免重复投票，减少投票等待时间。
+Raft弱化了priority功能，可能出现非最高priority候选节点当选的情况，后续的心跳中会发现，并重新选举。
+取消了veto，选举不一定需要等待心跳超时。
+主节点的降级有自己发起，效率更高。
+
+
+##Raft与MongoDB复制集协议比较
+https://www.cnblogs.com/xybaby/p/10165564.html
+
+##自增id
+###mongodb实现主键自增
+https://www.cnblogs.com/arcticBoiledWater/p/9681498.html
+
 
 ##mongodb语法
 mongodb查询的语法（大于，小于，大于或等于，小于或等于等等）  
@@ -132,8 +216,10 @@ db.postings.find( { "author.name" : "joe" } );
 注意用法是author.name，用一个点就行了。更详细的可以看这个链接： dot notation
 
 举个例子：
+
 > db.blog.save({ title : "My First Post", author: {name : "Jane", id : 1}})
 如果我们要查询 authors name 是Jane的, 我们可以这样：
+
 > db.blog.findOne({"author.name" : "Jane"})
 如果不用点，那就需要用下面这句才能匹配：
 
@@ -1254,6 +1340,7 @@ https://www.cnblogs.com/web-fusheng/p/6884759.html
  
 4.       MySQL不指定PRIMARY KEY插入：
 
+ 
 总结：
 1.       整体上的插入速度还是和上一回的统计数据类似：MongoDB不指定_id插入 > MySQL不指定主键插入 > MySQL指定主键插入 > MongoDB指定_id插入。
 2.       从图中可以看出，在指定主键插入数据的时候，MySQL与MongoDB在不同数据数量级时，每秒插入的数据每隔一段时间就会有一个波动，在图表中显示成为规律的毛刺现象。而在不指定插入数据时，在大多数情况下插入速率都比较平均，但随着数据库中数据的增多，插入的效率在某一时段有瞬间下降，随即又会变稳定。
@@ -1467,38 +1554,3 @@ norris	无穷大	B
 
     迁移是由名为均衡器（balancer）的软件进程管理的，它的任务就是确保数据在各个分片中保持均匀变化。通过追踪各分片上块的数量，就能实现这个功能。虽然均衡的触发会随总数据量的不同而变化，但是通常来说，当集群中拥有块最多的分片与拥有块最少的分片的块数相差大于8时，均衡器就会发起一次均衡处理。在均衡过程中，块会从块较多的分片迁移到块较少非分片上，直到两个分片的块数大致相等为止。
 
-##MongoDB 的插入和更新, $setOnInsert、upsert和$set、upsert 
-https://www.cnblogs.com/yuanyongqiang/p/12575344.html
-
-##分布式一致性协议在MongoDB选举中的应用
-https://blog.csdn.net/wentyoon/article/details/79043031
-
-##
-https://www.runoob.com/mongodb/mongodb-autoincrement-sequence.html
-
-https://blog.csdn.net/yaomingyang/article/details/78769540
-https://www.cnblogs.com/crazylqy/p/5566428.html
-
-db.user.save({
-    uid: db.tt.findAndModify({
-        update:{$inc:{'id':1}},
-        query:{"name":"user"},
-        upsert:true,
-				new:true
-    }).id,  
-    username: "dotcoo",
-    password:"dotcoo",
-    info:"http://www.dotcoo.com/"
-})
-	db.user.insert({
-    uid: db.tt.findAndModify({
-        update:{$inc:{'id':1}},
-        query:{"name":"user"},
-        upsert:true,
-			new:true
-    }).id,  
-    username: "dotcoo",
-    password:"dotcoo",
-    info:"http://www.dotcoo.com/"
-}
-)
