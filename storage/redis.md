@@ -765,6 +765,64 @@ redis-check-aof --fix
 （2）有很多用户都只使用 AOF 持久化， 但并不推荐这种方式： 因为定时生成 RDB 快照（snapshot）非常便于进行数据库备份， 并且 RDB 恢复数据集的速度也要比 AOF 恢复的速度要快 。
 两种持久化策略可以同时使用，也可以使用其中一种。如果同时使用的话， 那么 Redis 重启时，会优先使用AOF文件来还原数据。
 
+##REDIS持久化之RDB和AOF的区别
+https://www.jianshu.com/p/1d9ab6bc0835
+
+##redis的持久化方式RDB和AOF的区别
+https://www.jianshu.com/p/425b8530ae76
+
+##
+https://www.v2ex.com/amp/t/334192
+
+##Mongodb 自动增长 自增id 实现 
+http://www.dotcoo.com/post-39.html
+https://blog.csdn.net/cyuyan112233/article/details/19769291
+https://www.runoob.com/mongodb/mongodb-autoincrement-sequence.html
+
+db.user.save({
+    uid: db.tt.findAndModify({
+        update:{$inc:{'id':1}},
+        query:{"name":"user"},
+        upsert:true,
+		new:true
+    }).id,  
+    username: "dotcoo",
+    password:"dotcoo",
+    info:"http://www.dotcoo.com/"
+})
+
+db.system.js.insert(
+{_id:"getNextSequence",value:function getNextSequence(name) {
+   var ret = db.counters.findAndModify(
+          {
+            query: { _id: name },
+            update: { $inc: { seq: 1 } },
+            new: true
+          }
+   );
+   return ret.seq;
+}
+});
+
+<?php
+function mid($name, $db){
+    $update = array('$inc'=>array("id"=>1));
+    $query = array('name'=>$name);
+    $command = array(
+            'findandmodify'=>'ids', 'update'=>$update,
+            'query'=>$query, 'new'=>true, 'upsert'=>true
+    );
+    $id = $db->command($command);
+    return $id['value']['id'];
+}
+  
+$conn = new Mongo();
+$db = $conn->idtest;
+$id = mid('user', $db);
+$db->user->save(array('uid'=>$id, 'username'=>'kekeles', 'password'=>'kekeles', 'info'=>'http://www.dotcoo.com/  '));
+$conn->close();
+?>
+
 #codis
 ##[codis]https://github.com/CodisLabs/codis/blob/release3.2/doc/tutorial_zh.md
 
@@ -1153,3 +1211,4 @@ sentinel current-epoch 2
 ##Codis3.2集群HA高可用方案
 
 https://www.jianshu.com/p/68552828ef8a
+

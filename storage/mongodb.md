@@ -1,3 +1,19 @@
+
+##MongoDB wiredTiger存储引擎下的存储方式LSM和B-Tree比较 
+https://www.cnblogs.com/sylvialucy/p/8883646.html
+
+前段时间做拦截件监控的时候把拦截件生命期存入mongodb，因生命期有各种变化，因此对此表的更新写操作非常多，老大给我看了一篇文章，才知道mongodb已经支持lsm存储方式了。
+原文如连接：https://github.com/wiredtiger/wiredtiger/wiki/Btree-vs-LSM
+文中对比了LSM和B-Tree的读写吞吐量，在单线程写操作下和多线程读操作下的差异。英文差的小伙伴别指望我这个半吊子来翻译了。
+总结一点就是：在写操作上，LSM的吞吐量会是B-Tree的1.5~2倍   而在读操作上，随着读线程的增加，LSM性能下降很明显，B-Tree在读的性能上吞吐量是LSM的1.5~2倍。
+因此在一个表需要频繁的进行写操作时，换成LSM的存储方式，将会是一个不错的选择。
+目前正准备从B-Tree转向LSM，需要一段时间验证其效果。
+另，目前只知道在创建collection的时候可以修改存储方式，脚本如下：
+db.createCollection(
+"TestTable",
+{storageEngine: { wiredTiger: {configString: "type=lsm"}}}
+)
+
 ##mongodb语法
 mongodb查询的语法（大于，小于，大于或等于，小于或等于等等）  
 https://www.cnblogs.com/Logan626/articles/4858728.html
@@ -116,10 +132,8 @@ db.postings.find( { "author.name" : "joe" } );
 注意用法是author.name，用一个点就行了。更详细的可以看这个链接： dot notation
 
 举个例子：
-
 > db.blog.save({ title : "My First Post", author: {name : "Jane", id : 1}})
 如果我们要查询 authors name 是Jane的, 我们可以这样：
-
 > db.blog.findOne({"author.name" : "Jane"})
 如果不用点，那就需要用下面这句才能匹配：
 
@@ -1240,7 +1254,6 @@ https://www.cnblogs.com/web-fusheng/p/6884759.html
  
 4.       MySQL不指定PRIMARY KEY插入：
 
- 
 总结：
 1.       整体上的插入速度还是和上一回的统计数据类似：MongoDB不指定_id插入 > MySQL不指定主键插入 > MySQL指定主键插入 > MongoDB指定_id插入。
 2.       从图中可以看出，在指定主键插入数据的时候，MySQL与MongoDB在不同数据数量级时，每秒插入的数据每隔一段时间就会有一个波动，在图表中显示成为规律的毛刺现象。而在不指定插入数据时，在大多数情况下插入速率都比较平均，但随着数据库中数据的增多，插入的效率在某一时段有瞬间下降，随即又会变稳定。
@@ -1454,3 +1467,38 @@ norris	无穷大	B
 
     迁移是由名为均衡器（balancer）的软件进程管理的，它的任务就是确保数据在各个分片中保持均匀变化。通过追踪各分片上块的数量，就能实现这个功能。虽然均衡的触发会随总数据量的不同而变化，但是通常来说，当集群中拥有块最多的分片与拥有块最少的分片的块数相差大于8时，均衡器就会发起一次均衡处理。在均衡过程中，块会从块较多的分片迁移到块较少非分片上，直到两个分片的块数大致相等为止。
 
+##MongoDB 的插入和更新, $setOnInsert、upsert和$set、upsert 
+https://www.cnblogs.com/yuanyongqiang/p/12575344.html
+
+##分布式一致性协议在MongoDB选举中的应用
+https://blog.csdn.net/wentyoon/article/details/79043031
+
+##
+https://www.runoob.com/mongodb/mongodb-autoincrement-sequence.html
+
+https://blog.csdn.net/yaomingyang/article/details/78769540
+https://www.cnblogs.com/crazylqy/p/5566428.html
+
+db.user.save({
+    uid: db.tt.findAndModify({
+        update:{$inc:{'id':1}},
+        query:{"name":"user"},
+        upsert:true,
+				new:true
+    }).id,  
+    username: "dotcoo",
+    password:"dotcoo",
+    info:"http://www.dotcoo.com/"
+})
+	db.user.insert({
+    uid: db.tt.findAndModify({
+        update:{$inc:{'id':1}},
+        query:{"name":"user"},
+        upsert:true,
+			new:true
+    }).id,  
+    username: "dotcoo",
+    password:"dotcoo",
+    info:"http://www.dotcoo.com/"
+}
+)
