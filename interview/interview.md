@@ -110,4 +110,12 @@ https://blog.csdn.net/mulinsen77/article/details/88925672
 ##网络协议面试题汇总
 https://blog.csdn.net/tencupofkaiwater/article/details/88416256
 
-
+#进程间通信
+##面试题：进程间通信的方式
+https://blog.csdn.net/wm12345645/article/details/82381407
+##操作系统面试题：关于共享内存相关API
+https://blog.csdn.net/weixin_41019383/article/details/99186586
+##共享内存实现进程间通信
+https://blog.csdn.net/qq_17525769/article/details/80877032
+##共享内存和信号
+https://blog.csdn.net/farsight2009/article/details/5396777
