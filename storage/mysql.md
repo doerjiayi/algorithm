@@ -1,4 +1,12 @@
 
+##同步
+###MySQL 半同步复制模式说明及配置示例 - 运维小结 
+https://www.cnblogs.com/kevingrace/p/10228694.html
+
+##mvcc
+###史上最详尽，一文讲透 MVCC 实现原理
+https://blog.csdn.net/diligent203/article/details/100751755#comments
+
 ##MySQL 主从同步延迟的原因及解决办法
 https://blog.csdn.net/hao_yunfeng/article/details/82392261
  

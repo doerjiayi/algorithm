@@ -1,4 +1,26 @@
 
+##性能
+###Mongodb亿级数据量的性能测试
+https://blog.csdn.net/weixin_33708432/article/details/86087114
+
+##MongoDB数据库查询性能提高40倍
+https://blog.csdn.net/pbymw8iwm/article/details/81284921
+
+##数据库评测报告第二期：MongoDB-3.2
+https://cloud.tencent.com/developer/article/1005453
+
+##引擎
+###MongoDB版本及存储引擎区别 
+https://www.cnblogs.com/Sungeek/p/12485009.html
+
+WiredTiger
+基于BTree结构组织数据，相比MongoDB早期的MMAPv1存储引擎性能提升明显，且支持数据压缩，存储成本更低。
+默认存储引擎，适用于大多数业务场景。
+
+##隔离
+###update isolated 
+https://docs.mongodb.com/v3.2/reference/operator/update/isolated/#up._S_isolated
+
 ##锁
 ###MongoDB中的读写锁
 https://www.cnblogs.com/duanxz/p/10737548.html

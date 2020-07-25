@@ -97,7 +97,6 @@ https://zhuanlan.zhihu.com/p/83936791
 
 ##RAFT算法详解
 https://www.cnblogs.com/charlieroro/articles/12655975.html
->>>>>>> branch 'master' of https://github.com/doerjiayi/algorithm.git
 
 #tcp
 ##HTTP、TCP、IP协议常见面试题
@@ -109,6 +108,12 @@ https://blog.csdn.net/mulinsen77/article/details/88925672
 
 ##网络协议面试题汇总
 https://blog.csdn.net/tencupofkaiwater/article/details/88416256
+
+##面试遇到TCP，读完这篇就够了！
+https://zhuanlan.zhihu.com/p/158183161
+
+##TCP 协议面试灵魂10问，建议收藏~
+https://zhuanlan.zhihu.com/p/161970400
 
 #进程间通信
 ##面试题：进程间通信的方式
