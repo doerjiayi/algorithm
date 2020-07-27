@@ -1,5 +1,13 @@
 #多线程
 
+##队列
+###多线程编程之无锁队列
+https://www.cnblogs.com/kuliuheng/p/4072851.html
+###多线程的那点儿事（之无锁队列）
+https://blog.csdn.net/feixiaoxing/article/details/7047856
+###无锁队列的实现
+https://coolshell.cn/articles/8239.html
+
 ##原子变量
 
 ###atomic_flag 

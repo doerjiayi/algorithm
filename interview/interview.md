@@ -101,8 +101,14 @@ https://zhuanlan.zhihu.com/p/83936791
 https://www.cnblogs.com/charlieroro/articles/12655975.html
 
 #tcp
-##面试之路（29）-TCP流量控制和拥塞控制-滑动窗口协议详解
-https://blog.csdn.net/lpjishu/article/details/84802035
+##TCP Win=0,Len=0
+https://blog.csdn.net/farmwang/article/details/73518806
+
+##TCP滑动窗口移动规则
+https://blog.csdn.net/farmwang/article/details/73521663
+
+##【面经笔记】TCP流量控制、阻塞控制
+https://blog.csdn.net/xiaxzhou/article/details/76400640
 
 ##HTTP、TCP、IP协议常见面试题
 https://blog.csdn.net/aigan8070/article/details/101573386
