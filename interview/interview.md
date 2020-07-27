@@ -18,7 +18,9 @@ https://blog.csdn.net/huhigher/article/details/106347347
 ##C++面试常见题
 https://www.cnblogs.com/inception6-lxc/p/8686156.html
 
-<<<<<<< HEAD
+##虚函数实现原理(转)
+https://blog.csdn.net/wanghaobo920/article/details/7674631
+
 #zk
 ##zookeeper的原理和应用（非常详细透彻）
 https://blog.csdn.net/csd850182221/article/details/100543025
