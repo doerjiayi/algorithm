@@ -6267,6 +6267,23 @@ public:
 ##[插入区间](https://leetcode-cn.com/problems/insert-interval)    
  
 ##[删除排序数组中的重复项](https://leetcode-cn.com/problems/remove-duplicates-from-sorted-array)    
+class Solution {
+public:
+    int removeDuplicates(vector<int>& nums) 
+    {//直接在nums上赋值
+        int len = nums.size();
+        if (len <= 1)return len;
+        int count = 1;
+        for (int i = 1; i < len; i++) //从第二个数开始
+        {
+            if (nums[i] != nums[count-1]) 
+            {
+                nums[count++] = nums[i];
+            }
+        }
+        return count;
+    }
+};
  
 ##[递增的三元子序列](https://leetcode-cn.com/problems/increasing-triplet-subsequence)    
  

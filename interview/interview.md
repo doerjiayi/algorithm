@@ -21,6 +21,18 @@ https://www.cnblogs.com/inception6-lxc/p/8686156.html
 ##虚函数实现原理(转)
 https://blog.csdn.net/wanghaobo920/article/details/7674631
 
+##面试之C++11
+https://blog.csdn.net/xp178171640/article/details/104366004
+
+##C++面试常见题
+https://www.cnblogs.com/inception6-lxc/p/8686156.html
+
+##当面试官问我C++ 11新特性的时候，应该怎样回答？
+https://www.zhihu.com/question/65209863/answer/230185590
+
+##面试笔记——C++11新特性
+https://www.cnblogs.com/SHOR/p/6641688.html
+
 #zk
 ##zookeeper的原理和应用（非常详细透彻）
 https://blog.csdn.net/csd850182221/article/details/100543025
@@ -78,18 +90,7 @@ Redis检查内存使用情况，如果大于maxmemory的限制， 则根据设�
 ##面试官：说说你对ZooKeeper集群与Leader选举的理解？
 https://blog.csdn.net/g6U8W7p06dCO99fQ3/article/details/89166894
 
-=======
-##面试之C++11
-https://blog.csdn.net/xp178171640/article/details/104366004
 
-##C++面试常见题
-https://www.cnblogs.com/inception6-lxc/p/8686156.html
-
-##当面试官问我C++ 11新特性的时候，应该怎样回答？
-https://www.zhihu.com/question/65209863/answer/230185590
-
-##面试笔记——C++11新特性
-https://www.cnblogs.com/SHOR/p/6641688.html
 
 ##真实面试经历：十面阿里，七面头条，六个Offer
 https://www.pianshen.com/article/2178153039/
@@ -101,6 +102,15 @@ https://zhuanlan.zhihu.com/p/83936791
 https://www.cnblogs.com/charlieroro/articles/12655975.html
 
 #tcp
+##TCP连接拥塞控制四种方法总结（详细简单，稳的一批）
+https://blog.csdn.net/qq_26896213/article/details/84594060
+
+##图解 TCP 重传、滑动窗口、流量控制、拥塞控制
+https://blog.csdn.net/qq_31442743/article/details/105613124
+
+##今日头条面试----TCP拥塞控制和流量控制 
+https://www.cnblogs.com/aademeng/articles/11083448.html
+
 ##TCP Win=0,Len=0
 https://blog.csdn.net/farmwang/article/details/73518806
 
@@ -126,11 +136,15 @@ https://zhuanlan.zhihu.com/p/158183161
 https://zhuanlan.zhihu.com/p/161970400
 
 #进程间通信
+
 ##面试题：进程间通信的方式
 https://blog.csdn.net/wm12345645/article/details/82381407
+
 ##操作系统面试题：关于共享内存相关API
 https://blog.csdn.net/weixin_41019383/article/details/99186586
+
 ##共享内存实现进程间通信
 https://blog.csdn.net/qq_17525769/article/details/80877032
+
 ##共享内存和信号
 https://blog.csdn.net/farsight2009/article/details/5396777
