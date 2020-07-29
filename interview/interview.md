@@ -45,6 +45,9 @@ https://blog.csdn.net/ThinkWon/article/details/104397719
 
 
 #redis
+##redis相关原理及面试官由浅到深必问的15大问题（高级）
+https://www.jianshu.com/p/16b6db9ee410
+
 ##Redis面试题（2020最新版）
 https://thinkwon.blog.csdn.net/article/details/103522351
 

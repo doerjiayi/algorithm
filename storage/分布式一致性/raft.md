@@ -1,4 +1,6 @@
 
+##很短 | 图解 Raft 算法
+https://zhuanlan.zhihu.com/p/66441389
 
 ##RAFT算法详解
 https://blog.csdn.net/daaikuaichuan/article/details/98627822

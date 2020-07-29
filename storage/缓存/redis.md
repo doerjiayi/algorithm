@@ -771,63 +771,14 @@ https://www.jianshu.com/p/1d9ab6bc0835
 ##redis的持久化方式RDB和AOF的区别
 https://www.jianshu.com/p/425b8530ae76
 
-##
-https://www.v2ex.com/amp/t/334192
-
-##Mongodb 自动增长 自增id 实现 
-http://www.dotcoo.com/post-39.html
-https://blog.csdn.net/cyuyan112233/article/details/19769291
-https://www.runoob.com/mongodb/mongodb-autoincrement-sequence.html
-
-db.user.save({
-    uid: db.tt.findAndModify({
-        update:{$inc:{'id':1}},
-        query:{"name":"user"},
-        upsert:true,
-		new:true
-    }).id,  
-    username: "dotcoo",
-    password:"dotcoo",
-    info:"http://www.dotcoo.com/"
-})
-
-db.system.js.insert(
-{_id:"getNextSequence",value:function getNextSequence(name) {
-   var ret = db.counters.findAndModify(
-          {
-            query: { _id: name },
-            update: { $inc: { seq: 1 } },
-            new: true
-          }
-   );
-   return ret.seq;
-}
-});
-
-<?php
-function mid($name, $db){
-    $update = array('$inc'=>array("id"=>1));
-    $query = array('name'=>$name);
-    $command = array(
-            'findandmodify'=>'ids', 'update'=>$update,
-            'query'=>$query, 'new'=>true, 'upsert'=>true
-    );
-    $id = $db->command($command);
-    return $id['value']['id'];
-}
-  
-$conn = new Mongo();
-$db = $conn->idtest;
-$id = mid('user', $db);
-$db->user->save(array('uid'=>$id, 'username'=>'kekeles', 'password'=>'kekeles', 'info'=>'http://www.dotcoo.com/  '));
-$conn->close();
-?>
-
 #codis
 ##[codis]https://github.com/CodisLabs/codis/blob/release3.2/doc/tutorial_zh.md
 
 ##Codis与Redis Cluster集群方案对比
 https://blog.csdn.net/tiandao321/article/details/88353128
+
+##Codis与RedisCluster的原理详解 
+https://www.cnblogs.com/pingyeaa/p/11294773.html
 
 ##redis4.0、codis、阿里云redis 3种redis集群对比分析
 https://blog.csdn.net/weixin_33701617/article/details/90585083
