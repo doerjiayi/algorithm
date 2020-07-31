@@ -1,4 +1,16 @@
 
+##面试
+###无语，我差点被面试官怼坏了，又给我问到MySQL索引
+https://www.jianshu.com/p/c82148473235
+
+###你说精通MySQL，竟然连bin log、redo log都不知道
+
+###MySQL 万字精华总结 + 面试100 问，吊打面试官绰绰有余
+https://www.jianshu.com/p/c189439fb32e
+
+###去阿里面试被问：如果是MySQL引起的CPU消耗过大，你会如何优化？
+https://www.jianshu.com/p/1990261fca3f
+
 ##同步
 ###MySQL 半同步复制模式说明及配置示例 - 运维小结 
 https://www.cnblogs.com/kevingrace/p/10228694.html

@@ -1,4 +1,7 @@
 
+##关于Mongodb的全面总结
+https://www.jianshu.com/p/7f4b8a97ecf0
+
 ##性能
 ###Mongodb亿级数据量的性能测试
 https://blog.csdn.net/weixin_33708432/article/details/86087114

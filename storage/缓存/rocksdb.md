@@ -1,4 +1,23 @@
 
+##RocksDB  知乎
+https://www.zhihu.com/topic/20087597/top-answers
+
+##基于BCH业务场景测试LevelDB和RocksDB
+总结
+测试过程中，随机写21000个key，无论rocksdb还是leveldb耗时都是大约0.5s，所以写性能完全不是问题
+导数据到两个DB的过程中，发现leveldb随机写性能比rocksdb明显要差，但是UTXO的随机写场景对leveldb来说还是够用的;对客户端节点来说，如果以后数据量进一步增大（>100GB）的时候，客户端首次同步，耗时会非常长，这时rocksdb的优势就明显了。
+leveldb 读过程中（没有写和删除操作），在LOG中发现有compaction，iostat也可以看到写操作,所以导致内存和CPU波动较大（compaction占用内存和CPU），这是leveldb的一个弱点。
+除了100GB的情况，本测试看起来对leveldb不是很公平，因为测试过程中,leveldb有compaction（测试前，1. 保持DB打开，且确认日志中没有compaction后才开始测试，2. 只发读操作，从leveldb日志中仍然可以看到compaction，并且无法确定什么时候compaction终止, iostat也可以看到写操作），而rocksdb没有compaction
+因为compaction的问题，leveldb比rocksdb有更高的读写放大问题，这么高的读写放大对ssd的性能和寿命都是挑战
+10GB场景下，leveldb经过简单优化耗时可以降低为原来的1/10; 开启多线程的rocksdb相比无优化的leveldb，耗时可以降低为无优化leveldb的1/20，且占用内存更少，cpu利用率也更少，ssd寿命会更长
+leveldb compaction结束后，读操作又触发了compaction(和缺点相比，优点微不足道) 
+优点：读过程会记录在LSM tree里面第一个被读的文件，如果读到这个文件，可能意味着相邻的区域也会被读到，而这个文件可能会和high level文件存在overlap，经过compaction，可以降低读这部分区域的开销，这个工作只有在写操作引起的compaction处于空闲的状态下，且读操作的第一个文件是低level的文件才会触发。降低了空间放大问题，减少了用IO的读放大。
+缺点：compaction增加了读写放大，降低了性能，减少ssd寿命
+
+
+##Performance Benchmarks
+https://github.com/facebook/rocksdb/wiki/Performance-Benchmarks
+
 ##RocksDB 介绍
 RocksDB是facebook开源的NOSQL存储系统，其设计是基于Google开源的LevelDB，优化了LevelDB中存在的一些问题，其性能要比LevelDB强，设计与LevelDB极其类似。
 LevelDB的开源发起者：Jeff Dean和Sanjay Ghemawat，这两位是Google公司重量级的工程师。
